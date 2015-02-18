@@ -2,14 +2,14 @@
 module Cards where
 
   data Color = Diamonds | Hearts | Spades | Clubs
-    deriving (Order, Show, Eq)
+    deriving (Ord, Eq)
 
   data Value = Ace | King | Queen | Jack | Ten | Nine | Eight | Seven | Six | Five 
                 | Four | Three | Two 
-    deriving (Order, Show, Eq)
+    deriving (Ord, Eq)
 
   data Card = Card (Color, Value)
-    deriving (Order, Show, Eq)
+    deriving (Ord, Show, Eq)
 
   instance Show Color where
     show Diamonds = "♦"
