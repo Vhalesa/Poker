@@ -2,6 +2,7 @@
 module Cards where
 
   data Color = Diamonds | Hearts | Spades | Clubs
+    deriving (Enum, Bounded)
 
   data Value = Two | Three | Four | Five | Six | Seven | Eight | Nine
                | Ten | Jack | Queen | King | Ace
@@ -16,6 +17,7 @@ module Cards where
     show Spades = "♠"
     show Clubs = "♣"
 
+  -- Alle 4 Farben sind gleichwertig
   instance Eq Color where 
     a == b = True
 
@@ -37,7 +39,14 @@ module Cards where
     show King = "King"
     show Ace = "Ace"
 
+  --Liste mit allen Karten-Werten (Zwei bis Ass)
   values :: [Value]
   values = [minBound .. maxBound]
-    
 
+  -- Liste mit allen 4 Farben
+  colors :: [Color]
+  colors = [minBound .. maxBound]
+
+  -- Liste mit allen Karten eines Decks (sortiert)
+  cards :: [Card]
+  cards = [Card (c,v) | c <- colors, v <- values]
