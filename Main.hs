@@ -9,3 +9,4 @@ main = do
     let ch = Chip 500
 
     putStrLn ("Karte " ++ show c ++ " und Chip " ++ show ch)
+    putStrLn ("Gesamtsumme der Chips jedes Spielers ist: " ++ show (Chips.sum chips))
