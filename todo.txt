@@ -1,0 +1,28 @@
+To-Do-Liste
+
+Karten:
+  - Definition (Datentypen für Farbe, Wert, Karte -> Show, Eq, Ord + evtl Enum, Bounded) [done]
+  - Deck (mit allen Karten) [done]
+  - Stapel -> Mischfunktion für das Deck []
+
+Chips:
+  - Datentyp (Show, Ord, Eq) [done]
+  - Chipshaufen für jeden Spieler für den Anfang [done]
+  - Summe der Chips bilden [done]
+  - Wechselfunktion: []
+    - reines Wechseln ist fertig [done]
+    - Austauschen des Chips (der aus dem Besitz gewechselt wird) mit den gewechselten Chips 
+      -> eigenen Chipshaufen aktualisieren []
+
+Regeln:
+  - Tabelle mit den Gewinnmöglichkeiten []
+  - Big Blind, Small Blind
+
+Spielablauf:
+  - 4 Wettrunden
+  - Showdown
+
+KI:
+
+Text-Ausgabe:
+  - Kartensymbole wenn möglich in bunt (rot/schwarz) []
