@@ -1,7 +1,7 @@
 module Chips where
 
-data Chip = Chip {value :: int}
-	deriving (Show, Eq, Order)
+data Chip = Chip {value :: Int}
+        deriving (Eq, Ord)
 
 instance Show Chip where
-	show (Chip v) = show v
+        show (Chip v) = show v
