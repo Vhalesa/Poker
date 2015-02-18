@@ -2,7 +2,6 @@
 module Cards where
 
   data Color = Diamonds | Hearts | Spades | Clubs
-    deriving (Ord, Eq)
 
   data Value = Two | Three | Four | Five | Six | Seven | Eight | Nine
                | Ten | Jack | Queen | King | Ace
@@ -16,6 +15,12 @@ module Cards where
     show Hearts = "♥"
     show Spades = "♠"
     show Clubs = "♣"
+
+  instance Eq Color where 
+    a == b = True
+
+  instance Ord Color where
+    compare a b = EQ 
 
   instance Show Value where
     show Two = "2"
@@ -34,7 +39,5 @@ module Cards where
 
   values :: [Value]
   values = [minBound .. maxBound]
-  
-
     
 
