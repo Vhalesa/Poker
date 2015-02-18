@@ -1,2 +1,3 @@
-module game where
+module Game where
 --bla spiellogik
+
