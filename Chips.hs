@@ -8,7 +8,7 @@ instance Show Chip where
 
 --Anfangschips fuer jeden Spieler im Gesamtwert 4000
 chips :: [Chip]
-chips = a ++ b ++ c ++ d ++ e ++ f ++ g 
+chips = a ++ b ++ c ++ d ++ e ++ f ++ g
 
 a = replicate 16 (Chip 5)  --16x5  = 80
 b = replicate 20 (Chip 10) --20x10 = 200
