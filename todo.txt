@@ -26,3 +26,14 @@ KI:
 
 Text-Ausgabe:
   - Kartensymbole wenn möglich in bunt (rot/schwarz) []
+
+Allgemeine Anforderungen:
+- mind. 2 (oder 3) Themen aus der Vorlesung verwenden
+  - z.B. Parallelität, Nebenläufigkeit, (Lazyness?) bei der KI
+  - evtl. GUI
+
+- für Präsentation:
+  - welche Techniken aus der Vorlesung wurden wo angewendet?
+  - welche interessanten Probleme traten auf? - wie wurden sie gelöst?
+  - welche Bibliotheken/Codevorlagen wurden genutzt?
+  
