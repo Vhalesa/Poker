@@ -15,6 +15,7 @@ getRandomCard = shuffle 52 >>= (\x -> return ((cards) !! x))
 -- Gibt, falls moeglich, eine zufaellige Karte aus dem (evtl. vermindertem) Kartendeck, sowie das Kartendeck OHNE diese Karte aus
 pullCard :: [Card] -> (Maybe Card,[Card])
 pullCard [] = (Nothing,[])
-pullCard cs = undefined --TODO
+pullCard cs = undefined --TODO; hier muesste man irgendwie deine Methoden verwenden koennen, Jenny. Aber ich weiß nciht ganz, wie
 
 --
+--bla
