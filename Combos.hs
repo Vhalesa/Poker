@@ -2,8 +2,10 @@ module Combos where
 
 import Cards
 
+--Die 5 Karten, die fuer jeden Spieler gewertet werden
 data Combo = Combo (Card,Card,Card,Card,Card)
 
+--Die Verschiedenen Typen von Wertungen
 data ScoreCombo = HighCard Card
                 | Pair (Card,Card) 
                 | Pair2 ((Card,Card),(Card,Card))
@@ -15,6 +17,7 @@ data ScoreCombo = HighCard Card
                 | StraightFlush (Card,Card,Card,Card,Card)
                 | RoyalFlush (Card,Card,Card,Card,Card)
     deriving (Ord, Eq)
+    --ToDo Ord und Eq manuell implementieren
 
 instance Show ScoreCombo where
     show (HighCard c) = "High Card " ++ show c
