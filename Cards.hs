@@ -34,10 +34,10 @@ module Cards where
     show Eight = "8"
     show Nine = "9"
     show Ten = "10"
-    show Jack = "Jack"
-    show Queen = "Queen"
-    show King = "King"
-    show Ace = "Ace"
+    show Jack = "J"
+    show Queen = "Q"
+    show King = "K"
+    show Ace = "A"
 
   --Liste mit allen Karten-Werten (Zwei bis Ass)
   values :: [Value]
