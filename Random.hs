@@ -1,21 +1,33 @@
 module Random where
-    
 import System.Random
 import Cards
-import Data.List
 
--- Gibt es zufällige Zahl zwischen 0 und 51 zurück
--- Anzahl Karten des Pokerdecks = 52
-shuffle :: Int -> IO Int
-shuffle x = getStdRandom (randomR (0,x))
+-- erzeugt einen Zufallsgenerator aus einem Int
+makeGenerator :: Int -> StdGen
+makeGenerator x = mkStdGen x
 
--- Gibt eine zufällige Karte des gesamten (geordneten) Decks zurück
-getRandomCard = shuffle 52 >>= (\x -> return ((cards) !! x))
+-- Erzeuge eine Zufallszahl zwischen 0 und x, sowie einen neuen Zufallsgenerator
+-- Es muss ein RandomGenerator gen sowie die Obergrenze x uebergeben werden
+randomizer :: StdGen -> Int -> (Int, StdGen)
+randomizer gen x = randomR (0,x) gen
 
--- Gibt, falls moeglich, eine zufaellige Karte aus dem (evtl. vermindertem) Kartendeck, sowie das Kartendeck OHNE diese Karte aus
-pullCard :: [Card] -> (Maybe Card,[Card])
-pullCard [] = (Nothing,[])
-pullCard cs = undefined --TODO; hier muesste man irgendwie deine Methoden verwenden koennen, Jenny. Aber ich weiß nciht ganz, wie
+-- Gibt die n.te Karte des übergebenden Kartenstapels (beliebiger Groesse) zurueck
+getCard :: [Card] -> Int -> Card
+getCard stapel n = stapel !! n
 
---
---bla
+-- Entfernt ein Element aus einer Liste und gibt die Liste ohne das Element zurueck
+removeElem :: Int -> [a] -> [a]
+removeElem n xs =
+  let (ys,zs) = splitAt n xs
+  in ys ++ (tail zs)
+
+-- Mische das Deck
+shuffle :: [Card] -> StdGen -> [Card] -> [Card]
+shuffle [] gen newDeck = newDeck
+shuffle oldDeck gen newDeck = shuffle (removeElem (randomX oldDeck gen) oldDeck) (newGenX oldDeck gen) 
+  ((getCard oldDeck (randomX oldDeck gen)) : newDeck)
+
+randomX :: [Card] -> StdGen -> Int
+randomX oldDeck gen = fst $ randomizer gen $ (length oldDeck) -1
+
+newGenX oldDeck gen = snd $ randomizer gen $ (length oldDeck) -1
