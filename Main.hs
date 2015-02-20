@@ -1,12 +1,17 @@
 module Main where
 
+import System.Random
+
+import Random
 import Cards
 import Chips
 import Combos
 
 --Diese Main Methode ist vorlaeufig zu Testzwecken bestimmt.
 main :: IO()
-main = test
+main = do 
+       test
+       mischen
 
 test = do
     let c1 = Card (Spades, Five)
@@ -24,4 +29,12 @@ test = do
     putStrLn ("Testspieler hat " ++ show co1 )
 
     putStrLn (show (c2 == c1))
-    
+
+-- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)
+mischen = do
+  randomNum <- randomIO :: IO Int
+  let generator = makeGenerator randomNum
+  let mixedDeck = shuffle cards generator []
+  print mixedDeck
+
+

@@ -36,4 +36,10 @@ Allgemeine Anforderungen:
   - welche Techniken aus der Vorlesung wurden wo angewendet?
   - welche interessanten Probleme traten auf? - wie wurden sie gelöst?
   - welche Bibliotheken/Codevorlagen wurden genutzt?
-  
+
+- Probleme:
+  - randomFunktion: Funktionen sollten ohne IO funktionieren, allerdings
+    muss mind. 1 Zufallszahl über IO erzeugt werden. Diese würde dann
+    alles vom Type IO machen -> doof
+    Lösung: StdGenerator wird über diese eine IO-RandomZahl erzeugt,
+            dieser kann dann Int-Zufallszahlen erzeugen (ohne IO)
