@@ -2,14 +2,14 @@
 module Cards where
 
   data Color = Diamonds | Hearts | Spades | Clubs
-    deriving (Enum, Bounded)
+    deriving (Eq, Ord, Enum, Bounded)
 
   data Value = Two | Three | Four | Five | Six | Seven | Eight | Nine
                | Ten | Jack | Queen | King | Ace
     deriving (Ord, Eq, Enum, Bounded)
 
   data Card = Card (Color, Value)
-    deriving (Ord, Show, Eq)
+    deriving (Show)
 
   instance Show Color where
     show Diamonds = "♦"
@@ -17,12 +17,11 @@ module Cards where
     show Spades = "♠"
     show Clubs = "♣"
 
-  -- Alle 4 Farben sind gleichwertig
-  instance Eq Color where 
-    a == b = True
+  instance Eq Card where
+    (Card (c1,v1)) == (Card (c2,v2)) = v1 == v2
 
-  instance Ord Color where
-    compare a b = EQ 
+  instance Ord Card where
+    compare (Card (c1,v1)) (Card (c2,v2)) = compare v1 v2
 
   instance Show Value where
     show Two = "2"
@@ -50,3 +49,6 @@ module Cards where
   -- Liste mit allen Karten eines Decks (sortiert)
   cards :: [Card]
   cards = [Card (c,v) | c <- colors, v <- values]
+
+  getColor :: Card -> Color
+  getColor (Card (c,v)) = c

@@ -10,14 +10,18 @@ main = test
 
 test = do
     let c1 = Card (Spades, Five)
-        c2 = Card (Spades, Six)
+        c2 = Card (Clubs, Five)
         c3 = Card (Diamonds, Seven)
         c4 = Card (Hearts, Eight)
         c5 = Card (Hearts, Nine)
-    let ch = Chip 500
-        co = Straight (c1,c2,c3,c4,c5)
+        c6 = Card (Hearts, Ten)
+        c7 = Card (Hearts, Jack)
+        c8 = Card (Hearts, Queen)
+        c9 = Card (Spades, King)
+        co1 = Straight (c5,c6,c7,c8,c9)
+        co2 = StraightFlush (c4,c5,c6,c7,c8)
+   
+    putStrLn ("Testspieler hat " ++ show co1 )
 
-    putStrLn ("Karte " ++ show c1 ++ " und Chip " ++ show ch)
-    putStrLn ("Gesamtsumme der Chips jedes Spielers ist: " ++ show (Chips.sum chips))
-
-    putStrLn ("Testspieler hat " ++ show co )
+    putStrLn (show (c2 == c1))
+    
