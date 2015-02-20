@@ -23,6 +23,7 @@ sum :: [Chip] -> Int
 sum [] = 0
 sum ((Chip v):t) = v + Chips.sum t
 
+-- Wechselt einen Chip in eine kleinere Menge Chips und gibt die kleinere Menge zurueck
 change :: Chip -> [Chip]
 change (Chip 500) = [Chip 200, Chip 100, Chip 100, Chip 50, Chip 50]
 change (Chip 200) = [Chip 100, Chip 50, Chip 20, Chip 20, Chip 10]

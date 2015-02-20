@@ -3,7 +3,7 @@ To-Do-Liste
 Karten:
   - Definition (Datentypen für Farbe, Wert, Karte -> Show, Eq, Ord + evtl Enum, Bounded) [done]
   - Deck (mit allen Karten) [done]
-  - Stapel -> Mischfunktion für das Deck []
+  - Stapel -> Mischfunktion für das Deck [done]
 
 Chips:
   - Datentyp (Show, Ord, Eq) [done]
@@ -19,18 +19,35 @@ Regeln:
   - Big Blind, Small Blind
 
 Spielablauf:
-  - 4 Wettrunden
-  - Showdown
+  - am Anfang vor allen Spielrunden (vor dem Spiel)
+    - Spielern Chipshaufen zuweisen
+  - vor der jeder Spielrunde
+    - Kartendeck mischen
+  - 4 Wettrunden []
+    - 1. Runde (PreFlop) 
+      -> jeder Spieler erhält 2 Karten auf die Hand
+    - 2. Runde (Flop)
+      -> 3 Karten werden offen gelegt
+    - 3. Runde (Turn Card)
+      -> weitere (4.) Karte wird offen gelegt 
+    - 4. Runde
+      -> weitere (5.) Karte wird offen gelegt
+  - Showdown []
+  - nach jeder Spielrunde
+    - Spieler hat die Möglichkeit aufzuhören
+    - automatisches Ende, wenn einer zu wenig Chips/Geld hat
 
 KI:
 
 Text-Ausgabe:
   - Kartensymbole wenn möglich in bunt (rot/schwarz) []
+    -> wird schwer, da es auf dem Cip-Pool das entsprechende Modul fehlt
 
 Allgemeine Anforderungen:
 - mind. 2 (oder 3) Themen aus der Vorlesung verwenden
   - z.B. Parallelität, Nebenläufigkeit, (Lazyness?) bei der KI
   - evtl. GUI
+  - generell IO für Ein- und Ausgabe
 
 - für Präsentation:
   - welche Techniken aus der Vorlesung wurden wo angewendet?
