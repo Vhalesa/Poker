@@ -9,14 +9,13 @@ instance Show Chip where
 --Anfangschips fuer jeden Spieler im Gesamtwert 4000
 chips :: [Chip]
 chips = a ++ b ++ c ++ d ++ e ++ f ++ g
-
-a = replicate 16 (Chip 5)  --16x5  = 80
-b = replicate 20 (Chip 10) --20x10 = 200
-c = replicate 11 (Chip 20) --11x20 = 220
-d = replicate 10 (Chip 50) --10x50 = 500
-e = replicate 8 (Chip 100) --8x100 = 800
-f = replicate 6 (Chip 200) --6x200 = 1200
-g = replicate 2 (Chip 500) --2x500 = 1000
+  where a = replicate 16 (Chip 5)  --16x5  = 80
+        b = replicate 20 (Chip 10) --20x10 = 200
+        c = replicate 11 (Chip 20) --11x20 = 220
+        d = replicate 10 (Chip 50) --10x50 = 500
+        e = replicate 8 (Chip 100) --8x100 = 800
+        f = replicate 6 (Chip 200) --6x200 = 1200
+        g = replicate 2 (Chip 500) --2x500 = 1000
 
 --Wert einer Summe von Chips
 sum :: [Chip] -> Int
