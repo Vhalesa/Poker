@@ -21,13 +21,14 @@ removeElem n xs =
   let (ys,zs) = splitAt n xs
   in ys ++ (tail zs)
 
--- Mische das Deck
+-- Mische das Deck und gibt das gemischte Deck zurueck
+-- Nimmt eine zufaellige Karte aus dem zu mischendem Stapel und tut sie in einen neuen Stapel
+-- solange bis der alte/zu mischende Stapel leer ist
 shuffle :: [Card] -> StdGen -> [Card] -> [Card]
 shuffle [] gen newDeck = newDeck
 shuffle oldDeck gen newDeck = shuffle (removeElem (randomX oldDeck gen) oldDeck) (newGenX oldDeck gen) 
   ((getCard oldDeck (randomX oldDeck gen)) : newDeck)
-
-randomX :: [Card] -> StdGen -> Int
-randomX oldDeck gen = fst $ randomizer gen $ (length oldDeck) -1
-
-newGenX oldDeck gen = snd $ randomizer gen $ (length oldDeck) -1
+  where randomX :: [Card] -> StdGen -> Int -- Gibt einen random Int zurueck
+        randomX oldDeck gen = fst $ randomizer gen $ (length oldDeck) -1
+        newGenX :: [Card] -> StdGen -> StdGen -- gibt einen neuen Zufallsgenerator zurueck
+        newGenX oldDeck gen = snd $ randomizer gen $ (length oldDeck) -1
