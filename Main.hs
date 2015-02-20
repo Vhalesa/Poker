@@ -30,6 +30,7 @@ test = do
 
     putStrLn (show (c2 == c1))
 
+
 -- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)
 mischen = do
   randomNum <- randomIO :: IO Int
