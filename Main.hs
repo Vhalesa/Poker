@@ -23,8 +23,8 @@ test = do
         c7 = Card (Hearts, Jack)
         c8 = Card (Hearts, Queen)
         c9 = Card (Spades, King)
-        co1 = Straight (c5,c6,c7,c8,c9)
-        co2 = StraightFlush (c4,c5,c6,c7,c8)
+        co1 = Straight [c5,c6,c7,c8,c9]
+        co2 = StraightFlush [c4,c5,c6,c7,c8]
    
     putStrLn ("Testspieler hat " ++ show co1 )
 

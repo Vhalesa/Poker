@@ -8,30 +8,17 @@ import Data.List
 data Combo = Combo (Card,Card,Card,Card,Card)
 
 --Die Verschiedenen Typen von Wertungen
-data ScoreCombo = HighCard Card
-                | Pair (Card,Card) 
-                | Pair2 ((Card,Card),(Card,Card))
-                | ThreeC (Card,Card,Card)
-                | Straight (Card,Card,Card,Card,Card)
-                | Flush (Card,Card,Card,Card,Card)
-                | FullHouse (Card,Card,Card,Card,Card)
-                | FourC (Card,Card,Card,Card)
-                | StraightFlush (Card,Card,Card,Card,Card)
-                | RoyalFlush (Card,Card,Card,Card,Card)
-    deriving (Ord, Eq)
-
-instance Show ScoreCombo where
-    show (HighCard c) = "High Card " ++ show c
-    show (Pair (c1,c2)) = "One Pair (" ++ show c1 ++ "," ++ show c2 ++")"
-    show (Pair2 ((c1,c2),(c3,c4))) = "Two Pair (" ++ show c1 ++ "," ++ show c2 ++") and (" ++ show c3 ++ "," ++ show c4 ++")"
-    show (ThreeC (c1,c2,c3)) = "Three of a Kind (" ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++")"
-    show (Straight (c1,c2,c3,c4,c5)) = "Straight (" ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++ "," ++ show c4 ++ "," ++ show c5 ++")"
-    show (Flush (c1,c2,c3,c4,c5)) = "Flush (" ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++ "," ++ show c4 ++ "," ++ show c5 ++")"
-    show (FullHouse (c1,c2,c3,c4,c5)) = "Full House! Three (" ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 
-                                        ++ ") and Two (" ++ show c4 ++ "," ++ show c5 ++")"
-    show (FourC (c1,c2,c3,c4)) = "Four of a Kind ("++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++ "," ++ show c4 ++ ")" 
-    show (StraightFlush (c1,c2,c3,c4,c5)) = "Straight Flush (" ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++ "," ++ show c4 ++ "," ++ show c5 ++")"
-    show (RoyalFlush (c1,c2,c3,c4,c5)) = "Royal Flush " ++ show c1 ++ "," ++ show c2 ++ "," ++ show c3 ++ "," ++ show c4 ++ "," ++ show c5 ++")"
+data ScoreCombo = HighCard [Card]
+                | Pair [Card] 
+                | Pair2 [Card]
+                | ThreeC [Card]
+                | Straight [Card]
+                | Flush [Card]
+                | FullHouse [Card]
+                | FourC [Card]
+                | StraightFlush [Card]
+                | RoyalFlush [Card]
+    deriving (Show, Ord, Eq)
 
 --Ueberpruefe, welche Combo ein Spieler mit seiner Hand und den Tischkarten hat
 checkCombo :: [Card] -> ScoreCombo
@@ -71,6 +58,7 @@ checkCombo cs
                     | otherwise = colorsIn cs (d:h:s:c+1:[])
         colorsIn cs _ = colorsIn cs [0,0,0,0]
 
+        --zaehlt an welcher Stelle einer Int Liste ein Wert >= 5 ist und gibt diesen Index zurueck
         ind5 :: [Int] -> Int
         ind5 [] = 1
         ind5 (h:is) = if h>=5 then 0 else 1+ind5 is
@@ -79,13 +67,24 @@ checkCombo cs
         --(sonst wird ein falscher CFlush erzeugt)
         getFlush :: [Card] -> Int -> ScoreCombo
         getFlush cs i
-                    | i==0 = getDFlush cs
-                    | i==1 = getHFlush cs
-                    | i==2 = getSFlush cs
-                    | otherwise = getCFlush cs
+                    | i==0 = Flush $ getDFlush cs 0
+                    | i==1 = Flush $ getHFlush cs 0
+                    | i==2 = Flush $ getSFlush cs 0
+                    | otherwise = Flush $ getCFlush cs 0
             where
-                getDFlush = undefined
-                getHFlush = undefined
-                getSFlush = undefined
-                getCFlush = undefined
-                   
+                getDFlush [] _ = []
+                getDFlush (ca:cs) x 
+                    | x>=5 = []
+                    | otherwise = if getColor ca == Diamonds then ca : getDFlush cs (x+1) else getDFlush cs x
+                getHFlush [] _ = []
+                getHFlush (ca:cs) x 
+                    | x>=5 = []
+                    | otherwise = if getColor ca == Hearts then ca : getHFlush cs (x+1) else getHFlush cs x
+                getSFlush [] _ = []
+                getSFlush (ca:cs) x 
+                    | x>=5 = []
+                    | otherwise = if getColor ca == Spades then ca : getSFlush cs (x+1) else getSFlush cs x
+                getCFlush [] _ = []
+                getCFlush (ca:cs) x 
+                    | x>=5 = []
+                    | otherwise = if getColor ca == Clubs then ca : getCFlush cs (x+1) else getCFlush cs x
