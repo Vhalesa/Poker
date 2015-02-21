@@ -27,10 +27,10 @@ checkCombo cs
 
                       else getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = undefined --Strasse erstelle
-    | checkFour cs = undefined --Vierling erstellen
+    | checkFour cs = getFour cs --Vierling erstellen
     | fst $ checkThree cs = if (checkDifferentTwo cs (snd $ checkThree cs)) then getFullHouse cs --Full House erstellen
-                            else undefined --Drilling erstellen
-    | fst $ checkTwo cs = if (checkDifferentTwo cs (snd $ checkTwo cs)) then undefined else undefined--Zweites Pair ueberpruefen
+                            else getThree cs --Drilling erstellen
+    | fst $ checkTwo cs = if (checkDifferentTwo cs (snd $ checkTwo cs)) then getPair2 cs else getPair cs--Zweites Pair ueberpruefen
     | otherwise = HighCard $ first5 cs --High Card erstellen
     where
         checkFlush :: [Card] -> (Bool)
@@ -87,12 +87,44 @@ checkCombo cs
                 getCFlush [] = []
                 getCFlush (ca:cs) = if getColor ca == Clubs then ca : getCFlush cs else getCFlush cs
 
+        --getFour erzeugt einen Vierling mit verbleibender High Card
+        getFour :: [Card] -> ScoreCombo
+        getFour cs = FourC $ fours ++ high
+            where
+                fours = get4 cs
+                high = getHighestSingle 1 cs fours
+
         --getFullHouse erzeugt ein Full House aus einer Liste von Karten
         getFullHouse :: [Card] -> ScoreCombo
         getFullHouse cs = FullHouse $ threes ++ twoes
             where
                 threes = get3 cs
                 twoes = get2Different cs $ head threes
+
+        --getThree erzeugt einen Drilling mit den 2 verbleibenden HighCards
+        getThree :: [Card] -> ScoreCombo
+        getThree cs = ThreeC $ threes ++ twoHigh
+            where
+                threes = get3 cs
+                twoHigh = getHighestSingle 2 cs threes
+
+        getPair :: [Card] -> ScoreCombo
+        getPair cs = Pair $ twoes ++ threeHigh
+            where
+                twoes = get2 cs
+                threeHigh = getHighestSingle 3 cs twoes
+
+        getPair2 :: [Card] -> ScoreCombo
+        getPair2 cs = Pair2 $ twoes ++ twoes2 ++ high
+            where
+                twoes = get2 cs
+                twoes2 = get2Different cs $ head twoes
+                high = getHighestSingle 1 cs (twoes++twoes2)
+
+        --Gibt einen Vierling als Liste von Karten
+        get4 :: [Card] -> [Card]
+        get4 (c1:c2:c3:c4:cs) = if c1==c2 && c1==c3 && c1==c4 then [c1,c2,c3,c4] else get3 (c2:c3:c4:cs)
+        get4 _ = []
 
         --Gibt einen Drilling als Liste von Karten
         get3 :: [Card] -> [Card]
@@ -101,13 +133,19 @@ checkCombo cs
 
         --Gibt ein Kartenpaar als Liste von Karten
         get2 :: [Card] -> [Card]
-        get2 (c1:c2:cs) = if c1==c2 then [c1,c2] else get3 (c2:cs)
+        get2 (c1:c2:cs) = if c1==c2 then [c1,c2] else get2 (c2:cs)
         get2 _ = []
 
         --Gibt ein Kartenpaar als Liste, das nicht gleich ist wie die uebergebene Karte cx
         get2Different :: [Card] -> Card -> [Card]
         get2Different (c1:c2:cs) cx = if (c1==c2 && c1/=cx) then [c1,c2] else get2Different (c2:cs) cx
         get2Different _ _= []
+
+        --Gibt die hoechsten n Karten, die nicht in ks vorkommen, aber in cs
+        getHighestSingle :: Int -> [Card] -> [Card] -> [Card]
+        getHighestSingle 0 _ _ = []
+        getHighestSingle n [] _ = []
+        getHighestSingle n (c:cs) ks = if (any (==c) ks) then getHighestSingle n cs ks else c : getHighestSingle (n-1) cs ks
 
 -- Diese Funktion zaehlt wie oft welche Farbe in einer Liste an Karten vorkommt.
 -- Format: [Diamond , Hearts , Spades , Clubs]
@@ -118,4 +156,4 @@ colorsIn (ca : cs) (d:h:s:c:is)
             | getColor ca == Hearts = colorsIn cs (d:h+1:s:c:[])
             | getColor ca == Spades = colorsIn cs (d:h:s+1:c:[])
             | otherwise = colorsIn cs (d:h:s:c+1:[])
-colorsIn cs _ = colorsIn cs [0,0,0,0]
+colorsIn cs []= colorsIn cs [0,0,0,0]
