@@ -9,7 +9,7 @@ module Cards where
     deriving (Ord, Eq, Enum, Bounded)
 
   data Card = Card (Color, Value)
-    deriving (Show)
+    deriving (Show, Bounded)
 
   instance Show Color where
     show Diamonds = "♦"
