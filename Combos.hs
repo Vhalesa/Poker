@@ -30,7 +30,7 @@ checkCombo cs
     | checkFlush cs = if (checkStraight $ cs) then undefined
 
                       else getFlush cs $ ind5 $ colorsIn cs []
-    | checkStraight cs = undefined --Strasse erstelle
+    | checkStraight cs = undefined 
     | checkFour cs = getFour cs --Vierling erstellen
     | fst $ checkThree cs = if (checkDifferentTwo cs (snd $ checkThree cs)) then getFullHouse cs --Full House erstellen
                             else getThree cs --Drilling erstellen
@@ -72,6 +72,40 @@ checkCombo cs
         first5 :: [a] -> [a]
         first5 (a1:a2:a3:a4:a5:as) = (a1:a2:a3:a4:a5:[])
         first5 _ = []
+        
+        --sucht eine Strasse -> erst Duplikate eliminieren
+        --gibt an, ob es eine Strasse gibt, oder nicht
+        findStraight :: [Card] -> Bool
+        findStraight cs = not $ null $ getStraight (remDup cs [])
+
+        -- Gibt den eine Liste mit Straights aus (bei 5-7 Karten)
+        getStraight :: [Card] -> [[Card]]
+        getStraight cs = map fst $ filter snd $ zip (splitListS cs) $ map straight $ splitListS cs
+          where straight :: [Card] -> Bool -- Gibt fuer 5-elementige Liste aus, ob ein Straight drin ist
+                straight cs = all (==True) $ splitList4 $ checkPreds cs []  
+                     
+                --teilt die Liste der Hand+Tischkarten in 3 Teillisten auf, wo jeweils ein Straight sein koennte
+                splitListS :: [Card] -> [[Card]]
+                splitListS cs = [fst $ splitAt 5 cs, tail $ fst $ splitAt 6 cs, snd $ splitAt 2 cs] 
+        
+                --Nimmt die ersten 4 Elemente aus einer Liste
+                splitList4 :: [a] -> [a] 
+                splitList4 cs = fst $ splitAt 4 cs
+       
+                --Checkt, welche Karte einen Vorgaenger hat
+                checkPreds :: [Card] -> [Bool] -> [Bool]
+                checkPreds [] erg = reverse erg 
+                checkPreds cs erg = hilf cs cs erg 
+                  where hilf cs [] erg = checkPreds [] erg --Hilfsfunktion, damit die urspruengliche Liste verwendet werden kann
+                        hilf cs (c1:c) erg = hilf cs c $ (predInList c1 cs):erg
+
+                        --prüft ob die VorgaengerKarte in der uebergeben Liste ist
+                        predInList :: Card -> [Card] -> Bool
+                        predInList c1 cs = elem (getPred c1) $ map getValue cs
+
+                        -- gibt den Value der Vorgänger-Karte (naechstniedrigeren Karte) zurueck
+                        getPred :: Card -> Value 
+                        getPred (Card(c,v)) = predB v
 
         --getFlush erzeugt einen Flush aus einer Liste von Karten. Darf nur aufgerufen werden, wenn es auch einen Flush gibt
         --(sonst wird ein leerer CFlush erzeugt)
@@ -161,3 +195,12 @@ colorsIn (ca : cs) (d:h:s:c:is)
             | getColor ca == Spades = colorsIn cs (d:h:s+1:c:[])
             | otherwise = colorsIn cs (d:h:s:c+1:[])
 colorsIn cs []= colorsIn cs [0,0,0,0]
+
+
+-- Karten mit gleichem Value eliminieren (von jedem Value nur 1 Karte danach) (Farbe wird nicht beachtet)
+-- Starten: remDup listeVonKarten []
+remDup :: [Card] -> [Card] -> [Card]
+remDup [] erg = reverse erg
+remDup (c1:cs) erg = if(elem (getValue c1) $ map getValue cs) then remDup cs erg
+                        else remDup cs $ c1:erg
+
