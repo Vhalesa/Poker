@@ -29,7 +29,7 @@ checkCombo cs
     -- uebergeben oder so 
     | checkFlush cs = if (checkStraight cs) then undefined
 
-                      else getFlush cs $ ind5 $ colorsIn cs []
+                      else Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = Straight $ head $ getStraight cs
     | checkFour cs = getFour cs --Vierling erstellen
     | fst $ checkThree cs = if (checkDifferentTwo cs (snd $ checkThree cs)) then getFullHouse cs --Full House erstellen
@@ -113,21 +113,21 @@ checkCombo cs
 
         --getFlush erzeugt einen Flush aus einer Liste von Karten. Darf nur aufgerufen werden, wenn es auch einen Flush gibt
         --(sonst wird ein leerer CFlush erzeugt)
-        getFlush :: [Card] -> Int -> ScoreCombo
+        getFlush :: [Card] -> Int -> [Card]
         getFlush cs i
-                    | i==0 = Flush $ first5 $ getDFlush cs
-                    | i==1 = Flush $ first5 $ getHFlush cs
-                    | i==2 = Flush $ first5 $ getSFlush cs
-                    | otherwise = Flush $ first5 $ getCFlush cs
-            where
-                getDFlush [] = []
-                getDFlush (ca:cs) = if getColor ca == Diamonds then ca : getDFlush cs else getDFlush cs
-                getHFlush [] = []
-                getHFlush (ca:cs) = if getColor ca == Hearts then ca : getHFlush cs else getHFlush cs
-                getSFlush [] = []
-                getSFlush (ca:cs) = if getColor ca == Spades then ca : getSFlush cs else getSFlush cs
-                getCFlush [] = []
-                getCFlush (ca:cs) = if getColor ca == Clubs then ca : getCFlush cs else getCFlush cs
+                    | i==0 = getDFlush cs
+                    | i==1 = getHFlush cs
+                    | i==2 = getSFlush cs
+                    | otherwise = getCFlush cs
+        
+        getDFlush [] = []
+        getDFlush (ca:cs) = if getColor ca == Diamonds then ca : getDFlush cs else getDFlush cs
+        getHFlush [] = []
+        getHFlush (ca:cs) = if getColor ca == Hearts then ca : getHFlush cs else getHFlush cs
+        getSFlush [] = []
+        getSFlush (ca:cs) = if getColor ca == Spades then ca : getSFlush cs else getSFlush cs
+        getCFlush [] = []
+        getCFlush (ca:cs) = if getColor ca == Clubs then ca : getCFlush cs else getCFlush cs
 
         --getFour erzeugt einen Vierling mit verbleibender High Card
         getFour :: [Card] -> ScoreCombo
