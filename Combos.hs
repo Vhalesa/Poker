@@ -27,9 +27,9 @@ checkCombo :: [Card] -> ScoreCombo
 checkCombo cs
     -- Achtung: Straight Flush oder Royal Flush -> hier der Funktion checkStraight nur die Liste mit Karten gleicher Farbe
     -- uebergeben oder so 
-    | checkFlush cs = if (checkStraight cs) then undefined
-
-                      else Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
+    | checkFlush cs = if (checkStraight $ getFlush cs $ ind5 $ colorsIn cs []) 
+                        then StraightFlush $ head $ getStraight $ getFlush cs $ ind5 $ colorsIn cs []
+                        else Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = Straight $ head $ getStraight cs
     | checkFour cs = getFour cs --Vierling erstellen
     | fst $ checkThree cs = if (checkDifferentTwo cs (snd $ checkThree cs)) then getFullHouse cs --Full House erstellen
