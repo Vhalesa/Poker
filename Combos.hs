@@ -30,7 +30,7 @@ checkCombo cs
     | checkFlush cs = if (checkStraight $ cs) then undefined
 
                       else getFlush cs $ ind5 $ colorsIn cs []
-    | checkStraight cs = undefined 
+    | checkStraight cs = Straight $ head $ getStraight cs
     | checkFour cs = getFour cs --Vierling erstellen
     | fst $ checkThree cs = if (checkDifferentTwo cs (snd $ checkThree cs)) then getFullHouse cs --Full House erstellen
                             else getThree cs --Drilling erstellen
