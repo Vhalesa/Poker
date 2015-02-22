@@ -41,7 +41,7 @@ checkCombo cs
         checkFlush cs = if (length cs <5) then False else any (>=5) (colorsIn cs [])
 
         checkStraight :: [Card] -> Bool
-        checkStraight cs = if (length cs <5) then False else True--Brauche Strassen-Finde-Funktion
+        checkStraight cs = if (length cs <5) then False else findStraight cs
 
         checkFour :: [Card] -> Bool
         --Da Liste geordnet, muss nur der erste Wert mit den 3 Nachfolgern verglichen werden
