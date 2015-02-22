@@ -1,4 +1,4 @@
--- Definitione der Karten --
+-- Definitionen der Karten --
 module Cards where
 
   data Color = Diamonds | Hearts | Spades | Clubs
@@ -22,6 +22,19 @@ module Cards where
 
   instance Ord Card where
     compare (Card (c1,v1)) (Card (c2,v2)) = compare v1 v2
+
+  -- Quelle: http://stackoverflow.com/questions/5684049/is-there-some-way-to-define-an-enum-in-haskell-that-wraps-around
+  -- | a `succ` that wraps 
+  -- wird im Moment nicht benoetigt, aber vielleicht spaeter?
+  --succB :: (Bounded a, Enum a, Eq a) => a -> a 
+  --succB en | en == maxBound = minBound
+  --         | otherwise = succ en
+  --
+  -- | a `pred` that wraps
+  -- damit Ace auch der Vorgaenger von Two ist
+  predB :: (Bounded a, Enum a, Eq a) => a -> a
+  predB en | en == minBound = maxBound
+           | otherwise = pred en  
 
   instance Show Value where
     show Two = "2"
@@ -52,3 +65,8 @@ module Cards where
 
   getColor :: Card -> Color
   getColor (Card (c,v)) = c
+
+  getValue :: Card -> Value
+  getValue (Card (c,v)) = v
+
+

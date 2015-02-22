@@ -21,9 +21,13 @@ data ScoreCombo = HighCard [Card]
     deriving (Show, Ord, Eq)
 
 --Ueberpruefe, welche Combo ein Spieler mit seiner Hand und den Tischkarten hat
+-- Es muss eine Liste, die aus den Handkarten und den Tischkarten besteht uebergeben werden
+-- (am besten absteigend geordet, oder die Funktion ordnet die Liste anfangs selbst)
 checkCombo :: [Card] -> ScoreCombo
 checkCombo cs
-    | checkFlush cs = if (checkStraight $ cs) then undefined --noch ueberpruefen, ob royal
+    -- Achtung: Straight Flush oder Royal Flush -> hier der Funktion checkStraight nur die Liste mit Karten gleicher Farbe
+    -- uebergeben oder so 
+    | checkFlush cs = if (checkStraight $ cs) then undefined
 
                       else getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = undefined --Strasse erstelle
@@ -37,7 +41,7 @@ checkCombo cs
         checkFlush cs = if (length cs <5) then False else any (>=5) (colorsIn cs [])
 
         checkStraight :: [Card] -> Bool
-        checkStraight cs = if (length cs <5) then False else True --Brauche Strassen-Finde-Funktion
+        checkStraight cs = if (length cs <5) then False else True--Brauche Strassen-Finde-Funktion
 
         checkFour :: [Card] -> Bool
         --Da Liste geordnet, muss nur der erste Wert mit den 3 Nachfolgern verglichen werden
@@ -146,7 +150,7 @@ checkCombo cs
         getHighestSingle 0 _ _ = []
         getHighestSingle n [] _ = []
         getHighestSingle n (c:cs) ks = if (any (==c) ks) then getHighestSingle n cs ks else c : getHighestSingle (n-1) cs ks
-
+      
 -- Diese Funktion zaehlt wie oft welche Farbe in einer Liste an Karten vorkommt.
 -- Format: [Diamond , Hearts , Spades , Clubs]
 colorsIn :: [Card] -> [Int] -> [Int]
