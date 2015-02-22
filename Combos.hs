@@ -27,7 +27,7 @@ checkCombo :: [Card] -> ScoreCombo
 checkCombo cs
     -- Achtung: Straight Flush oder Royal Flush -> hier der Funktion checkStraight nur die Liste mit Karten gleicher Farbe
     -- uebergeben oder so 
-    | checkFlush cs = if (checkStraight $ cs) then undefined
+    | checkFlush cs = if (checkStraight cs) then undefined
 
                       else getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = Straight $ head $ getStraight cs
@@ -84,13 +84,17 @@ checkCombo cs
           where straight :: [Card] -> Bool -- Gibt fuer 5-elementige Liste aus, ob ein Straight drin ist
                 straight cs = all (==True) $ splitList4 $ checkPreds cs []  
                      
-                --teilt die Liste der Hand+Tischkarten in 3 Teillisten auf, wo jeweils ein Straight sein koennte
+                --teilt die Liste der Hand+Tischkarten in 4 Teillisten auf, wo jeweils ein Straight sein koennte
                 splitListS :: [Card] -> [[Card]]
-                splitListS cs = [fst $ splitAt 5 cs, tail $ fst $ splitAt 6 cs, snd $ splitAt 2 cs] 
+                splitListS cs = [fst $ splitAt 5 cs, tail $ fst $ splitAt 6 cs, snd $ splitAt 2 cs, last4 cs ++ [head cs]] 
         
                 --Nimmt die ersten 4 Elemente aus einer Liste
                 splitList4 :: [a] -> [a] 
                 splitList4 cs = fst $ splitAt 4 cs
+                
+                --Nimmt die letzten 4 Elemente aus einer Liste
+                last4 :: [a] -> [a]
+                last4 cs = reverse $ splitList4 $ reverse cs
        
                 --Checkt, welche Karte einen Vorgaenger hat
                 checkPreds :: [Card] -> [Bool] -> [Bool]
@@ -201,6 +205,6 @@ colorsIn cs []= colorsIn cs [0,0,0,0]
 -- Starten: remDup listeVonKarten []
 remDup :: [Card] -> [Card] -> [Card]
 remDup [] erg = reverse erg
-remDup (c1:cs) erg = if(elem (getValue c1) $ map getValue cs) then remDup cs erg
+remDup (c1:cs) erg = if (elem (getValue c1) $ map getValue cs) then remDup cs erg
                         else remDup cs $ c1:erg
 
