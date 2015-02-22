@@ -18,7 +18,7 @@ Regeln:
   - Tabelle mit den Gewinnmöglichkeiten []
   - Big Blind, Small Blind
 
-Spielablauf:
+Spielablauf (IO?):
   - am Anfang vor allen Spielrunden (vor dem Spiel)
     - Spielern Chipshaufen zuweisen
   - vor der jeder Spielrunde
@@ -38,6 +38,18 @@ Spielablauf:
     - automatisches Ende, wenn einer zu wenig Chips/Geld hat
 
 KI:
+- Anfang: Rudimentäre KI? (Random könnte kompliziert werden...)
+    -> KI kann Call, Raise, Fold, AllIn []
+    -> KI kann ihre Menge an Chips auslesen []
+    -> KI macht immer das gleiche (immer call z.B.) []
+    -> KI kann durcheinander Call, Raise, Fold und AllIn []
+. Später: KI macht intelligente Züge 
+    -> KI berechnet ihr momentanes Blatt []
+    -> KI berechnet die Wahrscheinlichkeit, dass sie damit gewinnt []
+    -> KI berechnet die Wahrscheinlichkeit, dass ihr Blatt noch besser wird []
+    -> KI macht Berechnungen parallel (Awesome Vorlesungstechnik) []
+    -> KI verwendet ihre Berechnungen um zu entscheiden, ob sie Call, Raise, Fold oder AllIn macht []
+    -> KI kann bluffen []
 
 Text-Ausgabe:
   - Kartensymbole wenn möglich in bunt (rot/schwarz) []
