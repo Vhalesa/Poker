@@ -72,3 +72,7 @@ Allgemeine Anforderungen:
     alles vom Type IO machen -> doof
     Lösung: StdGenerator wird über diese eine IO-RandomZahl erzeugt,
             dieser kann dann Int-Zufallszahlen erzeugen (ohne IO)
+  - Straight erstellen/herausfinden: Card ist nicht vom Typ Enum,
+    und Ace ist sowohl höchste als auch niedrigste Karte
+    Lösung: Value von Card zur Überprüfung verwenden, da Enum.
+            (+ extra pred-Funktion damit Ace beides ist)
