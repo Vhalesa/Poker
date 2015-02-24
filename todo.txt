@@ -23,7 +23,14 @@ Spielablauf (IO?):
     - Spielern Chipshaufen zuweisen
   - vor der jeder Spielrunde
     - Kartendeck mischen
-  - 4 Wettrunden []
+    - Small/Big Blind zuweisen
+  - 4 Wettrunden [] 
+    -> Vorgehen bei jeder Wettrunde
+      -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
+      - Small Blind und Big Blind setzen automatisch 
+      - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören
+      - Big Blind: aufstocken, erhöhen oder verlassen
+      - ... bis beide gleich sind oder einer rausgeht
     - 1. Runde (PreFlop) 
       -> jeder Spieler erhält 2 Karten auf die Hand
     - 2. Runde (Flop)
@@ -33,6 +40,10 @@ Spielablauf (IO?):
     - 4. Runde
       -> weitere (5.) Karte wird offen gelegt
   - Showdown []
+    - Spieler (4.Runde als letzter erhöht / Small Blind) muss seine Combo vorzeigen
+    - anderer Spieler darf
+    - Berechnung/Vergleich wer gewonnen hat
+    -> Verteilung des ChipsGewinns
   - nach jeder Spielrunde
     - Spieler hat die Möglichkeit aufzuhören
     - automatisches Ende, wenn einer zu wenig Chips/Geld hat
