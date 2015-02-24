@@ -1,7 +1,7 @@
 module Game where
 --bla spiellogik
 import Cards
-import Chips
+--import Chips
 import Random
 import Combos
 import Player
@@ -10,17 +10,25 @@ import System.Random
 
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
-    let player1 = Player { name = "Player 1", hand = [], cash = chips, ki = False, role=None, currentBet=[]}
-        player2 = Player { name = "Player 2", hand = [], cash = chips, ki = True, role=None, currentBet=[]}
-    deck <- mischen
-    print deck
-    
-       
+    let player1 = Player { name = "Player 1", hand = [], cash = 4000, ki = False, role=BigBlind, currentBet=0}
+        player2 = Player { name = "Player 2", hand = [], cash = 4000, ki = True, role=SmallBlind, currentBet=0}
+    startGame [player1,player2]
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
---
---
---
+
+--Eine komplette Spielrunde mit einer Liste an Spielern durchfuehren
+startGame ps = do
+    --Karten mischen
+    deck <- mischen
+    print deck
+
+    --Blinds bezahlen
+    playersAndPot <- doBlinds ps 10
+    
+    --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
+    --ToDo
+    
+    mischen --Platzhalter, damit es ausfuehrbar ist
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -29,6 +37,15 @@ mischen = do
       mixedDeck = shuffle cards generator []
   return mixedDeck
 
+--Kuemmert sich um alles, was die Blinds angeht, Blinds zuweisen, bezahlen und in den Pot packen.
+doBlinds :: [Player] -> Int -> IO([Player],Int)
+doBlinds ps x = do
+    let ps1 = map delegateBlind ps
+        ps2 = map (payBlind x) ps1
+        pot = blinds x
+    return (ps2,pot)
+        
+
 -- Small und Big Blind zuweisen
 delegateBlind :: Player -> Player
 delegateBlind p
@@ -36,19 +53,28 @@ delegateBlind p
     | getPlayerRole p == SmallBlind = p {role = BigBlind}
     | otherwise = p
 
--- Small und Big Blind setzen (Small Blind wird als Parameter uebergeben)
---blinds :: [Player] -> Int -> [Chip]
-blinds [] _ = []
-blinds (p:ps) v
-    | getPlayerRole p == BigBlind = putInPot (2*v) $ getPlayerCash p
-    | getPlayerRole p == SmallBlind = putInPot v $ getPlayerCash p
-    | otherwise = []
+-- Blinds kommen in den Pot
+blinds :: Int -> Int
+blinds v = 3*v
+
+-- Spieler muss Blind bezahlen
+payBlind :: Int -> Player -> Player
+payBlind v p
+    | getPlayerRole p == BigBlind = pay p (2*v)
+    | getPlayerRole p == SmallBlind = pay p v
+    | otherwise = p
+
+
+-- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
+pay :: Player -> Int -> Player
+pay p 0 = p
+pay p x = p {cash = (getPlayerCash p)-x}
     
     
 
 -- Runde (ohne Kartenaufdecken)
 -- setzen, erhoehen....
-runde = undefined
+
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde

@@ -1,10 +1,12 @@
 module Main where
 
+--Dieses Modul fliegt vermutlich spaeter raus. Aber zum Testen ist/war es gut
+
 import System.Random
 
 import Random
 import Cards
-import Chips
+--import Chips
 import Combos
 
 --Diese Main Methode ist vorlaeufig zu Testzwecken bestimmt.
