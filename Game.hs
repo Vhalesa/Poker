@@ -27,8 +27,25 @@ startGame ps = do
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --ToDo
+
+    --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
+    --ToDo
+
+    --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
+    --ToDo 
+
+    --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
+    --ToDo
+
+    --Showdown, wer hat gewonnen??
+    --ToDo
+
+    --Weiterspielen?
+    --ToDo
+
     
-    mischen --Platzhalter, damit es ausfuehrbar ist
+    
+    mischen --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -53,11 +70,11 @@ delegateBlind p
     | getPlayerRole p == SmallBlind = p {role = BigBlind}
     | otherwise = p
 
--- Blinds kommen in den Pot
+-- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int
 blinds v = 3*v
 
--- Spieler muss Blind bezahlen
+-- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
 payBlind :: Int -> Player -> Player
 payBlind v p
     | getPlayerRole p == BigBlind = pay p (2*v)
