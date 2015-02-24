@@ -30,6 +30,21 @@ mischen = do
   return mixedDeck
 
 -- Small und Big Blind zuweisen
+delegateBlind :: Player -> Player
+delegateBlind p
+    | getPlayerRole p == BigBlind = p {role = SmallBlind}
+    | getPlayerRole p == SmallBlind = p {role = BigBlind}
+    | otherwise = p
+
+-- Small und Big Blind setzen (Small Blind wird als Parameter uebergeben)
+--blinds :: [Player] -> Int -> [Chip]
+blinds [] _ = []
+blinds (p:ps) v
+    | getPlayerRole p == BigBlind = putInPot (2*v) $ getPlayerCash p
+    | getPlayerRole p == SmallBlind = putInPot v $ getPlayerCash p
+    | otherwise = []
+    
+    
 
 -- Runde (ohne Kartenaufdecken)
 -- setzen, erhoehen....

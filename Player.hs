@@ -5,6 +5,7 @@ import Chips
 
 --Datentyp, welche Rolle der Spieler gerade annimmt (interessant bei 3+ Spielern)
 data Role = BigBlind | SmallBlind | Dealer | None
+    deriving (Eq)
 
 --Datentyp fuer Spieler
 data Player = Player {name::String, hand::[Card], cash::[Chip], role::Role, currentBet::[Chip], ki::Bool}
