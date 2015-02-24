@@ -60,6 +60,9 @@ doBlinds ps x = do
     let ps1 = map delegateBlind ps
         ps2 = map (payBlind x) ps1
         pot = blinds x
+    putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
+    putStrLn ("Spieler 1 hat noch " ++ show (getPlayerCash $ head ps2) ++ " Chips")
+    putStrLn ("Spieler 2 hat noch " ++ show (getPlayerCash $ last ps2) ++ " Chips")
     return (ps2,pot)
         
 
