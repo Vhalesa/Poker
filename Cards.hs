@@ -68,5 +68,3 @@ module Cards where
 
   getValue :: Card -> Value
   getValue (Card (c,v)) = v
-
-
