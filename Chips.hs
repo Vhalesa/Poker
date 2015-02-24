@@ -31,3 +31,11 @@ change (Chip 50) = replicate 3 (Chip 10) ++ [Chip 20]
 change (Chip 20) = replicate 2 (Chip 10)
 change (Chip 10) = replicate 2 (Chip 5)
 change c = [c]
+
+-- Methode, um zu erhoehen (raise) oder aufzustocken (call)
+-- Ueberpruefung, ob Spieler genug Chips hat NICHT hier
+
+putInPot :: Int -> [Chip] -> [Chip]
+putInPot 0 _ = []
+putInPot v [] = [Chip v] -- Schoener waere: Chips wechseln!!
+putInPot v (c:cs) = if (Chips.sum[c] <= v) then c: putInPot (v - (Chips.sum [c])) cs else putInPot v cs 

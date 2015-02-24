@@ -10,8 +10,8 @@ import System.Random
 
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
-    let player1 = Player { name = "Player 1", hand = [], cash = chips, ki = False}
-        player2 = Player { name = "Player 2", hand = [], cash = chips, ki = True}
+    let player1 = Player { name = "Player 1", hand = [], cash = chips, ki = False, role=None, currentBet=[]}
+        player2 = Player { name = "Player 2", hand = [], cash = chips, ki = True, role=None, currentBet=[]}
     deck <- mischen
     print deck
     
@@ -45,9 +45,26 @@ runde1 stapel p = do
       p1 = setPlayerHand (head p) (head cards1)
       p2 = setPlayerHand (p !! 1) (cards1 !! 1)
   return ([p1,p2], last cards1)
+
+--runde1 nicht in IO. 
+runde1b :: [Card] -> [Player] -> ([Player],[Card])
+runde1b cs ps = ([p1,p2],last cards1)
+                where cards1 = austeilen cs 2 [] 2  
+                      p1 = setPlayerHand (head ps) (head cards1)
+                      p2 = setPlayerHand (ps !! 1) (cards1 !! 1)
+
+-- 3 Karten werden vom Stapel genommen
+runde2b :: [Card] -> [[Card]]
+runde2b cs = austeilen cs 1 [] 3
+
+-- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
+runde3b :: [Card] -> [[Card]]
+runde3b cs = austeilen cs 1 [] 1
       
 
--- Zieht fuer n Spieler jeweils x Karten, und gibt auch den Rest des Decks zurueck [[p1][p2]...[rest]] 
+-- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
+-- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
+-- kann mit n >= 1 und x = 2 genutzt werden, um Spielern die Startkarten zu ziehen
 austeilen :: [Card] -> Int -> [[Card]] -> Int -> [[Card]]
 austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
