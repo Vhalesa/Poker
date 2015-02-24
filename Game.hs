@@ -2,9 +2,13 @@ module Game where
 --bla spiellogik
 import Cards
 import Chips
+import Random
+import Combos
 
-main = do
-        
+import System.Random
+
+-- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
+main = undefined
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
