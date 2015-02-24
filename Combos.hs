@@ -31,9 +31,7 @@ checkCombo cs
                               else StraightFlush $ getStraightFlush cs 
     | checkFour cs = getFour cs --Vierling erstellen
     | checkFullHouse cs = getFullHouse cs 
-    | checkFlush cs = if (checkStraight $ getFlush cs $ ind5 $ colorsIn cs []) 
-                        then StraightFlush $ head $ getStraight $ getFlush cs $ ind5 $ colorsIn cs []
-                        else Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
+    | checkFlush cs = Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
     | checkStraight cs = Straight $ head $ getStraight cs
     | fst $ checkThree cs = getThree cs --Drilling erstellen
     | fst $ checkTwo cs = if (checkDifferentTwo cs (snd $ checkTwo cs)) then getPair2 cs else getPair cs--Zweites Pair ueberpruefen
