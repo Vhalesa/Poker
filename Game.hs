@@ -17,13 +17,13 @@ main = do
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
---Eine komplette Spielrunde mit einer Liste an Spielern durchfuehren
+--Ein komplettes Spiel mit einer Liste an Spielern durchfuehren
 startGame ps = do
     --Karten mischen
     deck <- mischen
     print deck
 
-    --Blinds bezahlen
+    --Blinds bezahlen 
     playersAndPot <- doBlinds ps 10
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
@@ -44,7 +44,10 @@ startGame ps = do
     --Weiterspielen?
     --ToDo
 
-    
+    -- Testzeug
+    x <- entscheidungKI (ps,0) []
+    print $ snd x
+        
     
     putStrLn (show (runde1bis4 deck)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
 
@@ -107,8 +110,40 @@ pay p x = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
 resetBets :: [Player] -> [Player]
 resetBets ps = map removeCurrentBet ps
 
--- Runde (ohne Kartenaufdecken)
+-- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
+-- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
+--runde :: ([Player],Int) -> Int -> ([Player],Int)
+--runde ((p1:p2:ps), pot) tisch = do
+--  rundeImmer p1
+--  rundeImmer p2
+--  wdhRunde ((p1:p2:ps),pot)
+--  print 1
+--    where rundeImmer Player {ki=False} = entscheidungMensch 
+--          rundeImmer Player {ki=True} = entscheidungKI
+--          --lieber rekursiv
+--          wdhRunde :: ([Player],Int) -> ([Player],Int)
+--          wdhRunde p pot = undefined
+--          --wdhRunde ((p1:p2:ps),pot) = do 
+          --  when (betrag /=) $ do
+          --    spielerDran rundeImmer
+          --    naechsterSpiler dran
+          --    wdhRunde
+
+-- Abfrage beim Mensch: Call, Raise oder Fold?
+-- braucht dazu die Player, den Pot und die Tischkarten
+--entscheidungMensch :: ([Player],Int) -> Int -> ([Player],Int) 
+-- mit IO
+entscheidungMensch = undefined
+
+-- Abfrage bei der KI: Call, Raise oder Fold?
+-- braucht dazu die Player, den Pot und die Tischkarten
+-- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
+-- evlt mit IO, da ausgegeben werden soll, was die KI macht?
+entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
+entscheidungKI (p, pot) tisch = do
+    putStrLn "KI called"
+    return $ call (p, pot)
 
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
