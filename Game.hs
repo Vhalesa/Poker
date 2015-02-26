@@ -88,9 +88,11 @@ payBlind v p
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Player -> Int -> Player
 pay p 0 = p
-pay p x = p {cash = (getPlayerCash p)-x}
+pay p x = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
     
-    
+-- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
+resetBets :: [Player] -> [Player]
+resetBets ps = map removeCurrentBet ps
 
 -- Runde (ohne Kartenaufdecken)
 -- setzen, erhoehen....

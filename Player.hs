@@ -37,8 +37,11 @@ setPlayerRole x role = x {role}
 getCurrentBet :: Player -> Int
 getCurrentBet Player {currentBet} =currentBet
 
-setCurrentBet :: Player -> Int -> Player
+setCurrentBet ::  Player -> Int -> Player
 setCurrentBet x currentBet = x {currentBet}
+
+removeCurrentBet :: Player -> Player
+removeCurrentBet p = setCurrentBet p 0
 
 getKI :: Player -> Bool
 getKI Player {ki} = ki
