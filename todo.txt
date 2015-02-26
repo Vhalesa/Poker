@@ -17,8 +17,8 @@ Chips:
 Regeln:
   - Tabelle mit den Gewinnmöglichkeiten [done]
   - Big Blind, Small Blind [done]
-  - Raise []
-  - Call []
+  - Raise [done]
+  - Call [done]
   - Fold []
 
 Spielablauf (IO?):
@@ -100,3 +100,5 @@ Allgemeine Anforderungen:
     und Ace ist sowohl höchste als auch niedrigste Karte
     Lösung: Value von Card zur Überprüfung verwenden, da Enum.
             (+ extra pred-Funktion damit Ace beides ist)
+  - Chips Datentyp erwies sich im Nachhinein als nicht praktikabel
+    Lösung: Chips Datentyp wurde wieder entfernt und stattdessen Int verwendet
