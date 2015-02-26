@@ -1,6 +1,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 module Player where
 import Cards
+import Combos
 --import Chips
 
 --Datentyp, welche Rolle der Spieler gerade annimmt (interessant bei 3+ Spielern)
@@ -8,7 +9,7 @@ data Role = BigBlind | SmallBlind | Dealer | None
     deriving (Eq)
 
 --Datentyp fuer Spieler
-data Player = Player {name::String, hand::[Card], cash::Int, role::Role, currentBet::Int, ki::Bool}
+data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ki::Bool}
 
 getPlayerName :: Player -> String
 getPlayerName Player {name} = name
@@ -19,8 +20,14 @@ setPlayerName x name = x {name}
 getPlayerHand :: Player -> [Card]
 getPlayerHand Player {hand} = hand
 
-setPlayerHand :: Player -> [Card] -> Player
-setPlayerHand x hand = x {hand}
+setPlayerHand :: [Card] -> Player -> Player
+setPlayerHand hand x = x {hand}
+
+getPlayerCombo :: Player -> ScoreCombo
+getPlayerCombo Player {combo} = combo
+
+setPlayerCombo :: ScoreCombo -> Player -> Player
+setPlayerCombo combo x = x {combo}
 
 getPlayerCash :: Player -> Int
 getPlayerCash Player {cash} = cash

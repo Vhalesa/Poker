@@ -49,12 +49,15 @@ Spielablauf (IO?):
     - anderer Spieler darf
     - Berechnung/Vergleich wer gewonnen hat -> CompareFunktion []
       -> überprüfen, was genau Combo.hs kann (vielleicht geht es automatisch?)
-      -> bekommt 2 Combos => gibt das höhere aus(?), und/oder den Player, der gewonnen hat
+      -> bekommt Combos => gibt das höchste aus(?), und/oder den Player, der gewonnen hat
       -> dazu vielleicht die Combo in Player speichern?
     - Verteilung des ChipsGewinns
   - nach jeder Spielrunde
-    - Spieler hat die Möglichkeit aufzuhören
-    - automatisches Ende, wenn einer zu wenig Chips/Geld hat
+    - Spieler hat die Möglichkeit aufzuhören []
+    - automatisches Ende, wenn einer zu wenig Chips/Geld hat []
+    - Reset von Pot, Karten, Combo, CurrentBet []
+  - nach n Spielrunden (Wenn jeder Spieler einmal Big Blind war)
+    - Blinds werden erhoeht []
 
 Mensch: []
 - Abfrage, was er tun will (Call, Raise, Fold) []
