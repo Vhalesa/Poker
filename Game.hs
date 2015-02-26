@@ -158,14 +158,26 @@ austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ 
 --showdown :: ([Player],Int) -> IO
 showdown (ps,pot) cs = do
     let
-        playerCardSet = map (getComboForPlayer cs) ps
-    winner <- undefined
-    putStrLn("Gewonnen hat ")
+        playersWithCombo = map (getComboForPlayer cs) ps
+        
+        winner = playerWithHighestCombo playersWithCombo
+        
+    putStrLn("Gewonnen hat " ++ show winner ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
 
 -- Ermittelt fuer einen Spieler anhand der uebergebenen (Tisch-)Karten die Combo fuer den Spieler
 -- und traegt diese im Spieler ein.
 getComboForPlayer :: [Card] -> Player -> Player
 getComboForPlayer cs p = setPlayerCombo (checkCombo (reverse $ sort $ getPlayerHand p ++ cs)) p
+
+-- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
+-- Funktioniert fuer beliebig viele Spieler, bis auf die letzte Zeile
+playerWithHighestCombo :: [Player] -> [Player]
+playerWithHighestCombo [p1] = [p1]
+playerWithHighestCombo (p1:p2:ps)
+    | getPlayerCombo p1 > getPlayerCombo p2 = playerWithHighestCombo (p1:ps)
+    | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
+    | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
+
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 

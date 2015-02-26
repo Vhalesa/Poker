@@ -11,6 +11,9 @@ data Role = BigBlind | SmallBlind | Dealer | None
 --Datentyp fuer Spieler
 data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ki::Bool}
 
+instance Show Player where
+    show Player {name} = name
+
 getPlayerName :: Player -> String
 getPlayerName Player {name} = name
 
