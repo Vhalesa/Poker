@@ -96,6 +96,8 @@ raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
   where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
 
+-- p1 hoert auf. p2 gewinnt, Runde wird beendet (inkl. Gewinnausschuettung und so)
+fold = undefined
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Player -> Int -> Player

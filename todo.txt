@@ -17,8 +17,8 @@ Chips:
 Regeln:
   - Tabelle mit den Gewinnmöglichkeiten [done]
   - Big Blind, Small Blind [done]
-  - Raise []
-  - Call []
+  - Raise [done]
+  - Call [done]
   - Fold []
 
 Spielablauf (IO?):
