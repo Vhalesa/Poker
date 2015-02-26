@@ -26,11 +26,11 @@ test = do
         c8 = Card (Hearts, Queen)
         c9 = Card (Spades, King)
         co1 = Straight [c5,c6,c7,c8,c9]
-        co2 = StraightFlush [c4,c5,c6,c7,c8]
+        co2 = Straight [c4,c5,c6,c7,c8]
    
     putStrLn ("Testspieler hat " ++ show co1 )
 
-    putStrLn (show (c2 == c1))
+    putStrLn (show (co2 == co1))
 
 
 -- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)

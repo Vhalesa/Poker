@@ -15,38 +15,51 @@ Chips:
       -> eigenen Chipshaufen aktualisieren []
 
 Regeln:
-  - Tabelle mit den Gewinnmöglichkeiten []
-  - Big Blind, Small Blind
+  - Tabelle mit den Gewinnmöglichkeiten [done]
+  - Big Blind, Small Blind [done]
+  - Raise []
+  - Call []
+  - Fold []
 
 Spielablauf (IO?):
   - am Anfang vor allen Spielrunden (vor dem Spiel)
     - Spielern Chipshaufen zuweisen
   - vor der jeder Spielrunde
-    - Kartendeck mischen
-    - Small/Big Blind zuweisen
+    - Kartendeck mischen [done]
+    - Small/Big Blind zuweisen [done]
   - 4 Wettrunden [] 
-    -> Vorgehen bei jeder Wettrunde
+    -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) []
       -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
-      - Small Blind und Big Blind setzen automatisch 
-      - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören
-      - Big Blind: aufstocken, erhöhen oder verlassen
-      - ... bis beide gleich sind oder einer rausgeht
-    - 1. Runde (PreFlop) 
+      - Small Blind und Big Blind setzen automatisch [done]
+      - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören []
+      - Big Blind: aufstocken, erhöhen oder verlassen []
+      - while (beide haben ungleichen Betrag)
+        - spielDerDranIst: Raise, Call oder Fold
+        - nächsterSpielerDran -> [p1,p2] (p1 war dran, wird wieder ganz hinten eingereiht) 
+    - 1. Runde (PreFlop) []
       -> jeder Spieler erhält 2 Karten auf die Hand
-    - 2. Runde (Flop)
+    - 2. Runde (Flop) []
       -> 3 Karten werden offen gelegt
-    - 3. Runde (Turn Card)
+    - 3. Runde (Turn Card) []
       -> weitere (4.) Karte wird offen gelegt 
-    - 4. Runde
+    - 4. Runde []
       -> weitere (5.) Karte wird offen gelegt
   - Showdown []
     - Spieler (4.Runde als letzter erhöht / Small Blind) muss seine Combo vorzeigen
     - anderer Spieler darf
-    - Berechnung/Vergleich wer gewonnen hat
-    -> Verteilung des ChipsGewinns
+    - Berechnung/Vergleich wer gewonnen hat -> CompareFunktion []
+      -> überprüfen, was genau Combo.hs kann (vielleicht geht es automatisch?)
+      -> bekommt 2 Combos => gibt das höhere aus(?), und/oder den Player, der gewonnen hat
+      -> dazu vielleicht die Combo in Player speichern?
+    - Verteilung des ChipsGewinns
   - nach jeder Spielrunde
     - Spieler hat die Möglichkeit aufzuhören
     - automatisches Ende, wenn einer zu wenig Chips/Geld hat
+
+Mensch: []
+- Abfrage, was er tun will (Call, Raise, Fold) []
+  -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn
+- nach jedem Spiel: weiterspielen? []
 
 KI:
 - Anfang: Rudimentäre KI? (Random könnte kompliziert werden...)
@@ -54,7 +67,7 @@ KI:
     -> KI kann ihre Menge an Chips auslesen []
     -> KI macht immer das gleiche (immer call z.B.) []
     -> KI kann durcheinander Call, Raise, Fold und AllIn []
-. Später: KI macht intelligente Züge 
+- Später: KI macht intelligente Züge 
     -> KI berechnet ihr momentanes Blatt []
     -> KI berechnet die Wahrscheinlichkeit, dass sie damit gewinnt []
     -> KI berechnet die Wahrscheinlichkeit, dass ihr Blatt noch besser wird []
