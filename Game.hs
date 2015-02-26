@@ -85,6 +85,18 @@ payBlind v p
     | otherwise = p
 
 
+-- p1 erhoeht 
+-- bekommt die Liste der Player und den Pot (und gibt diese mit Veraenderung wieder zurueck)
+call :: ([Player],Int) -> ([Player],Int)
+call p = raise p 0
+
+-- p1 erhoeht um betrag 
+-- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
+raise :: ([Player],Int) -> Int -> ([Player],Int)
+raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
+  where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
+
+
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Player -> Int -> Player
 pay p 0 = p
