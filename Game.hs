@@ -7,11 +7,12 @@ import Combos
 import Player
 
 import System.Random
+import Data.List
 
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
-    let player1 = Player { name = "Player 1", hand = [], cash = 4000, ki = False, role=BigBlind, currentBet=0}
-        player2 = Player { name = "Player 2", hand = [], cash = 4000, ki = True, role=SmallBlind, currentBet=0}
+    let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, currentBet=0}
+        player2 = Player { name = "Player 2", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, currentBet=0}
     startGame [player1,player2]
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -48,7 +49,7 @@ startGame ps = do
     print $ snd x
         
     
-    mischen --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
+    putStrLn (show (runde1bis4 deck)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -99,8 +100,6 @@ raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
   where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
 
--- p1 hoert auf. p2 gewinnt, Runde wird beendet (inkl. Gewinnausschuettung und so)
-fold = undefined
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Player -> Int -> Player
@@ -154,16 +153,16 @@ entscheidungKI (p, pot) tisch = do
 --runde1 :: [Card] -> [Player] -> IO
 runde1 stapel p = do
   let cards1 = austeilen stapel 2 [] 2  
-      p1 = setPlayerHand (head p) (head cards1)
-      p2 = setPlayerHand (p !! 1) (cards1 !! 1)
+      p1 = setPlayerHand (head cards1) (head p) 
+      p2 = setPlayerHand (cards1 !! 1) (p !! 1)
   return ([p1,p2], last cards1)
 
 --runde1 nicht in IO. 
 runde1b :: [Card] -> [Player] -> ([Player],[Card])
 runde1b cs ps = ([p1,p2],last cards1)
                 where cards1 = austeilen cs 2 [] 2  
-                      p1 = setPlayerHand (head ps) (head cards1)
-                      p2 = setPlayerHand (ps !! 1) (cards1 !! 1)
+                      p1 = setPlayerHand (head cards1) (head ps)
+                      p2 = setPlayerHand (cards1 !! 1) (ps !! 1)
 
 -- 3 Karten werden vom Stapel genommen
 runde2b :: [Card] -> [[Card]]
@@ -172,7 +171,16 @@ runde2b cs = austeilen cs 1 [] 3
 -- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
 runde3b :: [Card] -> [[Card]]
 runde3b cs = austeilen cs 1 [] 1
-      
+--Testfunktion um 5 random Karten zu bekommen. Kann danach vermutlich wieder geloescht werden!!
+runde1bis4 :: [Card] -> [Card]
+runde1bis4 cs = f3 ++ s1 ++ t1 
+    where
+        f3 = head f
+        s1 = head s
+        t1 = head t
+        f = runde2b cs
+        s = runde3b $ last f
+        t = runde3b $ last s
 
 -- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
 -- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
@@ -182,6 +190,17 @@ austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
      
 -- Showdown
+--showdown :: ([Player],Int) -> IO
+showdown (ps,pot) cs = do
+    let
+        playerCardSet = map (getComboForPlayer cs) ps
+    winner <- undefined
+    putStrLn("Gewonnen hat ")
+
+-- Ermittelt fuer einen Spieler anhand der uebergebenen (Tisch-)Karten die Combo fuer den Spieler
+-- und traegt diese im Spieler ein.
+getComboForPlayer :: [Card] -> Player -> Player
+getComboForPlayer cs p = setPlayerCombo (checkCombo (reverse $ sort $ getPlayerHand p ++ cs)) p
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 
