@@ -26,6 +26,8 @@ startGame ps = do
     --Blinds bezahlen 
     playersAndPot <- doBlinds ps 10
     
+    runde playersAndPot []
+
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --ToDo
 
@@ -45,8 +47,10 @@ startGame ps = do
     --ToDo
 
     -- Testzeug
-    x <- entscheidungKI (ps,0) []
-    print $ snd x
+    --x <- entscheidungKI (ps,0) []
+    --print $ snd x
+    --runde (ps,0) []
+    --print $ snd y
         
     
     putStrLn (show (runde1bis4 deck)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
@@ -96,6 +100,7 @@ call p = raise p 0
 
 -- p1 erhoeht um betrag 
 -- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
+-- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
   where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
@@ -113,28 +118,35 @@ resetBets ps = map removeCurrentBet ps
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
---runde :: ([Player],Int) -> Int -> ([Player],Int)
---runde ((p1:p2:ps), pot) tisch = do
---  rundeImmer p1
---  rundeImmer p2
+--runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
+runde (p, pot) tisch = do
+  x <- rundeImmer (p,pot) tisch
+  y <- rundeImmer x tisch
+  return y
 --  wdhRunde ((p1:p2:ps),pot)
---  print 1
---    where rundeImmer Player {ki=False} = entscheidungMensch 
---          rundeImmer Player {ki=True} = entscheidungKI
---          --lieber rekursiv
---          wdhRunde :: ([Player],Int) -> ([Player],Int)
---          wdhRunde p pot = undefined
---          --wdhRunde ((p1:p2:ps),pot) = do 
-          --  when (betrag /=) $ do
-          --    spielerDran rundeImmer
-          --    naechsterSpiler dran
-          --    wdhRunde
+    where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int) 
+          rundeImmer ((p1:ps),pot) tisch = if (getKI p1) then entscheidungKI ((p1:ps),pot) tisch
+                                              else entscheidungMensch ((p1:ps),pot) tisch
+          --wdhRunde :: ([Player],Int) -> ([Player],Int)
+          --wdhRunde p pot = undefined
+         -- wdhRunde (ps,pot) tisch = do 
+         --   when (betrag /=) $ do
+         --     rundeImmer (ps,pot) tisch
+         --     wdhRunde
+         
+-- brauchen wir vmtl gar nicht 
+nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)
+nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
 -- Abfrage beim Mensch: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
---entscheidungMensch :: ([Player],Int) -> Int -> ([Player],Int) 
+--entscheidungMensch :: ([Player],Int) -> Int -> IO ([Player],Int) 
 -- mit IO
-entscheidungMensch = undefined
+entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
+entscheidungMensch (p, pot) tisch = do
+    putStrLn "Mensch called"
+    print $ getPlayerName $ head p
+    return $ call (p, pot)
 
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -143,6 +155,7 @@ entscheidungMensch = undefined
 entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
     putStrLn "KI called"
+    print $ getPlayerName $ head p
     return $ call (p, pot)
 
 
