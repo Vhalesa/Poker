@@ -28,15 +28,15 @@ startGame ps = do
     --Blinds bezahlen 
     playersAndPot <- doBlinds ps 10
     
-    runde playersAndPot []
-
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --Karten austeilen 
     let
         r1 = runde1b deck $ fst playersAndPot
         players1 = fst $ r1
         deck1 = snd $ r1
+
     --ToDo: Setzen
+    playersAndPot1 <- runde playersAndPot []
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
     r2 <- runde2 deck1
@@ -68,6 +68,7 @@ startGame ps = do
     --print $ snd x
     --runde (ps,0) []
     --print $ snd y
+    print "Testausgabe"
         
     
 
@@ -133,22 +134,19 @@ resetBets ps = map removeCurrentBet ps
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
---runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
+runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
   x <- rundeImmer (p,pot) tisch
   y <- rundeImmer x tisch
-  return y
---  wdhRunde ((p1:p2:ps),pot)
+  wdhRunde y tisch
     where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int) 
           rundeImmer ((p1:ps),pot) tisch = if (getKI p1) then entscheidungKI ((p1:ps),pot) tisch
                                               else entscheidungMensch ((p1:ps),pot) tisch
-          --wdhRunde :: ([Player],Int) -> ([Player],Int)
-          --wdhRunde p pot = undefined
-         -- wdhRunde (ps,pot) tisch = do 
-         --   when (betrag /=) $ do
-         --     rundeImmer (ps,pot) tisch
-         --     wdhRunde
-         
+          wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
+          wdhRunde ((p1:p2:ps),pot) tisch 
+            | getCurrentBet p1 == getCurrentBet p2 = return ((p1:p2:ps),pot)
+            | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
+
 -- brauchen wir vmtl gar nicht 
 nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)
 nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
