@@ -1,5 +1,7 @@
+--Dieses Modul kuemmert sich um den Ablauf des Spiels. Hier werden Karten gegeben, Einsaetze gemacht usw.
 module Game where
---bla spiellogik
+
+
 import Cards
 --import Chips
 import Random
@@ -38,20 +40,20 @@ startGame ps = do
     r2 <- runde2 deck1
     let
         deck2 = last r2
-    --ToDo
+    --ToDo: Setzen
 
     --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
     r3 <- runde3 deck2
     let
         deck3 = last r3
         tischkarten = head r2 ++ head r3
-    --ToDo 
+    --ToDo: Setzen 
 
     --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
     r4 <- runde4 deck3
     let
         finalTischkarten = tischkarten ++ head r4
-    --ToDo
+    --ToDo: Setzen
 
     --Showdown, wer hat gewonnen??
     playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (finalTischkarten)
@@ -168,6 +170,7 @@ runde1 stapel p = do
   let cards1 = austeilen stapel 2 [] 2  
       p1 = setPlayerHand (head cards1) (head p) 
       p2 = setPlayerHand (cards1 !! 1) (p !! 1)
+  putStrLn ("Jeder Spieler hat seine Karten auf die Hand bekommen")
   return ([p1,p2], last cards1)
 
 --runde1 nicht in IO. 
@@ -181,6 +184,14 @@ runde1b cs ps = ([p1,p2],last cards1)
 runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
 
+-- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
+runde34 :: [Card] -> [[Card]]
+runde34 cs = austeilen (last trashCard) 1 [] 1
+    where 
+        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
+        trashCard = austeilen cs 1 [] 1
+
+--Gibt die ersten 3 Karten, den sog. Flop zurueck, sowie das restliche Deck
 runde2 cs = do
     let
         --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
@@ -189,40 +200,25 @@ runde2 cs = do
     putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
--- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
-runde34 :: [Card] -> [[Card]]
-runde34 cs = austeilen (last trashCard) 1 [] 1
-    where 
-        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
-        trashCard = austeilen cs 1 [] 1
-
+--Gibt die vierte Karte, den sog. Turn zurueck, sowie das restliche Deck
 runde3 cs = do
     let 
         cardsAndDeck = runde34 cs
     putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
-
+--Gibt die fuenfte und letzte Karte, den sog. River, zurueck, OHNE das restliche Deck (Das brauchen wir nicht mehr)
 runde4 cs = do
     let 
         cardsAndDeck = runde34 cs
     putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
---Testfunktion um 5 random Karten zu bekommen. Kann danach vermutlich wieder geloescht werden!!
-runde1bis4 :: [Card] -> [Card]
-runde1bis4 cs = f3 ++ s1 ++ t1 
-    where
-        f3 = head f
-        s1 = head s
-        t1 = head t
-        f = runde2b cs
-        s = runde34 $ last f
-        t = runde34 $ last s
-
 -- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
 -- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
 -- kann mit n >= 1 und x = 2 genutzt werden, um Spielern die Startkarten zu ziehen
+-- Sollte aufgerufen werden: austeilen deck n [] x;
+--  wenn erg /= [] werden die Karten in erg am Ende wieder mit ausgegeben
 austeilen :: [Card] -> Int -> [[Card]] -> Int -> [[Card]]
 austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
@@ -256,6 +252,8 @@ playerWithHighestCombo (p1:p2:ps)
     | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
     | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
 
+-- Ersetzt in der zweiten Liste die Spieler mit gleichem Namen wie in der ersten Liste.
+-- Funktioniert im Moment nur, wenn beide Listen gleich geordnet sind
 replace :: [Player] -> [Player] -> [Player]
 replace [] as = as
 replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns) as 

@@ -1,6 +1,5 @@
-module Main where
-
 --Dieses Modul fliegt vermutlich spaeter raus. Aber zum Testen ist/war es gut
+module Main where
 
 import System.Random
 

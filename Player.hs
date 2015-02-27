@@ -1,4 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
+--Dieses Modul verwaltet Spieler quasi objektorientiert. 
 module Player where
 import Cards
 import Combos

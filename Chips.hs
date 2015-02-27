@@ -1,3 +1,4 @@
+--Dieses Modul war urspruenglich dafuer gedacht, die Chips zu verwalten. Es wird derzeit nicht benutzt.
 module Chips where
 
 data Chip = Chip {value :: Int}
