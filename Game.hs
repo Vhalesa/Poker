@@ -161,6 +161,8 @@ entscheidungMensch (p, pot) tisch = do
     print $ getPlayerName $ head p
     return $ call (p, pot)
 
+  
+
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
 -- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
