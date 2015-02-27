@@ -27,6 +27,10 @@ startGame ps = do
     playersAndPot <- doBlinds ps 10
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
+    let
+        r1 = runde1b deck $ fst playersAndPot
+        players1 = fst $ r1
+        deck1 = snd $ r1
     --ToDo
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
@@ -39,7 +43,7 @@ startGame ps = do
     --ToDo
 
     --Showdown, wer hat gewonnen??
-    --ToDo
+    playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (runde1bis4 deck1)
 
     --Weiterspielen?
     --ToDo
@@ -49,7 +53,8 @@ startGame ps = do
     print $ snd x
         
     
-    putStrLn (show (runde1bis4 deck)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
+    putStrLn (show (runde1bis4 deck1)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
+    
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -84,8 +89,8 @@ blinds v = 3*v
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
 payBlind :: Int -> Player -> Player
 payBlind v p
-    | getPlayerRole p == BigBlind = pay p (2*v)
-    | getPlayerRole p == SmallBlind = pay p v
+    | getPlayerRole p == BigBlind = pay (2*v) p
+    | getPlayerRole p == SmallBlind = pay v p
     | otherwise = p
 
 
@@ -97,14 +102,13 @@ call p = raise p 0
 -- p1 erhoeht um betrag 
 -- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
 raise :: ([Player],Int) -> Int -> ([Player],Int)
-raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
+raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay diff p1], pot + diff)
   where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
 
-
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
-pay :: Player -> Int -> Player
-pay p 0 = p
-pay p x = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
+pay :: Int -> Player -> Player
+pay 0 p = p
+pay x p = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
     
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
@@ -196,13 +200,18 @@ showdown (ps,pot) cs = do
         playersWithCombo = map (getComboForPlayer cs) ps
         
         winner = playerWithHighestCombo playersWithCombo
-        
-    putStrLn("Gewonnen hat " ++ show winner ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
+        --Gewinner bezahlt negativen Betrag = Gewinner bekommt Betrag
+        updatedWinner = map (pay (negate $ quot pot (length winner))) winner 
 
--- Ermittelt fuer einen Spieler anhand der uebergebenen (Tisch-)Karten die Combo fuer den Spieler
--- und traegt diese im Spieler ein.
-getComboForPlayer :: [Card] -> Player -> Player
-getComboForPlayer cs p = setPlayerCombo (checkCombo (reverse $ sort $ getPlayerHand p ++ cs)) p
+        newPlayerList = replace updatedWinner playersWithCombo
+        
+    putStrLn("Gewonnen hat " ++ show updatedWinner ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
+    putStrLn(show updatedWinner ++ " hat jetzt " ++ show (map getPlayerCash updatedWinner) ++ " Chips")
+
+    return newPlayerList
+    
+
+
 
 -- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
 -- Funktioniert fuer beliebig viele Spieler, bis auf die letzte Zeile
@@ -212,6 +221,10 @@ playerWithHighestCombo (p1:p2:ps)
     | getPlayerCombo p1 > getPlayerCombo p2 = playerWithHighestCombo (p1:ps)
     | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
     | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
+
+replace :: [Player] -> [Player] -> [Player]
+replace [] as = as
+replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns) as 
 
 
 -- Entscheidung: weiterspielen oder aufhoeren?
