@@ -1,5 +1,7 @@
+--Dieses Modul kuemmert sich um den Ablauf des Spiels. Hier werden Karten gegeben, Einsaetze gemacht usw.
 module Game where
---bla spiellogik
+
+
 import Cards
 --import Chips
 import Random
@@ -29,19 +31,34 @@ startGame ps = do
     runde playersAndPot []
 
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
-    --ToDo
+    --Karten austeilen 
+    let
+        r1 = runde1b deck $ fst playersAndPot
+        players1 = fst $ r1
+        deck1 = snd $ r1
+    --ToDo: Setzen
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
-    --ToDo
+    r2 <- runde2 deck1
+    let
+        deck2 = last r2
+    --ToDo: Setzen
 
     --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
-    --ToDo 
+    r3 <- runde3 deck2
+    let
+        deck3 = last r3
+        tischkarten = head r2 ++ head r3
+    --ToDo: Setzen 
 
     --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
-    --ToDo
+    r4 <- runde4 deck3
+    let
+        finalTischkarten = tischkarten ++ head r4
+    --ToDo: Setzen
 
     --Showdown, wer hat gewonnen??
-    --ToDo
+    playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (finalTischkarten)
 
     --Weiterspielen?
     --ToDo
@@ -53,7 +70,6 @@ startGame ps = do
     --print $ snd y
         
     
-    putStrLn (show (runde1bis4 deck)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -88,8 +104,8 @@ blinds v = 3*v
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
 payBlind :: Int -> Player -> Player
 payBlind v p
-    | getPlayerRole p == BigBlind = pay p (2*v)
-    | getPlayerRole p == SmallBlind = pay p v
+    | getPlayerRole p == BigBlind = pay (2*v) p
+    | getPlayerRole p == SmallBlind = pay v p
     | otherwise = p
 
 
@@ -102,14 +118,13 @@ call p = raise p 0
 -- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
 -- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
-raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay p1 diff], pot + diff)
+raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay diff p1], pot + diff)
   where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
 
-
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
-pay :: Player -> Int -> Player
-pay p 0 = p
-pay p x = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
+pay :: Int -> Player -> Player
+pay 0 p = p
+pay x p = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
     
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
@@ -168,6 +183,7 @@ runde1 stapel p = do
   let cards1 = austeilen stapel 2 [] 2  
       p1 = setPlayerHand (head cards1) (head p) 
       p2 = setPlayerHand (cards1 !! 1) (p !! 1)
+  putStrLn ("Jeder Spieler hat seine Karten auf die Hand bekommen")
   return ([p1,p2], last cards1)
 
 --runde1 nicht in IO. 
@@ -182,22 +198,40 @@ runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
 
 -- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
-runde3b :: [Card] -> [[Card]]
-runde3b cs = austeilen cs 1 [] 1
---Testfunktion um 5 random Karten zu bekommen. Kann danach vermutlich wieder geloescht werden!!
-runde1bis4 :: [Card] -> [Card]
-runde1bis4 cs = f3 ++ s1 ++ t1 
-    where
-        f3 = head f
-        s1 = head s
-        t1 = head t
-        f = runde2b cs
-        s = runde3b $ last f
-        t = runde3b $ last s
+runde34 :: [Card] -> [[Card]]
+runde34 cs = austeilen (last trashCard) 1 [] 1
+    where 
+        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
+        trashCard = austeilen cs 1 [] 1
+
+--Gibt die ersten 3 Karten, den sog. Flop zurueck, sowie das restliche Deck
+runde2 cs = do
+    let
+        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
+        trashCard = austeilen cs 1 [] 1
+        cardsAndDeck = runde2b (last trashCard)
+    putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
+
+--Gibt die vierte Karte, den sog. Turn zurueck, sowie das restliche Deck
+runde3 cs = do
+    let 
+        cardsAndDeck = runde34 cs
+    putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
+
+--Gibt die fuenfte und letzte Karte, den sog. River, zurueck, OHNE das restliche Deck (Das brauchen wir nicht mehr)
+runde4 cs = do
+    let 
+        cardsAndDeck = runde34 cs
+    putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
 
 -- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
 -- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
 -- kann mit n >= 1 und x = 2 genutzt werden, um Spielern die Startkarten zu ziehen
+-- Sollte aufgerufen werden: austeilen deck n [] x;
+--  wenn erg /= [] werden die Karten in erg am Ende wieder mit ausgegeben
 austeilen :: [Card] -> Int -> [[Card]] -> Int -> [[Card]]
 austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
@@ -206,14 +240,37 @@ austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ 
 --showdown :: ([Player],Int) -> IO
 showdown (ps,pot) cs = do
     let
-        playerCardSet = map (getComboForPlayer cs) ps
-    winner <- undefined
-    putStrLn("Gewonnen hat ")
+        playersWithCombo = map (getComboForPlayer cs) ps
+        
+        winner = playerWithHighestCombo playersWithCombo
+        --Gewinner bezahlt negativen Betrag = Gewinner bekommt Betrag
+        updatedWinner = map (pay (negate $ quot pot (length winner))) winner 
 
--- Ermittelt fuer einen Spieler anhand der uebergebenen (Tisch-)Karten die Combo fuer den Spieler
--- und traegt diese im Spieler ein.
-getComboForPlayer :: [Card] -> Player -> Player
-getComboForPlayer cs p = setPlayerCombo (checkCombo (reverse $ sort $ getPlayerHand p ++ cs)) p
+        newPlayerList = replace updatedWinner playersWithCombo
+        
+    putStrLn("Gewonnen hat " ++ show updatedWinner ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
+    putStrLn(show updatedWinner ++ " hat jetzt " ++ show (map getPlayerCash updatedWinner) ++ " Chips")
+
+    return newPlayerList
+    
+
+
+
+-- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
+-- Funktioniert fuer beliebig viele Spieler, bis auf die letzte Zeile
+playerWithHighestCombo :: [Player] -> [Player]
+playerWithHighestCombo [p1] = [p1]
+playerWithHighestCombo (p1:p2:ps)
+    | getPlayerCombo p1 > getPlayerCombo p2 = playerWithHighestCombo (p1:ps)
+    | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
+    | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
+
+-- Ersetzt in der zweiten Liste die Spieler mit gleichem Namen wie in der ersten Liste.
+-- Funktioniert im Moment nur, wenn beide Listen gleich geordnet sind
+replace :: [Player] -> [Player] -> [Player]
+replace [] as = as
+replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns) as 
+
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 

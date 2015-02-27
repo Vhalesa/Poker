@@ -1,3 +1,4 @@
+--Dieses Modul berechnet, welche Kombination von Karten vorliegt.
 module Combos where
 
 import Cards
@@ -22,20 +23,27 @@ data ScoreCombo = HighCard [Card]
 
 --Ueberpruefe, welche Combo ein Spieler mit seiner Hand und den Tischkarten hat
 -- Es muss eine Liste, die aus den Handkarten und den Tischkarten besteht uebergeben werden
--- (am besten absteigend geordet, oder die Funktion ordnet die Liste anfangs selbst)
+-- (absteigend geordnet, Bsp: [Ass, 10, 4, 2, 2])
 checkCombo :: [Card] -> ScoreCombo
 checkCombo cs
     -- Achtung: Straight Flush oder Royal Flush -> hier der Funktion checkStraight nur die Liste mit Karten gleicher Farbe
     -- uebergeben oder so 
     | checkStraightFlush cs = if ( getValue(head $ getStraightFlush cs) == Ace) then RoyalFlush $ getStraightFlush cs
-                              else StraightFlush $ getStraightFlush cs 
-    | checkFour cs = getFour cs --Vierling erstellen
-    | checkFullHouse cs = getFullHouse cs 
+                              else StraightFlush $ getStraightFlush cs
+    -- Vierling
+    | checkFour cs = getFour cs
+    --Full House
+    | checkFullHouse cs = getFullHouse cs
+    --Flush
     | checkFlush cs = Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
+    --Straight
     | checkStraight cs = Straight $ head $ getStraight cs
-    | fst $ checkThree cs = getThree cs --Drilling erstellen
-    | fst $ checkTwo cs = if (checkDifferentTwo cs (snd $ checkTwo cs)) then getPair2 cs else getPair cs--Zweites Pair ueberpruefen
-    | otherwise = HighCard $ first5 cs --High Card erstellen
+    --Drilling
+    | fst $ checkThree cs = getThree cs
+    --Paar / 2 Paare
+    | fst $ checkTwo cs = if (checkDifferentTwo cs (snd $ checkTwo cs)) then getPair2 cs else getPair cs
+    --Keine Kombination, nur hoechste Karte
+    | otherwise = HighCard $ first5 cs
     where
         getStraightFlush :: [Card] -> [Card]
         getStraightFlush cs = head $ getStraight $ getFlush cs $ ind5 $ colorsIn cs []
