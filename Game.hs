@@ -27,23 +27,34 @@ startGame ps = do
     playersAndPot <- doBlinds ps 10
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
+    --Karten austeilen 
     let
         r1 = runde1b deck $ fst playersAndPot
         players1 = fst $ r1
         deck1 = snd $ r1
-    --ToDo
+    --ToDo: Setzen
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
+    r2 <- runde2 deck1
+    let
+        deck2 = last r2
     --ToDo
 
     --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
+    r3 <- runde3 deck2
+    let
+        deck3 = last r3
+        tischkarten = head r2 ++ head r3
     --ToDo 
 
     --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
+    r4 <- runde4 deck3
+    let
+        finalTischkarten = tischkarten ++ head r4
     --ToDo
 
     --Showdown, wer hat gewonnen??
-    playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (runde1bis4 deck1)
+    playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (finalTischkarten)
 
     --Weiterspielen?
     --ToDo
@@ -52,8 +63,6 @@ startGame ps = do
     x <- entscheidungKI (ps,0) []
     print $ snd x
         
-    
-    putStrLn (show (runde1bis4 deck1)) --Platzhalter, damit es ausfuehrbar ist. Kann spaeter weg!
     
 
 --Gibt gemischtes Kartendeck zurueck 
@@ -172,9 +181,34 @@ runde1b cs ps = ([p1,p2],last cards1)
 runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
 
+runde2 cs = do
+    let
+        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
+        trashCard = austeilen cs 1 [] 1
+        cardsAndDeck = runde2b (last trashCard)
+    putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
+
 -- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
-runde3b :: [Card] -> [[Card]]
-runde3b cs = austeilen cs 1 [] 1
+runde34 :: [Card] -> [[Card]]
+runde34 cs = austeilen (last trashCard) 1 [] 1
+    where 
+        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
+        trashCard = austeilen cs 1 [] 1
+
+runde3 cs = do
+    let 
+        cardsAndDeck = runde34 cs
+    putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
+
+
+runde4 cs = do
+    let 
+        cardsAndDeck = runde34 cs
+    putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
+    return cardsAndDeck
+
 --Testfunktion um 5 random Karten zu bekommen. Kann danach vermutlich wieder geloescht werden!!
 runde1bis4 :: [Card] -> [Card]
 runde1bis4 cs = f3 ++ s1 ++ t1 
@@ -183,8 +217,8 @@ runde1bis4 cs = f3 ++ s1 ++ t1
         s1 = head s
         t1 = head t
         f = runde2b cs
-        s = runde3b $ last f
-        t = runde3b $ last s
+        s = runde34 $ last f
+        t = runde34 $ last s
 
 -- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
 -- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
