@@ -10,6 +10,7 @@ import Player
 
 import System.Random
 import Data.List
+import Control.Monad
 
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
@@ -36,7 +37,7 @@ startGame ps = do
         deck1 = snd $ r1
 
     --ToDo: Setzen
-    playersAndPot1 <- runde playersAndPot []
+    playersAndPot1 <- runde (players1,snd playersAndPot) []
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
     r2 <- runde2 deck1
@@ -163,12 +164,22 @@ nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 -- mit IO
 entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungMensch (p, pot) tisch = do
-    putStrLn "Mensch ist dran"
+    putStrLn "Du bist dran"
     abfrage
     where abfrage = do  
             --Ausgabe: Du hast folgende Handkarten: ...
+            let hand = getPlayerHand $ head p
+            putStr "Du hast folgende Handkarten: "
+            putStr .  show $ head hand
+            putStr " und "
+            putStr .  show $ hand !! 1
+            putStrLn ""
             --auf dem Tisch liegen die Karten...
-            --du hast noch xxx Geld (weiter Info Ausgaben)
+            when (not $ null tisch) $ do
+                putStr "Auf dem Tisch liegen: "
+                (putStr . show) tisch
+                putStrLn ""
+            --du hast noch xxx Geld (weiter Info Ausgaben)?
             putStrLn "Was möchtest du tun? Call, Raise oder Fold?"
             input <- getLine
             if (input == "Call" || input == "call") 
