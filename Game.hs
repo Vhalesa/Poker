@@ -42,23 +42,29 @@ startGame ps = do
     r2 <- runde2 deck1
     let
         deck2 = last r2
+
     --ToDo: Setzen
+    playersAndPot2 <- runde playersAndPot1 (head r2)
 
     --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
     r3 <- runde3 deck2
     let
         deck3 = last r3
         tischkarten = head r2 ++ head r3
+
     --ToDo: Setzen 
+    playersAndPot3 <- runde playersAndPot2 tischkarten
 
     --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
     r4 <- runde4 deck3
     let
         finalTischkarten = tischkarten ++ head r4
+
     --ToDo: Setzen
+    playersAndPot4 <- runde playersAndPot2 finalTischkarten
 
     --Showdown, wer hat gewonnen??
-    playersAfterShowdown <- showdown (players1,snd $ playersAndPot) (finalTischkarten)
+    playersAfterShowdown <- showdown (players1,snd $ playersAndPot4) (finalTischkarten)
 
     --Weiterspielen?
     --ToDo
@@ -157,22 +163,55 @@ nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 -- mit IO
 entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungMensch (p, pot) tisch = do
-    putStrLn "Mensch called"
-    print $ getPlayerName $ head p
-    return $ call (p, pot)
-
-  
-
+    putStrLn "Mensch ist dran"
+    abfrage
+    where abfrage = do  
+            --Ausgabe: Du hast folgende Handkarten: ...
+            --auf dem Tisch liegen die Karten...
+            --du hast noch xxx Geld (weiter Info Ausgaben)
+            putStrLn "Was möchtest du tun? Call, Raise oder Fold?"
+            input <- getLine
+            if (input == "Call" || input == "call") 
+              then do
+                putStrLn "Du hast Call eingesetzt. It's very effektive" 
+                return $ call (p, pot)
+            --else if (input  == "Fold" || input == "fold")
+            --   then do  
+            --    putStrLn "Du hast Fold eingesetzt. It's not very effektive" 
+            else if (input  == "Raise" || input == "raise")
+               then do  
+                putStrLn "Du hast Raise eingesetzt. Um wie viel möchtest du erhöhen?" 
+                raiseAbfrage
+            else do
+              putStrLn "Du musst entweder Raise oder Call oder Fold eingeben!"
+              abfrage 
+          --Betrag, um den der Spieler erhoehen will
+          --fehlt noch: Ueberpruefung, sodass innerhalb des Budgets ist (und positiv)
+          --            dass nur Int eingegeben wurde, nicht 132xxx 
+          raiseAbfrage = do
+            eingabe <- getLine
+            if (null (isInt eingabe)) 
+              then do  
+                --todo: genauere Ausgabe, was als Eingabe geht
+                putStrLn "Du musst eine ganze Zahl zwischen 5 und All In (x) eingeben!"
+                raiseAbfrage
+              else do
+                let betrag = fst $ head (isInt eingabe)
+                putStrLn ("Du hast um den Betrag " ++ eingabe ++ " erhöht.")
+                return $ raise (p,pot) betrag 
+          --gibt wenn Anfang ein Int einen [(Int,RestString)] zurueck. Ansonsten eine leere Liste
+          isInt :: String -> [(Int,String)]
+          isInt x = reads x
+         
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
 -- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
 -- evlt mit IO, da ausgegeben werden soll, was die KI macht?
 entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
+    putStrLn "Ki ist am Zug"
     putStrLn "KI called"
-    print $ getPlayerName $ head p
     return $ call (p, pot)
-
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde
