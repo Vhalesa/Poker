@@ -1,11 +1,11 @@
 To-Do-Liste
 
-Karten:
+Karten: [done]
   - Definition (Datentypen für Farbe, Wert, Karte -> Show, Eq, Ord + evtl Enum, Bounded) [done]
   - Deck (mit allen Karten) [done]
   - Stapel -> Mischfunktion für das Deck [done]
 
-Chips:
+Chips: => abgeschafft!
   - Datentyp (Show, Ord, Eq) [done]
   - Chipshaufen für jeden Spieler für den Anfang [done]
   - Summe der Chips bilden [done]
@@ -27,12 +27,12 @@ Spielablauf (IO?):
   - vor der jeder Spielrunde
     - Kartendeck mischen [done]
     - Small/Big Blind zuweisen [done]
-  - 4 Wettrunden [] 
-    -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) []
+  - 4 Wettrunden [done] 
+    -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) [done]
       -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
       - Small Blind und Big Blind setzen automatisch [done]
-      - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören []
-      - Big Blind: aufstocken, erhöhen oder verlassen []
+      - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören [done]
+      - Big Blind: aufstocken, erhöhen oder verlassen [done]
       - while (beide haben ungleichen Betrag)
         - spielDerDranIst: Raise, Call oder Fold
         - nächsterSpielerDran -> [p1,p2] (p1 war dran, wird wieder ganz hinten eingereiht) 
@@ -64,7 +64,7 @@ Spielablauf (IO?):
 Mensch: []
 - In neues Modul, da Game bereits sehr groß? []
 - Abfrage, was er tun will (Call, Raise, Fold) []
-  -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn
+  -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn 
 - nach jedem Spiel: weiterspielen? []
 
 KI:
@@ -72,7 +72,7 @@ KI:
 - Anfang: Rudimentäre KI? (Random könnte kompliziert werden...)
     -> KI kann Call, Raise, Fold, AllIn []
     -> KI kann ihre Menge an Chips auslesen []
-    -> KI macht immer das gleiche (immer call z.B.) []
+    -> KI macht immer das gleiche (immer call z.B.) [done]
     -> KI kann durcheinander Call, Raise, Fold und AllIn []
 - Später: KI macht intelligente Züge 
     -> KI berechnet ihr momentanes Blatt []
