@@ -164,6 +164,7 @@ nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 -- mit IO
 entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungMensch (p, pot) tisch = do
+    putStrLn ""
     putStrLn "Du bist dran"
     abfrage
     where abfrage = do  
@@ -179,7 +180,7 @@ entscheidungMensch (p, pot) tisch = do
                 putStr "Auf dem Tisch liegen: "
                 (putStr . show) tisch
                 putStrLn ""
-            --du hast noch xxx Geld (weiter Info Ausgaben)?
+            --todo: du hast noch xxx Geld (weiter Info Ausgaben)?
             putStrLn "Was möchtest du tun? Call, Raise oder Fold?"
             input <- getLine
             if (input == "Call" || input == "call") 
@@ -217,11 +218,12 @@ entscheidungMensch (p, pot) tisch = do
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
 -- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
--- evlt mit IO, da ausgegeben werden soll, was die KI macht?
 entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
-    putStrLn "Ki ist am Zug"
+    putStrLn ""
+    putStrLn "KI ist am Zug"
     putStrLn "KI called"
+    putStrLn ""
     return $ call (p, pot)
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
