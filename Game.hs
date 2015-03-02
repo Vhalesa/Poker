@@ -176,7 +176,16 @@ entscheidungMensch (p, pot) tisch = do
                 (putStr . show) tisch
                 putStrLn ""
             --todo: du hast noch xxx Geld (weiter Info Ausgaben)?
-            putStrLn "Was möchtest du tun? Call, Raise oder Fold?"
+            let eigCash = getPlayerCash $ head p
+                bet = getCurrentBet $ p !! 1
+                eigBet = getCurrentBet $ head p
+            putStr "Du hast noch Cash: "
+            putStrLn . show $ eigCash 
+            putStr "Die höchste Wette ist derzeit bei: "
+            putStrLn . show $ bet 
+            putStr "Deine Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
+            putStrLn . show $ eigBet 
+            putStrLn "Was möchtest du tun? (Call/Raise/Fold)"
             input <- getLine
             if (input == "Call" || input == "call") 
               then do
@@ -188,24 +197,30 @@ entscheidungMensch (p, pot) tisch = do
             else if (input  == "Raise" || input == "raise")
                then do  
                 putStrLn "Du hast Raise eingesetzt. Um wie viel möchtest du erhöhen?" 
-                raiseAbfrage
+                raiseAbfrage p
             else do
-              putStrLn "Du musst entweder Raise oder Call oder Fold eingeben!"
+              putStrLn "Du musst Call, Raise oder Fold eingeben."
               abfrage 
           --Betrag, um den der Spieler erhoehen will
           --fehlt noch: Ueberpruefung, sodass innerhalb des Budgets ist (und positiv)
           --            dass nur Int eingegeben wurde, nicht 132xxx 
-          raiseAbfrage = do
+          raiseAbfrage p = do
             eingabe <- getLine
             if (null (isInt eingabe)) 
               then do  
                 --todo: genauere Ausgabe, was als Eingabe geht
-                putStrLn "Du musst eine ganze Zahl zwischen 5 und All In (x) eingeben!"
-                raiseAbfrage
+                putStrLn "Du musst eine ganze Zahl zwischen 0 und All In (x) eingeben!"
+                raiseAbfrage p
               else do
                 let betrag = fst $ head (isInt eingabe)
-                putStrLn ("Du hast um den Betrag " ++ eingabe ++ " erhöht.")
-                return $ raise (p,pot) betrag 
+                if (betrag < 0)
+                  then do
+                    putStrLn "Du kannst nicht um einen negativen Betrag erhöhen. Du Cheater!"
+                    putStrLn "Gib gefälligst eine positive Zahl ein."
+                    raiseAbfrage p
+                  else do
+                    putStrLn ("Du hast um den Betrag " ++ eingabe ++ " erhöht.")
+                    return $ raise (p,pot) betrag 
           --gibt wenn Anfang ein Int einen [(Int,RestString)] zurueck. Ansonsten eine leere Liste
           isInt :: String -> [(Int,String)]
           isInt x = reads x
