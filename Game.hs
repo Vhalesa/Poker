@@ -16,18 +16,19 @@ import Control.Monad
 main = do 
     let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, currentBet=0}
         player2 = Player { name = "Player 2", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, currentBet=0}
-    startGame [player1,player2]
+    startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
---Ein komplettes Spiel mit einer Liste an Spielern durchfuehren
-startGame ps = do
+--Ein komplettes Spiel mit einer Liste an Spielern durchfuehren; n = n-te Spielrunde
+startGame ps n = do
     --Karten mischen
     deck <- mischen
     print deck
 
     --Blinds bezahlen 
-    playersAndPot <- doBlinds ps 10
+    let blindsMultiplikator = 1 + (quot (n-1) $ length ps)
+    playersAndPot <- doBlinds ps (blindsMultiplikator*10)
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --Karten austeilen 
@@ -68,7 +69,7 @@ startGame ps = do
     playersAfterShowdown <- showdown (players1,snd $ playersAndPot4) (finalTischkarten)
 
     --Weiterspielen?
-    --ToDo
+    continueGame playersAfterShowdown n
 
     -- Testzeug
     --x <- entscheidungKI (ps,0) []
@@ -137,6 +138,12 @@ pay x p = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
 resetBets ps = map removeCurrentBet ps
+
+resetHands :: [Player] -> [Player]
+resetHands ps = map (setPlayerHand []) ps
+
+resetCombos :: [Player] -> [Player]
+resetCombos ps = map (setPlayerCombo $ HighCard []) ps
 
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
@@ -326,4 +333,20 @@ replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns)
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 
--- Abfrage bei menschlichen Spieler fuer jede Wettrunde/Runde etc.
+continueGame ps n = do
+    putStrLn ("Die " ++ show n ++ ". Spielrunde ist vorbei. Weiterspielen? (Y/N)")
+    input <- getLine
+    if input=="y" || input=="Y" then do
+        putStrLn "So ist es recht!"
+        let
+            updatedPlayers = resetCombos $ resetHands $ resetBets ps
+        startGame updatedPlayers (n+1)
+    else if input=="n" || input=="N" then do
+        putStrLn "Du hast das Spiel beendet."
+
+    else if any (<=10) (map getPlayerCash ps) then do
+        putStrLn "Mindestens ein Spieler hat zu wenig Geld. Das Spiel ist deshalb beendet."
+        --todo falls wir mehr als 2 Spieler machen: Ohne den Spieler weiterspielen?
+    else do
+        continueGame ps n
+
