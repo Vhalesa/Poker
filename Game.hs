@@ -80,7 +80,7 @@ startGame ps n = do
     playersAndPot4 <- runde playersAndPot3 finalTischkarten
 
     --Showdown, wer hat gewonnen??
-    playersAfterShowdown <- showdown (players1,snd $ playersAndPot4) (finalTischkarten)
+    playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
 
     --Weiterspielen?
     continueGame playersAfterShowdown n
