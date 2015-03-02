@@ -88,8 +88,8 @@ KI:
     -> KI kann bluffen []
 
 Text-Ausgabe:
-  - Kartensymbole wenn möglich in bunt (rot/schwarz) []
-    -> wird schwer, da es auf dem Cip-Pool das entsprechende Modul fehlt
+  - Kartensymbole wenn möglich in bunt (rot/schwarz) [done]
+  - Ausgabe generell schöner machen. Fragen vielleicht in fett oder so []
 
 Allgemeine Anforderungen:
 - mind. 2 (oder 3) Themen aus der Vorlesung verwenden
