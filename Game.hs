@@ -68,7 +68,7 @@ startGame ps = do
     playersAfterShowdown <- showdown (players1,snd $ playersAndPot4) (finalTischkarten)
 
     --Weiterspielen?
-    --ToDo
+    continueGame playersAfterShowdown
 
     -- Testzeug
     --x <- entscheidungKI (ps,0) []
@@ -137,6 +137,12 @@ pay x p = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
 resetBets ps = map removeCurrentBet ps
+
+resetHands :: [Player] -> [Player]
+resetHands ps = map (setPlayerHand []) ps
+
+resetCombos :: [Player] -> [Player]
+resetCombos ps = map (setPlayerCombo $ HighCard []) ps
 
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
@@ -326,4 +332,16 @@ replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns)
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 
--- Abfrage bei menschlichen Spieler fuer jede Wettrunde/Runde etc.
+continueGame ps = do
+    putStrLn "Die Spielrunde ist vorbei. Weiterspielen? (Y/N)"
+    input <- getLine
+    if input=="y" || input=="Y" then do
+        putStrLn "So ist es recht!"
+        let
+            updatedPlayers = resetCombos $ resetHands $ resetBets ps
+        startGame updatedPlayers
+    else if input=="n" || input=="N" then do
+        putStrLn "Das Spiel ist beendet."
+    else do
+        continueGame ps
+
