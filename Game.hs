@@ -77,7 +77,7 @@ startGame ps n = do
         finalTischkarten = tischkarten ++ head r4
 
     --Setzen
-    playersAndPot4 <- runde playersAndPot2 finalTischkarten
+    playersAndPot4 <- runde playersAndPot3 finalTischkarten
 
     --Showdown, wer hat gewonnen??
     playersAfterShowdown <- showdown (players1,snd $ playersAndPot4) (finalTischkarten)
