@@ -1,3 +1,4 @@
+#!/usr/bin/runhaskell
 --Dieses Modul kuemmert sich um den Ablauf des Spiels. Hier werden Karten gegeben, Einsaetze gemacht usw.
 module Game where
 
