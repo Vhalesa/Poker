@@ -55,9 +55,9 @@ Spielablauf (IO?):
       -> dazu vielleicht die Combo in Player speichern? [done]
     - Verteilung des ChipsGewinns [done]
   - nach jeder Spielrunde
-    - Spieler hat die Möglichkeit aufzuhören []
-    - automatisches Ende, wenn einer zu wenig Chips/Geld hat []
-    - Reset von Pot, Karten, Combo, CurrentBet []
+    - Spieler hat die Möglichkeit aufzuhören [done]
+    - automatisches Ende, wenn einer keine Chips mehr hat [done] 
+    - Reset von Pot, Karten, Combo, CurrentBet [done]
   - nach n Spielrunden (Wenn jeder Spieler einmal Big Blind war)
     - Blinds werden erhoeht []
 
@@ -65,7 +65,7 @@ Mensch: []
 - In neues Modul, da Game bereits sehr groß? []
 - Abfrage, was er tun will (Call, Raise, Fold) []
   -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn
-- nach jedem Spiel: weiterspielen? []
+- nach jedem Spiel: weiterspielen? [done]
 
 KI:
 - In neues Modul, da Game bereits sehr groß? []
