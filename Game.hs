@@ -24,8 +24,22 @@ main = do
 startGame ps n = do
     --Karten mischen
     deck <- mischen
-    print deck
+    --print deck
 
+    putStrLn ""
+    putStrLn "  ██████╗  ██████╗ ██╗  ██╗███████╗██████╗"
+    putStrLn "  ██╔══██╗██╔═══██╗██║ ██╔╝██╔════╝██╔══██╗"
+    putStrLn "  ██████╔╝██║   ██║█████╔╝ █████╗  ██████╔╝"    
+    putStrLn "  ██╔═══╝ ██║   ██║██╔═██╗ ██╔══╝  ██╔══██╗"    
+    putStrLn "  ██║     ╚██████╔╝██║  ██╗███████╗██║  ██║"    
+    putStrLn "  ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"    
+                                             
+    putStrLn ""
+    putStr "         "
+    putStrLn "\ESC[5;32m$$$\ESC[0m \ESC[5mWIN BIG MONEY \ESC[5;32m$$$\ESC[0m"
+    putStrLn ""
+    putStrLn ""
+  
     --Blinds bezahlen 
     let blindsMultiplikator = 1 + (quot (n-1) $ length ps)
     playersAndPot <- doBlinds ps (blindsMultiplikator*10)
