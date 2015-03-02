@@ -37,15 +37,15 @@ startGame ps n = do
         players1 = fst $ r1
         deck1 = snd $ r1
 
-    --ToDo: Setzen
-    playersAndPot1 <- runde (players1,snd playersAndPot) []
+    --Setzen
+    playersAndPot1 <- runde (players1, snd playersAndPot) []
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
     r2 <- runde2 deck1
     let
         deck2 = last r2
 
-    --ToDo: Setzen
+    --Setzen
     playersAndPot2 <- runde playersAndPot1 (head r2)
 
     --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
@@ -54,7 +54,7 @@ startGame ps n = do
         deck3 = last r3
         tischkarten = head r2 ++ head r3
 
-    --ToDo: Setzen 
+    --Setzen 
     playersAndPot3 <- runde playersAndPot2 tischkarten
 
     --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
@@ -62,7 +62,7 @@ startGame ps n = do
     let
         finalTischkarten = tischkarten ++ head r4
 
-    --ToDo: Setzen
+    --Setzen
     playersAndPot4 <- runde playersAndPot2 finalTischkarten
 
     --Showdown, wer hat gewonnen??
@@ -71,14 +71,6 @@ startGame ps n = do
     --Weiterspielen?
     continueGame playersAfterShowdown n
 
-    -- Testzeug
-    --x <- entscheidungKI (ps,0) []
-    --print $ snd x
-    --runde (ps,0) []
-    --print $ snd y
-    print "Testausgabe"
-        
-    
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -128,7 +120,7 @@ call p = raise p 0
 -- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay diff p1], pot + diff)
-  where diff = getCurrentBet p2 - getCurrentBet p1 + betrag
+  where diff = (getCurrentBet p2 - getCurrentBet p1) + betrag
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player
@@ -160,10 +152,6 @@ runde (p, pot) tisch = do
           wdhRunde ((p1:p2:ps),pot) tisch 
             | getCurrentBet p1 == getCurrentBet p2 = return ((p1:p2:ps),pot)
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
-
--- brauchen wir vmtl gar nicht 
-nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)
-nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
 -- Abfrage beim Mensch: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
