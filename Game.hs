@@ -26,7 +26,6 @@ startGame ps n = do
     deck <- mischen
     print deck
 
-    putStrLn "\ESC[7;33;40mHallo?\ESC[0m"
     --Blinds bezahlen 
     let blindsMultiplikator = 1 + (quot (n-1) $ length ps)
     playersAndPot <- doBlinds ps (blindsMultiplikator*10)
