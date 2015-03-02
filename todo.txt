@@ -29,12 +29,17 @@ Spielablauf (IO?):
     - Small/Big Blind zuweisen [done]
   - 4 Wettrunden [] 
     -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) []
+      -> Wenn alle Spieler außer einem fold gemacht haben, abbrechen und direkt verbleibenden Spieler zum Gewinner erklären []
       -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
       - Small Blind und Big Blind setzen automatisch [done]
       - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören []
       - Big Blind: aufstocken, erhöhen oder verlassen []
       - while (beide haben ungleichen Betrag)
         - spielDerDranIst: Raise, Call oder Fold
+            -> Fold:
+                - Spieler temporär aus der Spielerliste löschen und am Ende nach dem Showdown wieder einsetzen?
+                - Hand des Spielers auf [] setzen?
+                - Spieler eine Bool Variable geben namens Fold?
         - nächsterSpielerDran -> [p1,p2] (p1 war dran, wird wieder ganz hinten eingereiht) 
     - 1. Runde (PreFlop) [done]
       -> jeder Spieler erhält 2 Karten auf die Hand
