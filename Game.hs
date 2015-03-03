@@ -52,39 +52,50 @@ startGame ps n = do
         players1 = fst $ r1
         deck1 = snd $ r1
 
-    --Setzen -> Ueberpruefen, ob es schon einen Gewinner gibt?
+    -- Setzen -> Ueberpruefen, ob es schon einen Gewinner gibt?
     playersAndPot1 <- runde (players1, snd playersAndPot) []
+    if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot1))
+      then do
+        continueGame (payWinner (fst playersAndPot1) ([head $ fst playersAndPot1],snd playersAndPot1)) n
+      else do 
+        --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
+        r2 <- runde2 deck1
+        let
+            deck2 = last r2
 
-    --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
-    r2 <- runde2 deck1
-    let
-        deck2 = last r2
+        --Setzen
+        playersAndPot2 <- runde playersAndPot1 (head r2)
+        if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot2))
+          then do
+            continueGame (payWinner (fst playersAndPot2) ([head $ fst playersAndPot2],snd playersAndPot2)) n
+          else do
+            --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
+            r3 <- runde3 deck2
+            let
+                deck3 = last r3
+                tischkarten = head r2 ++ head r3
 
-    --Setzen
-    playersAndPot2 <- runde playersAndPot1 (head r2)
+            --Setzen 
+            playersAndPot3 <- runde playersAndPot2 tischkarten
+            if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot3))
+              then do continueGame (payWinner (fst playersAndPot3) ([head $ fst playersAndPot3],snd playersAndPot3)) n
+              else do
+                --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
+                r4 <- runde4 deck3
+                let
+                    finalTischkarten = tischkarten ++ head r4
 
-    --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
-    r3 <- runde3 deck2
-    let
-        deck3 = last r3
-        tischkarten = head r2 ++ head r3
+                --Setzen
+                playersAndPot4 <- runde playersAndPot3 finalTischkarten
+                if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
+                  then do
+                    continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
+                  else do
+                    --Showdown, wer hat gewonnen??
+                    playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
 
-    --Setzen 
-    playersAndPot3 <- runde playersAndPot2 tischkarten
-
-    --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
-    r4 <- runde4 deck3
-    let
-        finalTischkarten = tischkarten ++ head r4
-
-    --Setzen
-    playersAndPot4 <- runde playersAndPot3 finalTischkarten
-
-    --Showdown, wer hat gewonnen??
-    playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
-
-    --Weiterspielen?
-    continueGame playersAfterShowdown n
+                    --Weiterspielen?
+                    continueGame playersAfterShowdown n
 
 
 --Gibt gemischtes Kartendeck zurueck 
