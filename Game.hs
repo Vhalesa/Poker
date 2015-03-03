@@ -188,6 +188,7 @@ runde (p, pot) tisch = do
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch 
             | getCurrentBet p1 == getCurrentBet p2 = return ((p1:p2:ps),pot)
+            | (getPlayerIngame p1) || (not $ all getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
           nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
