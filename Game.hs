@@ -15,8 +15,8 @@ import Control.Monad
 
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
-    let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, currentBet=0}
-        player2 = Player { name = "Player 2", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, currentBet=0}
+    let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, ingame = True, currentBet=0}
+        player2 = Player { name = "Player 2", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
     startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -125,6 +125,9 @@ payBlind v p
     | getPlayerRole p == SmallBlind = pay v p
     | otherwise = p
 
+-- p1 folded
+fold :: ([Player],Int) -> ([Player],Int)
+fold ((p1:ps),pot) = (ps++[setPlayerIngame False p1],pot)
 
 -- p1 erhoeht 
 -- bekommt die Liste der Player und den Pot (und gibt diese mit Veraenderung wieder zurueck)
@@ -152,6 +155,9 @@ resetHands ps = map (setPlayerHand []) ps
 
 resetCombos :: [Player] -> [Player]
 resetCombos ps = map (setPlayerCombo $ HighCard []) ps
+
+resetIngame :: [Player] -> [Player]
+resetIngame ps = map (setPlayerIngame True) ps
 
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
@@ -363,7 +369,7 @@ continueGame ps n = do
     if input=="y" || input=="Y" then do
         putStrLn "So ist es recht!"
         let
-            updatedPlayers = resetCombos $ resetHands $ resetBets ps
+            updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets ps
         startGame updatedPlayers (n+1)
     else if input=="n" || input=="N" then do
         putStrLn "Du hast das Spiel beendet."

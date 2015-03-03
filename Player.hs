@@ -12,7 +12,7 @@ data Role = BigBlind | SmallBlind | Dealer | None
     deriving (Eq)
 
 --Datentyp fuer Spieler
-data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ki::Bool}
+data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ingame::Bool, ki::Bool}
 
 instance Show Player where
     show Player {name} = name
@@ -64,6 +64,12 @@ setCurrentBet currentBet x = x {currentBet}
 
 removeCurrentBet :: Player -> Player
 removeCurrentBet p = setCurrentBet 0 p
+
+getPlayerIngame :: Player -> Bool
+getPlayerIngame Player {ingame} = ingame
+
+setPlayerIngame :: Bool -> Player -> Player
+setPlayerIngame ingame x = x {ingame}
 
 getKI :: Player -> Bool
 getKI Player {ki} = ki
