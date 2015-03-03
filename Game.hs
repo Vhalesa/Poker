@@ -52,7 +52,7 @@ startGame ps n = do
         players1 = fst $ r1
         deck1 = snd $ r1
 
-    --Setzen
+    --Setzen -> Ueberpruefen, ob es schon einen Gewinner gibt?
     playersAndPot1 <- runde (players1, snd playersAndPot) []
 
     --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
@@ -168,12 +168,18 @@ runde (p, pot) tisch = do
   y <- rundeImmer x tisch
   wdhRunde y tisch
     where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int) 
-          rundeImmer ((p1:ps),pot) tisch = if (getKI p1) then entscheidungKI ((p1:ps),pot) tisch
-                                              else entscheidungMensch ((p1:ps),pot) tisch
+          rundeImmer ((p1:ps),pot) tisch = if (not $ getPlayerIngame p1)
+                                             then return $ nextPlayer ((p1:ps),pot)
+                                           else if (not $ all getPlayerIngame ps) 
+                                              then return $ ((p1:ps),pot)
+                                           else if (getKI p1) then entscheidungKI ((p1:ps),pot) tisch
+                                           else entscheidungMensch ((p1:ps),pot) tisch
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch 
             | getCurrentBet p1 == getCurrentBet p2 = return ((p1:p2:ps),pot)
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
+          nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
+          nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
 -- Abfrage beim Mensch: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -213,9 +219,10 @@ entscheidungMensch (p, pot) tisch = do
               then do
                 putStrLn "Du hast Call eingesetzt. It's very effektive" 
                 return $ call (p, pot)
-            --else if (input  == "Fold" || input == "fold")
-            --   then do  
-            --    putStrLn "Du hast Fold eingesetzt. It's not very effektive" 
+            else if (input  == "Fold" || input == "fold")
+               then do  
+                putStrLn "Du hast Fold eingesetzt. It's not very effektive" 
+                return $ fold (p,pot)
             else if (input  == "Raise" || input == "raise")
                then do  
                 putStrLn "Du hast Raise eingesetzt. Um wie viel möchtest du erhöhen?" 
