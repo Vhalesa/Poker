@@ -333,23 +333,26 @@ austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
      
 -- Showdown
---showdown :: ([Player],Int) -> IO
+showdown :: ([Player],Int) -> [Card] -> IO [Player]
 showdown (ps,pot) cs = do
     let
         playersWithCombo = map (getComboForPlayer cs) ps
         
         winner = playerWithHighestCombo playersWithCombo
-        --Gewinner bezahlt negativen Betrag = Gewinner bekommt Betrag
-        updatedWinner = map (pay (negate $ quot pot (length winner))) winner 
 
-        newPlayerList = replace updatedWinner playersWithCombo
+        updatedPlayers = payWinner playersWithCombo (winner,pot) 
+
         
-    putStrLn("Gewonnen hat " ++ show updatedWinner ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
-    putStrLn(show updatedWinner ++ " hat jetzt " ++ show (map getPlayerCash updatedWinner) ++ " Chips")
+    putStrLn("Gewonnen hat " ++ (show (map getPlayerName winner)) ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
+    putStrLn( show updatedPlayers)
 
-    return newPlayerList
-    
+    return updatedPlayers
 
+-- Gewinner bezahlt negativen Betrag = Gewinner bekommt Betrag  
+payWinner :: [Player] -> ([Player],Int) -> [Player]
+payWinner all (winners,pot) = replace newWinners all
+    where
+        newWinners = map (pay (negate $ quot pot (length winners))) winners
 
 
 -- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
