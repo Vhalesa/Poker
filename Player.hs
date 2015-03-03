@@ -15,7 +15,7 @@ data Role = BigBlind | SmallBlind | Dealer | None
 data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ingame::Bool, ki::Bool}
 
 instance Show Player where
-    show Player {name} = name
+    show Player {name,cash} = "(" ++ name ++ ", Cash: " ++ show cash ++")"
 
 --Zwei Spieler mit dem selben Namen sind der selbe Spieler
 instance Eq Player where
