@@ -148,8 +148,12 @@ call p = raise p 0
 -- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
 -- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
-raise ((p1:p2:ps),pot) betrag = (p2:ps ++ [pay diff p1], pot + diff)
+raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) > 0) 
+                                  then (p2:ps ++ [pay diff p1], pot + diff)
+                                  else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff - allIn)))
   where diff = (getCurrentBet p2 - getCurrentBet p1) + betrag
+        allIn = getPlayerCash p1
+        newPlayer2 = pay (negate (diff - allIn)) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player
