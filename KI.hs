@@ -16,7 +16,13 @@ entscheidungKI (p, pot) tisch = do
     let
         kiCards :: [Card]
         kiCards = getPlayerHand (head p)
+
+        kiCash :: Int
+        kiCash = getPlayerCash (head p)
+
+        kiRaise :: Int
+        kiRaise = 200
         
-    if (any (>= Card(Spades,Jack)) kiCards) then return $ raise (p, pot) 200
+    if (any (>= Card(Spades,Jack)) kiCards && kiCash >= kiRaise) then return $ raise (p, pot) kiRaise
     else if (all (<= Card (Spades,Five)) kiCards) then return $ fold (p, pot)
     else return $ call (p,pot)
