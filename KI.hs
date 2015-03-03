@@ -22,7 +22,12 @@ entscheidungKI (p, pot) tisch = do
 
         kiRaise :: Int
         kiRaise = 200
-        
-    if (any (>= Card(Spades,Jack)) kiCards && kiCash >= kiRaise) then return $ raise (p, pot) kiRaise
+
+    --Wenn beide Karten besser als 10, ALL IN
+    if (all (>= Card(Spades,Jack)) kiCards) then return $ raise (p, pot) kiCash
+    --Wenn eine Karte besser als Dame, RAISE
+    else if (any (>= Card(Spades,King)) kiCards && kiCash >= kiRaise) then return $ raise (p, pot) kiRaise
+    --Wenn alle Karten schlechter als 6, FOLD
     else if (all (<= Card (Spades,Five)) kiCards) then return $ fold (p, pot)
+    --Sonst CALL
     else return $ call (p,pot)
