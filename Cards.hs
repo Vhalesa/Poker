@@ -17,6 +17,15 @@ module Cards where
     show Spades = " \ESC[47;38;5;16m♠\ESC[0m "
     show Clubs = " \ESC[47;38;5;16m♣\ESC[0m "
 
+--Karten werden nicht fancy angezeigt
+{-
+  instance Show Color where
+    show Diamonds = "♦"
+    show Hearts = "♥"
+    show Spades = "♠"
+    show Clubs = "♣
+-}
+
   instance Eq Card where
     (Card (c1,v1)) == (Card (c2,v2)) = v1 == v2
 

@@ -97,7 +97,7 @@ mischen = do
 --Kuemmert sich um alles, was die Blinds angeht, Blinds zuweisen, bezahlen und in den Pot packen.
 doBlinds :: [Player] -> Int -> IO([Player],Int)
 doBlinds ps x = do
-    let ps1 = map delegateBlind ps
+    let ps1 = delegateBlind ps
         ps2 = map (payBlind x) ps1
         pot = blinds x
     putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
@@ -107,11 +107,12 @@ doBlinds ps x = do
         
 
 -- Small und Big Blind zuweisen
-delegateBlind :: Player -> Player
-delegateBlind p
-    | getPlayerRole p == BigBlind = p {role = SmallBlind}
-    | getPlayerRole p == SmallBlind = p {role = BigBlind}
-    | otherwise = p
+delegateBlind :: [Player] -> [Player]
+delegateBlind [] = []
+delegateBlind (p:ps)
+    | getPlayerRole p == BigBlind = p {role = SmallBlind} : delegateBlind ps
+    | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
+    | otherwise = p : delegateBlind ps
 
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int
