@@ -112,8 +112,7 @@ doBlinds ps x = do
         ps2 = map (payBlind x) ps1
         pot = blinds x
     putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
-    putStrLn ("Spieler 1 hat noch " ++ show (getPlayerCash $ head ps2) ++ " Chips")
-    putStrLn ("Spieler 2 hat noch " ++ show (getPlayerCash $ last ps2) ++ " Chips")
+    putStrLn ("Verbleibende Chips: " ++ show ps2)
     return (ps2,pot)
         
 
@@ -393,17 +392,16 @@ replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns)
 continueGame ps n = do
     putStrLn ("Die " ++ show n ++ ". Spielrunde ist vorbei. Weiterspielen? (Y/N)")
     input <- getLine
-    if input=="y" || input=="Y" then do
-        putStrLn "So ist es recht!"
+    if any (<=10) (map getPlayerCash ps) then do
+        putStrLn "Mindestens ein Spieler hat zu wenig Geld. Das Spiel ist deshalb beendet."
+        --todo falls wir mehr als 2 Spieler machen: Ohne den Spieler weiterspielen?
+    else if input=="y" || input=="Y" then do
+        putStrLn "Die naechste Spielrunde beginnt gleich!"
         let
             updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets ps
         startGame updatedPlayers (n+1)
     else if input=="n" || input=="N" then do
         putStrLn "Du hast das Spiel beendet."
-
-    else if any (<=10) (map getPlayerCash ps) then do
-        putStrLn "Mindestens ein Spieler hat zu wenig Geld. Das Spiel ist deshalb beendet."
-        --todo falls wir mehr als 2 Spieler machen: Ohne den Spieler weiterspielen?
     else do
         continueGame ps n
 
