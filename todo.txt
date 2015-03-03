@@ -70,6 +70,7 @@ Mensch: []
 - In neues Modul, da Game bereits sehr groß? []
 - Abfrage, was er tun will (Call, Raise, Fold) []
   -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn 
+  -> sowas wie raise 200 soll gehen []
 - nach jedem Spiel: weiterspielen? [done]
 
 KI:
