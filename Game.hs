@@ -16,7 +16,7 @@ import Control.Monad
 -- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
     let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, ingame = True, currentBet=0}
-        player2 = Player { name = "Player 2", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
+        player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
     startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -266,9 +266,14 @@ entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
     putStrLn ""
     putStrLn "KI ist am Zug"
-    putStrLn "KI called"
     putStrLn ""
-    return $ call (p, pot)
+    let
+        kiCards :: [Card]
+        kiCards = getPlayerHand (head p)
+        
+    if (any (>= Card(Spades,Jack)) kiCards) then return $ raise (p, pot) 200
+    else if (all (<= Card (Spades,Five)) kiCards) then return $ fold (p, pot)
+    else return $ call (p,pot)
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde
