@@ -351,7 +351,11 @@ runde4 cs = do
 austeilen :: [Card] -> Int -> [[Card]] -> Int -> [[Card]]
 austeilen deck 0 erg x = erg ++ [deck]
 austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
-     
+
+-- Vervollstaendigt die Tischkarten auf 5. 
+completeTableCards :: [Card] -> [Card] -> [Card]
+completeTableCards deck table = head $ austeilen deck 1 [] (5 - length table)
+  
 -- Showdown
 showdown :: ([Player],Int) -> [Card] -> IO [Player]
 showdown (ps,pot) cs = do
