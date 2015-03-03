@@ -18,8 +18,12 @@ Regeln:
   - Tabelle mit den Gewinnmöglichkeiten [done]
   - Big Blind, Small Blind [done]
   - Raise [done]
-  - Call [done]
-  - Fold []
+  - Call []
+    Absicherung, bei nicht genug Geld -> automatisch AllIn -> anderer Spieler bekommt überschüssiges Geld zurück
+  - AllIn []
+    alle Karten aufdecken
+    showDown
+  - Fold [done]
 
 Spielablauf (IO?):
   - am Anfang vor allen Spielrunden (vor dem Spiel)
@@ -29,7 +33,7 @@ Spielablauf (IO?):
     - Small/Big Blind zuweisen [done]
   - 4 Wettrunden [done] 
     -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) [done]
-      -> Wenn alle Spieler außer einem fold gemacht haben, abbrechen und direkt verbleibenden Spieler zum Gewinner erklären []
+      -> Wenn alle Spieler außer einem fold gemacht haben, abbrechen und direkt verbleibenden Spieler zum Gewinner erklären [done]
       -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
       - Small Blind und Big Blind setzen automatisch [done]
       - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören [done]
@@ -39,7 +43,7 @@ Spielablauf (IO?):
             -> Fold:
                 - Spieler temporär aus der Spielerliste löschen und am Ende nach dem Showdown wieder einsetzen?
                 - Hand des Spielers auf [] setzen?
-                - Spieler eine Bool Variable geben namens Fold?
+                - Spieler eine Bool Variable geben namens Fold? [done]
         - nächsterSpielerDran -> [p1,p2] (p1 war dran, wird wieder ganz hinten eingereiht) 
     - 1. Runde (PreFlop) [done]
       -> jeder Spieler erhält 2 Karten auf die Hand
@@ -64,7 +68,7 @@ Spielablauf (IO?):
     - automatisches Ende, wenn einer keine Chips mehr hat [done] 
     - Reset von Pot, Karten, Combo, CurrentBet [done]
   - nach n Spielrunden (Wenn jeder Spieler einmal Big Blind war)
-    - Blinds werden erhoeht []
+    - Blinds werden erhoeht [done]
 
 Mensch: []
 - In neues Modul, da Game bereits sehr groß? []
@@ -79,7 +83,7 @@ KI:
     -> KI kann Call, Raise, Fold, AllIn []
     -> KI kann ihre Menge an Chips auslesen []
     -> KI macht immer das gleiche (immer call z.B.) [done]
-    -> KI kann durcheinander Call, Raise, Fold und AllIn []
+    -> KI kann durcheinander Call, Raise, Fold und AllIn [done]
 - Später: KI macht intelligente Züge 
     -> KI berechnet ihr momentanes Blatt []
     -> KI berechnet die Wahrscheinlichkeit, dass sie damit gewinnt []
