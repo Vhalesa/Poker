@@ -57,45 +57,63 @@ startGame ps n = do
     if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot1))
       then do
         continueGame (payWinner (fst playersAndPot1) ([head $ fst playersAndPot1],snd playersAndPot1)) n
-      else do 
-        --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
-        r2 <- runde2 deck1
+    else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot1)
+      then do
+        --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
+        playersAfterShowdown <- showdown playersAndPot1 $ completeTableCards deck1 [] 
+        --Weiterspielen?
+        continueGame playersAfterShowdown n
+    else do 
+      --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
+      r2 <- runde2 deck1
+      let
+          deck2 = last r2
+
+      --Setzen
+      playersAndPot2 <- runde playersAndPot1 (head r2)
+      if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot2))
+        then do
+          continueGame (payWinner (fst playersAndPot2) ([head $ fst playersAndPot2],snd playersAndPot2)) n
+      else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot2)
+        then do
+          --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
+          playersAfterShowdown <- showdown playersAndPot2 $ completeTableCards deck2 (head r2)
+          --Weiterspielen?
+          continueGame playersAfterShowdown n
+      else do
+        --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
+        r3 <- runde3 deck2
         let
-            deck2 = last r2
+            deck3 = last r3
+            tischkarten = head r2 ++ head r3
 
-        --Setzen
-        playersAndPot2 <- runde playersAndPot1 (head r2)
-        if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot2))
+        --Setzen 
+        playersAndPot3 <- runde playersAndPot2 tischkarten
+        if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot3))
+          then do continueGame (payWinner (fst playersAndPot3) ([head $ fst playersAndPot3],snd playersAndPot3)) n
+        else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot3)
           then do
-            continueGame (payWinner (fst playersAndPot2) ([head $ fst playersAndPot2],snd playersAndPot2)) n
-          else do
-            --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
-            r3 <- runde3 deck2
-            let
-                deck3 = last r3
-                tischkarten = head r2 ++ head r3
+            --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
+            playersAfterShowdown <- showdown playersAndPot3 $ completeTableCards deck3 tischkarten 
+            --Weiterspielen?
+            continueGame playersAfterShowdown n
+        else do
+          --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
+          r4 <- runde4 deck3
+          let
+              finalTischkarten = tischkarten ++ head r4
 
-            --Setzen 
-            playersAndPot3 <- runde playersAndPot2 tischkarten
-            if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot3))
-              then do continueGame (payWinner (fst playersAndPot3) ([head $ fst playersAndPot3],snd playersAndPot3)) n
-              else do
-                --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
-                r4 <- runde4 deck3
-                let
-                    finalTischkarten = tischkarten ++ head r4
+          --Setzen
+          playersAndPot4 <- runde playersAndPot3 finalTischkarten
+          if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
+            then do
+              continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
+            else do
+              --Showdown, wer hat gewonnen??
+              playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
 
-                --Setzen
-                playersAndPot4 <- runde playersAndPot3 finalTischkarten
-                if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
-                  then do
-                    continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
-                  else do
-                    --Showdown, wer hat gewonnen??
-                    playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
-
-                    --Weiterspielen?
-                    continueGame playersAfterShowdown n
+              --Weiterspielen?
+              continueGame playersAfterShowdown n
 
 
 --Gibt gemischtes Kartendeck zurueck 
@@ -148,17 +166,17 @@ call p = raise p 0
 -- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
 -- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
-raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) > 0) 
+raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) >= 0) 
                                   then (p2:ps ++ [pay diff p1], pot + diff)
                                   else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff - allIn)))
-  where diff = (getCurrentBet p2 - getCurrentBet p1) + betrag
+  where diff = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) + betrag
         allIn = getPlayerCash p1
         newPlayer2 = pay (allIn - diff) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player
 pay 0 p = p
-pay x p = p {cash = (getPlayerCash p)-x, currentBet = (getCurrentBet p) + x}
+pay x p = p {cash = getPlayerCash p - x, currentBet = getCurrentBet p + x}
     
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
@@ -261,10 +279,14 @@ entscheidungMensch (p, pot) tisch = do
                     putStrLn "Du kannst nicht um einen negativen Betrag erhöhen. Du Cheater!"
                     putStrLn "Gib gefälligst eine positive Zahl ein."
                     raiseAbfrage eigCash eigBet bet 
+                else if (betrag == 0)
+                  then do
+                    putStrLn "Mensch, da hättest du auch Call nehmen können -.-"
+                    return $ call (p,pot) 
                 else if (betrag > allIn)
                   then do
                     putStrLn "Du kannst nicht um mehr erhöhen als du Geld hast!"
-                    putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und AllIn " 
+                    putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und " 
                     putStrLn . show $ allIn
                     raiseAbfrage eigCash eigBet bet 
                 else do
@@ -281,14 +303,31 @@ entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
     putStrLn ""
     putStrLn "KI ist am Zug"
-    putStrLn ""
+    let eigCash = getPlayerCash $ head p
+        bet = getCurrentBet $ p !! 1
+        eigBet = getCurrentBet $ head p
+    putStr "KI hat noch Cash: "
+    putStrLn . show $ eigCash 
+    putStr "Die höchste Wette ist derzeit bei: "
+    putStrLn . show $ bet 
+    putStr "KIs Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
+    putStrLn . show $ eigBet 
     let
         kiCards :: [Card]
         kiCards = getPlayerHand (head p)
         
-    if (any (>= Card(Spades,Jack)) kiCards) then return $ raise (p, pot) 200
-    else if (all (<= Card (Spades,Five)) kiCards) then return $ fold (p, pot)
-    else return $ call (p,pot)
+    if (any (>= Card(Spades,Jack)) kiCards) then do
+      putStrLn "KI setzt Raise ein"
+      putStrLn ""
+      return $ raise (p, pot) 200
+    else if (all (<= Card (Spades,Five)) kiCards) then do
+      putStrLn "KI setzt Fold ein"
+      putStrLn ""
+      return $ fold (p, pot)
+    else do
+      putStrLn "KI setzt Call ein"
+      putStrLn ""
+      return $ call (p,pot)
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde
@@ -326,6 +365,7 @@ runde2 cs = do
         --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
         trashCard = austeilen cs 1 [] 1
         cardsAndDeck = runde2b (last trashCard)
+    putStrLn ""
     putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
@@ -333,6 +373,7 @@ runde2 cs = do
 runde3 cs = do
     let 
         cardsAndDeck = runde34 cs
+    putStrLn ""
     putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
@@ -340,6 +381,7 @@ runde3 cs = do
 runde4 cs = do
     let 
         cardsAndDeck = runde34 cs
+    putStrLn ""
     putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
     return cardsAndDeck
 
