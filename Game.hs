@@ -240,6 +240,7 @@ entscheidungMensch (p, pot) tisch = do
             let eigCash = getPlayerCash $ head p
                 bet = getCurrentBet $ p !! 1
                 eigBet = getCurrentBet $ head p
+                allIn = eigCash - (bet - eigBet) 
             putStr "Du hast noch Cash: "
             putStrLn . show $ eigCash 
             putStr "Die höchste Wette ist derzeit bei: "
@@ -248,6 +249,7 @@ entscheidungMensch (p, pot) tisch = do
             putStrLn . show $ eigBet 
             putStrLn "Was möchtest du tun? (Call/Raise/Fold)"
             input <- getLine
+            let inputSplit = words input
             if (input == "Call" || input == "call") 
               then do
                 putStrLn "Du hast Call eingesetzt. It's very effektive" 
@@ -259,26 +261,30 @@ entscheidungMensch (p, pot) tisch = do
             else if (input  == "Raise" || input == "raise")
                then do  
                 putStrLn "Du hast Raise eingesetzt. Um wie viel möchtest du erhöhen?" 
-                raiseAbfrage eigCash eigBet bet 
+                raiseAbfrage allIn 
+            else if ((head inputSplit == "Raise" || head inputSplit == "raise") && (length inputSplit) == 2)
+              then do
+                checkRaiseAbfrage (inputSplit !! 1) allIn
             else do
               putStrLn "Du musst Call, Raise oder Fold eingeben."
               abfrage 
           --Betrag, um den der Spieler erhoehen will
-          raiseAbfrage eigCash eigBet bet = do
+          raiseAbfrage allIn = do
             eingabe <- getLine
-            let allIn = eigCash - (bet - eigBet) 
+            checkRaiseAbfrage eingabe allIn
+          checkRaiseAbfrage eingabe allIn = do
             if (null (isInt eingabe)) || ( (snd $ head $ isInt eingabe) /= "")
               then do  
-                putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und AllIn " 
+                putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und " 
                 putStrLn . show $ allIn
-                raiseAbfrage eigCash eigBet bet 
+                raiseAbfrage allIn 
               else do
                 let betrag = fst $ head (isInt eingabe)
                 if (betrag < 0)
                   then do
                     putStrLn "Du kannst nicht um einen negativen Betrag erhöhen. Du Cheater!"
                     putStrLn "Gib gefälligst eine positive Zahl ein."
-                    raiseAbfrage eigCash eigBet bet 
+                    raiseAbfrage allIn 
                 else if (betrag == 0)
                   then do
                     putStrLn "Mensch, da hättest du auch Call nehmen können -.-"
@@ -288,7 +294,7 @@ entscheidungMensch (p, pot) tisch = do
                     putStrLn "Du kannst nicht um mehr erhöhen als du Geld hast!"
                     putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und " 
                     putStrLn . show $ allIn
-                    raiseAbfrage eigCash eigBet bet 
+                    raiseAbfrage allIn 
                 else do
                   putStrLn ("Du hast um den Betrag " ++ eingabe ++ " erhöht.")
                   return $ raise (p,pot) betrag 
