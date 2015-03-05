@@ -1,7 +1,7 @@
 module KI where
 
 import Cards
-import Game
+import Aktionen 
 import Combos
 import Player
  

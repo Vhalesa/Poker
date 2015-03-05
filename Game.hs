@@ -8,6 +8,8 @@ import Cards
 import Random
 import Combos
 import Player
+import Mensch
+import Aktionen
 
 import System.Random
 import Data.List
@@ -152,33 +154,7 @@ payBlind v p
     | getPlayerRole p == BigBlind = pay (2*v) p
     | getPlayerRole p == SmallBlind = pay v p
     | otherwise = p
-
--- p1 folded
-fold :: ([Player],Int) -> ([Player],Int)
-fold ((p1:ps),pot) = (ps++[setPlayerIngame False p1],pot)
-
--- p1 erhoeht 
--- bekommt die Liste der Player und den Pot (und gibt diese mit Veraenderung wieder zurueck)
-call :: ([Player],Int) -> ([Player],Int)
-call p = raise p 0
-
--- p1 erhoeht um betrag 
--- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
--- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
-raise :: ([Player],Int) -> Int -> ([Player],Int)
-raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) >= 0) 
-                                  then (p2:ps ++ [pay diff p1], pot + diff)
-                                else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff2 - allIn)))
-  where diff = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) + betrag
-        diff2 = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) 
-        allIn = getPlayerCash p1
-        newPlayer2 = pay (allIn - diff2) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
-
--- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
-pay :: Int -> Player -> Player
-pay 0 p = p
-pay x p = p {cash = getPlayerCash p - x, currentBet = getCurrentBet p + x}
-    
+   
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
 resetBets ps = map removeCurrentBet ps
@@ -215,94 +191,6 @@ runde (p, pot) tisch = do
           nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
--- Abfrage beim Mensch: Call, Raise oder Fold?
--- braucht dazu die Player, den Pot und die Tischkarten
---entscheidungMensch :: ([Player],Int) -> Int -> IO ([Player],Int) 
--- mit IO
-entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
-entscheidungMensch (p, pot) tisch = do
-    putStrLn ""
-    putStrLn "Du bist dran"
-    abfrage
-    where abfrage = do  
-            --Ausgabe: Du hast folgende Handkarten: ...
-            let hand = getPlayerHand $ head p
-            putStr "Du hast folgende Handkarten: "
-            putStr .  show $ head hand
-            putStr " und "
-            putStr .  show $ hand !! 1
-            putStrLn ""
-            --auf dem Tisch liegen die Karten...
-            when (not $ null tisch) $ do
-                putStr "Auf dem Tisch liegen: "
-                (putStr . show) tisch
-                putStrLn ""
-            --du hast noch xxx Geld (weiter Info Ausgaben)?
-            let eigCash = getPlayerCash $ head p
-                bet = getCurrentBet $ p !! 1
-                eigBet = getCurrentBet $ head p
-                allIn = eigCash - (bet - eigBet) 
-            putStr "Du hast noch Cash: "
-            putStrLn . show $ eigCash 
-            putStr "Die höchste Wette ist derzeit bei: "
-            putStrLn . show $ bet 
-            putStr "Deine Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
-            putStrLn . show $ eigBet 
-            putStrLn "Was möchtest du tun? (Call/Raise/Fold)"
-            input <- getLine
-            let inputSplit = words input
-            if (input == "Call" || input == "call") 
-              then do
-                putStrLn "Du hast Call eingesetzt. It's very effektive" 
-                return $ call (p, pot)
-            else if (input  == "Fold" || input == "fold")
-               then do  
-                putStrLn "Du hast Fold eingesetzt. It's not very effektive" 
-                return $ fold (p,pot)
-            else if (input  == "Raise" || input == "raise")
-               then do  
-                putStrLn "Du hast Raise eingesetzt. Um wie viel möchtest du erhöhen?" 
-                raiseAbfrage allIn 
-            else if ((head inputSplit == "Raise" || head inputSplit == "raise") && (length inputSplit) == 2)
-              then do
-                checkRaiseAbfrage (inputSplit !! 1) allIn
-            else do
-              putStrLn "Du musst Call, Raise oder Fold eingeben."
-              abfrage 
-          --Betrag, um den der Spieler erhoehen will
-          raiseAbfrage allIn = do
-            eingabe <- getLine
-            checkRaiseAbfrage eingabe allIn
-          checkRaiseAbfrage eingabe allIn = do
-            if (null (isInt eingabe)) || ( (snd $ head $ isInt eingabe) /= "")
-              then do  
-                putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und " 
-                putStrLn . show $ allIn
-                raiseAbfrage allIn 
-              else do
-                let betrag = fst $ head (isInt eingabe)
-                if (betrag < 0)
-                  then do
-                    putStrLn "Du kannst nicht um einen negativen Betrag erhöhen. Du Cheater!"
-                    putStrLn "Gib gefälligst eine positive Zahl ein."
-                    raiseAbfrage allIn 
-                else if (betrag == 0)
-                  then do
-                    putStrLn "Mensch, da hättest du auch Call nehmen können -.-"
-                    return $ call (p,pot) 
-                else if (betrag > allIn)
-                  then do
-                    putStrLn "Du kannst nicht um mehr erhöhen als du Geld hast!"
-                    putStr "Du musst eine ganze Zahl eingeben, zwischen 0 und " 
-                    putStrLn . show $ allIn
-                    raiseAbfrage allIn 
-                else do
-                  putStrLn ("Du hast um den Betrag " ++ eingabe ++ " erhöht.")
-                  return $ raise (p,pot) betrag 
-          --gibt wenn Anfang ein Int einen [(Int,RestString)] zurueck. Ansonsten eine leere Liste
-          isInt :: String -> [(Int,String)]
-          isInt x = reads x
-         
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
 -- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
