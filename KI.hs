@@ -12,7 +12,6 @@ entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
     putStrLn ""
     putStrLn "KI ist am Zug"
-    putStrLn ""
     let
         kiCards :: [Card]
         kiCards = getPlayerHand (head p)
@@ -27,13 +26,38 @@ entscheidungKI (p, pot) tisch = do
         kiHandValue = handValue kiCards
 
         kiToPay :: Int
-        kiToPay = quot pot 2 - getCurrentBet (head p)
+        kiToPay = maxBet - kiBet
 
-    -- ALL IN
-    if kiHandValue > 2500 then return $ raise (p, pot) kiCash
-    -- RAISE
-    else if kiHandValue > 1600 && kiToPay < 200 then return $ raise (p, pot) kiRaise
-    -- FOLD
-    else if kiHandValue < 800 && kiToPay >= 0 then return $ fold (p, pot)
-    -- CALL
-    else return $ call (p,pot)
+        kiBet :: Int
+        kiBet = getCurrentBet $ head p
+    
+        maxBet :: Int
+        maxBet = getCurrentBet $ p !! 1
+
+    putStr "KI hat noch Cash: "
+    putStrLn . show $ kiCash 
+    putStr "Die höchste Wette ist derzeit bei: "
+    putStrLn . show $ maxBet 
+    putStr "KIs Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
+    putStrLn . show $ kiBet 
+
+    --Wenn beide Karten besser als 10, ALL IN
+    if kiHandValue > 2500 then do
+      putStrLn "KI setzt AllIn ein"
+      putStrLn "" 
+      return $ raise (p, pot) kiCash
+    --Wenn eine Karte besser als Dame, RAISE
+    else if kiHandValue > 1600 && kiToPay < 200 then do
+      putStrLn "KI setzt Raise ein"
+      putStrLn ""
+      return $ raise (p, pot) kiRaise
+    --Wenn alle Karten schlechter als 6, FOLD
+    else if kiHandValue < 800 && kiToPay >= 0 then do
+      putStrLn "KI setzt Fold ein"
+      putStrLn ""
+      return $ fold (p, pot)
+    --Sonst CALL
+    else do
+      putStrLn "KI setzt Call ein"
+      putStrLn ""
+      return $ call (p,pot)
