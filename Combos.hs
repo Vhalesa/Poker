@@ -119,15 +119,7 @@ checkCombo cs
                 checkPreds cs erg = hilf cs cs erg 
                   where hilf cs [] erg = checkPreds [] erg --Hilfsfunktion, damit die urspruengliche Liste verwendet werden kann
                         hilf cs (c1:c) erg = hilf cs c $ (predInList c1 cs):erg
-
-                        --prüft ob die VorgaengerKarte in der uebergeben Liste ist
-                        predInList :: Card -> [Card] -> Bool
-                        predInList c1 cs = elem (getPred c1) $ map getValue cs
-
-                        -- gibt den Value der Vorgänger-Karte (naechstniedrigeren Karte) zurueck
-                        getPred :: Card -> Value 
-                        getPred (Card(c,v)) = predB v
-
+                        
         --getFlush erzeugt einen Flush aus einer Liste von Karten. Darf nur aufgerufen werden, wenn es auch einen Flush gibt
         --(sonst wird ein leerer CFlush erzeugt)
         getFlush :: [Card] -> Int -> [Card]
@@ -225,3 +217,10 @@ remDup [] erg = reverse erg
 remDup (c1:cs) erg = if (elem (getValue c1) $ map getValue cs) then remDup cs erg
                         else remDup cs $ c1:erg
 
+--prüft ob die VorgaengerKarte in der uebergeben Liste ist
+predInList :: Card -> [Card] -> Bool
+predInList c1 cs = elem (getPred c1) $ map getValue cs
+
+-- gibt den Value der Vorgänger-Karte (naechstniedrigeren Karte) zurueck
+getPred :: Card -> Value 
+getPred (Card(c,v)) = predB v
