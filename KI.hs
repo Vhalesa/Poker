@@ -4,6 +4,8 @@ import Cards
 import Aktionen 
 import Player
 import KICalculation
+
+import Data.List
  
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -19,11 +21,11 @@ entscheidungKI (p, pot) tisch = do
         kiCash :: Int
         kiCash = getPlayerCash (head p)
 
-        kiRaise :: Int
-        kiRaise = 200
+        kiRaiseBetrag :: Int
+        kiRaiseBetrag = 200
 
         kiHandValue :: Int
-        kiHandValue = handValue kiCards
+        kiHandValue = checkKICardValue $ reverse $ sort $ kiCards ++ tisch
 
         kiToPay :: Int
         kiToPay = maxBet - kiBet
@@ -42,22 +44,34 @@ entscheidungKI (p, pot) tisch = do
     putStrLn . show $ kiBet 
 
     -- ALL IN
-    if kiHandValue >= 2500 then do
+    if kiHandValue >= 25000 then do
       putStrLn "KI setzt AllIn ein"
-      putStrLn "" 
-      return $ raise (p, pot) kiCash
+      kiRaise (p,pot) kiCash
     -- RAISE
-    else if kiHandValue >= 1300 && kiToPay < 200 then do
-      putStrLn "KI setzt Raise ein"
-      putStrLn ""
-      return $ raise (p, pot) kiRaise
-    -- FOLD
-    else if kiHandValue < 800 && kiToPay > 0 then do
-      putStrLn "KI setzt Fold ein"
-      putStrLn ""
-      return $ fold (p, pot)
+    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) then
+      if kiToPay < 300 then
+         kiRaise (p,pot) kiRaiseBetrag
+      else
+         kiCall (p,pot)
     -- CALL
-    else do
-      putStrLn "KI setzt Call ein"
-      putStrLn ""
-      return $ call (p,pot)
+    else if (kiHandValue > 800 && kiToPay <= 300) || kiToPay <=0 then do
+      kiCall (p,pot)
+    -- FOLD
+    else
+      kiFold (p,pot)
+      
+
+kiRaise (p, pot) betrag = do
+    putStrLn ("KI setzt Raise ein und erhöht um " ++ show betrag)
+    putStrLn ""
+    return $ raise (p, pot) betrag
+
+kiCall (p,pot) = do
+    putStrLn "KI setzt Call ein"
+    putStrLn ""
+    return $ call (p,pot)
+
+kiFold (p,pot) = do
+    putStrLn "KI setzt Fold ein"
+    putStrLn ""
+    return $ fold (p, pot)

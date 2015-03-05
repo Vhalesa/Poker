@@ -3,6 +3,8 @@ module KICalculation where
 import Combos
 import Cards
 
+checkKICardValue :: [Card] -> Int
+checkKICardValue cs = if length cs < 5 then handValue cs else tableValue cs
 
 -- fiktiver Int Wert der die Staerke der Hand der KI angibt
 handValue :: [Card] -> Int
@@ -32,3 +34,24 @@ cardValueScore Five = 150
 cardValueScore Four = 100
 cardValueScore Three = 50
 cardValueScore Two = 0
+
+comboValueScore :: ScoreCombo -> Int
+comboValueScore (RoyalFlush cs)= 45000
+comboValueScore (StraightFlush cs)= 40000 + cardListValue cs
+comboValueScore (FourC cs)= 35000 + cardListValue cs
+comboValueScore (FullHouse cs)= 30000 + cardListValue cs
+comboValueScore (Flush cs)= 25000 + cardListValue cs
+comboValueScore (Straight cs)= 20000 + cardListValue cs
+comboValueScore (ThreeC cs)= 15000 + cardListValue cs
+comboValueScore (Pair2 cs)= 10000 + cardListValue cs
+comboValueScore (Pair cs)= 5000 + cardListValue cs
+comboValueScore (HighCard cs)= cardListValue cs
+
+tableValue :: [Card] -> Int
+tableValue cs = comboValueScore kiCombo
+    where
+        kiCombo = checkCombo cs
+
+cardListValue :: [Card] -> Int
+cardListValue [] = 0
+cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
