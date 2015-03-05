@@ -2,8 +2,8 @@ module KI where
 
 import Cards
 import Aktionen 
-import Combos
 import Player
+import KICalculation
  
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -23,11 +23,17 @@ entscheidungKI (p, pot) tisch = do
         kiRaise :: Int
         kiRaise = 200
 
-    --Wenn beide Karten besser als 10, ALL IN
-    if (all (>= Card(Spades,Jack)) kiCards) then return $ raise (p, pot) kiCash
-    --Wenn eine Karte besser als Dame, RAISE
-    else if (any (>= Card(Spades,King)) kiCards && kiCash >= kiRaise) then return $ raise (p, pot) kiRaise
-    --Wenn alle Karten schlechter als 6, FOLD
-    else if (all (<= Card (Spades,Five)) kiCards) then return $ fold (p, pot)
-    --Sonst CALL
+        kiHandValue :: Int
+        kiHandValue = handValue kiCards
+
+        kiToPay :: Int
+        kiToPay = quot pot 2 - getCurrentBet (head p)
+
+    -- ALL IN
+    if kiHandValue > 2500 then return $ raise (p, pot) kiCash
+    -- RAISE
+    else if kiHandValue > 1600 && kiToPay < 200 then return $ raise (p, pot) kiRaise
+    -- FOLD
+    else if kiHandValue < 800 && kiToPay >= 0 then return $ fold (p, pot)
+    -- CALL
     else return $ call (p,pot)
