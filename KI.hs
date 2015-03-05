@@ -54,7 +54,7 @@ entscheidungKI (p, pot) tisch = do
       else
          kiCall (p,pot)
     -- CALL
-    else if (kiHandValue > 800 && kiToPay <= 300) || kiToPay <=0 then do
+    else if (kiHandValue > 5000 && kiToPay <= 300) || (kiHandValue > 800 && tisch == []) || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
     else
