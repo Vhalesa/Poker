@@ -22,7 +22,7 @@ entscheidungKI (p, pot) tisch = do
         kiCash = getPlayerCash (head p)
 
         kiRaiseBetrag :: Int
-        kiRaiseBetrag = 200
+        kiRaiseBetrag = quot kiCash 15
 
         kiHandValue :: Int
         kiHandValue = checkKICardValue $ reverse $ sort $ kiCards ++ tisch
@@ -54,7 +54,7 @@ entscheidungKI (p, pot) tisch = do
       else
          kiCall (p,pot)
     -- CALL
-    else if (kiHandValue > 5000 && kiToPay <= 300) || (kiHandValue > 800 && tisch == []) || kiToPay <=0 then do
+    else if (kiHandValue > 5000 && kiToPay <= kiRaiseBetrag) || (kiHandValue > 800 && tisch == []) || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
     else
