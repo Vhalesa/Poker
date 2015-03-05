@@ -48,13 +48,13 @@ entscheidungKI (p, pot) tisch = do
       putStrLn "KI setzt AllIn ein"
       kiRaise (p,pot) kiCash
     -- RAISE
-    else if kiHandValue >= 10000 then
+    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) then
       if kiToPay < 300 then
          kiRaise (p,pot) kiRaiseBetrag
       else
          kiCall (p,pot)
     -- CALL
-    else if (kiHandValue > 800 && kiToPay <= 500) || kiToPay <=0 then do
+    else if (kiHandValue > 800 && kiToPay <= 300) || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
     else
