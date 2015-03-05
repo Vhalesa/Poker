@@ -50,8 +50,7 @@ startGame ps n = do
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --Karten austeilen 
-    let
-        r1 = runde1b deck $ fst playersAndPot
+    let r1 = runde1b deck $ fst playersAndPot
         players1 = fst $ r1
         deck1 = snd $ r1
 
@@ -69,8 +68,7 @@ startGame ps n = do
     else do 
       --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
       r2 <- runde2 deck1
-      let
-          deck2 = last r2
+      let deck2 = last r2
 
       --Setzen
       playersAndPot2 <- runde playersAndPot1 (head r2)
@@ -86,8 +84,7 @@ startGame ps n = do
       else do
         --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
         r3 <- runde3 deck2
-        let
-            deck3 = last r3
+        let deck3 = last r3
             tischkarten = head r2 ++ head r3
 
         --Setzen 
@@ -103,21 +100,35 @@ startGame ps n = do
         else do
           --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
           r4 <- runde4 deck3
-          let
-              finalTischkarten = tischkarten ++ head r4
+          let finalTischkarten = tischkarten ++ head r4
 
           --Setzen
           playersAndPot4 <- runde playersAndPot3 finalTischkarten
-          if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
-            then do
-              continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
-            else do
+         -- if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
+         --   then do
+         --     continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
+         --   else do
+         --     --Showdown, wer hat gewonnen??
+         --     playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
+         --     --Weiterspielen?
+         --     continueGame playersAfterShowdown n
+         --
+          x <- checkAllInGame playersAndPot4 n 
+          when (x) $ do
               --Showdown, wer hat gewonnen??
               playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
-
               --Weiterspielen?
               continueGame playersAfterShowdown n
 
+-- ueberprueft, ob noch alle Spieler im Spiel sind, oder es schon einen Gewinner gibt
+--checkAllInGame :: ([Player],Int) -> IO ()
+checkAllInGame playersAndPot n = do
+  if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot)) 
+    then do
+      continueGame (payWinner (fst playersAndPot) ([head $ fst playersAndPot],snd playersAndPot)) n
+      return False 
+    else
+      return True 
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
@@ -147,24 +158,26 @@ runde (p, pot) tisch = do
             | (getCurrentBet p1 == getCurrentBet p2) = return ((p1:p2:ps),pot)
             | (getPlayerIngame p1) && (not $ all getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
-          nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
+          --naechster Player kommt an Anfang der Liste (1.Player an den Schluss)  
+          nextPlayer :: ([Player],Int) -> ([Player],Int)
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
-
-
 -- Entscheidung: weiterspielen oder aufhoeren?
+continueGame :: [Player] -> Int -> IO ()
 continueGame ps n = do
     putStrLn ("Die " ++ show n ++ ". Spielrunde ist vorbei. Weiterspielen? (Y/N)")
     input <- getLine
-    if any (<=10) (map getPlayerCash ps) then do
+    if (any (<=10) $ map getPlayerCash ps) 
+      then do
         putStrLn "Mindestens ein Spieler hat zu wenig Geld. Das Spiel ist deshalb beendet."
         --todo falls wir mehr als 2 Spieler machen: Ohne den Spieler weiterspielen?
-    else if input=="y" || input=="Y" then do
+    else if (input=="y" || input=="Y") 
+      then do
         putStrLn "Die naechste Spielrunde beginnt gleich!"
-        let
-            updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets ps
-        startGame updatedPlayers (n+1)
-    else if input=="n" || input=="N" then do
+        let updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets ps
+        startGame updatedPlayers $ n+1
+    else if (input=="n" || input=="N") 
+      then do
         putStrLn "Du hast das Spiel beendet."
     else do
         continueGame ps n
