@@ -19,7 +19,9 @@ call p = raise p 0
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) >= 0)  
                                   then (p2:ps ++ [pay diff p1], pot + diff)
-                                  else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff2 - allIn)))
+                                else if ( (getPlayerCash p1 - diff2) >= 0 && diff2 >= 0)
+                                  then (p2:ps ++ [pay diff2 p1], pot + diff2)
+                                else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff2 - allIn)))
   where diff = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) + betrag
         diff2 = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) 
         allIn = getPlayerCash p1
