@@ -68,8 +68,7 @@ startGame ps n = do
     else do 
       --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
       r2 <- runde2 deck1
-      let
-          deck2 = last r2
+      let deck2 = last r2
 
       --Setzen
       playersAndPot2 <- runde playersAndPot1 (head r2)
@@ -85,8 +84,7 @@ startGame ps n = do
       else do
         --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
         r3 <- runde3 deck2
-        let
-            deck3 = last r3
+        let deck3 = last r3
             tischkarten = head r2 ++ head r3
 
         --Setzen 
@@ -102,8 +100,7 @@ startGame ps n = do
         else do
           --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
           r4 <- runde4 deck3
-          let
-              finalTischkarten = tischkarten ++ head r4
+          let finalTischkarten = tischkarten ++ head r4
 
           --Setzen
           playersAndPot4 <- runde playersAndPot3 finalTischkarten

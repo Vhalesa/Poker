@@ -39,7 +39,11 @@ entscheidungMensch (p, pot) tisch = do
           putStrLn "Was möchtest du tun? (Call/Raise/Fold)"
           input <- getLine
           let inputSplit = words input
-          if (input == "Call" || input == "call")
+          if (input == "")
+            then do
+              putStrLn "Du musst schon was eingeben! (Call/Raise/Fold)"
+              abfrage
+          else if (input == "Call" || input == "call")
             then do
               putStrLn "Du hast Call eingesetzt. It's very effektive"
               return $ call (p, pot)
