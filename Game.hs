@@ -10,6 +10,7 @@ import Combos
 import Player
 import Mensch
 import Aktionen
+import KI
 
 import System.Random
 import Data.List
@@ -190,38 +191,6 @@ runde (p, pot) tisch = do
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
           nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
-
--- Abfrage bei der KI: Call, Raise oder Fold?
--- braucht dazu die Player, den Pot und die Tischkarten
--- entscheidungKI :: ([Player],Int) -> Int -> ([Player],Int)
-entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
-entscheidungKI (p, pot) tisch = do
-    putStrLn ""
-    putStrLn "KI ist am Zug"
-    let eigCash = getPlayerCash $ head p
-        bet = getCurrentBet $ p !! 1
-        eigBet = getCurrentBet $ head p
-    putStr "KI hat noch Cash: "
-    putStrLn . show $ eigCash 
-    putStr "Die höchste Wette ist derzeit bei: "
-    putStrLn . show $ bet 
-    putStr "KIs Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
-    putStrLn . show $ eigBet 
-    let
-        kiCards :: [Card]
-        kiCards = getPlayerHand (head p)
-    if ((any (>= Card(Spades,Jack)) kiCards) ) then do
-      putStrLn "KI setzt Raise ein"
-      putStrLn ""
-      return $ raise (p, pot) 200
-    else if (all (<= Card (Spades,Five)) kiCards) then do
-      putStrLn "KI setzt Fold ein"
-      putStrLn ""
-      return $ fold (p, pot)
-    else do
-      putStrLn "KI setzt Call ein"
-      putStrLn ""
-      return $ call (p,pot)
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde
