@@ -6,21 +6,24 @@ import Combos
 
 --p1 folded
 fold :: ([Player],Int) -> ([Player],Int)
-fold ((p1:ps),pot) = (ps++[setPlayerIngame False p1],pot)
+fold ((p1:ps),pot) = (ps ++ [setPlayerIngame False p1], pot)
 
 -- p1 erhoeht 
 -- bekommt die Liste der Player und den Pot (und gibt diese mit Veraenderung wieder zurueck)
 call :: ([Player],Int) -> ([Player],Int)
 call p = raise p 0 
 
--- p1 erhoeht um betrag 
--- bekommt die Liste der Player, den Pot und den erhoehten Betrag 
--- Reihenfolge der Spieler wird gleich um 1 verschoben -> naechster Spieler ist dran
+-- p1 erhoeht um einen Betrag 
+-- raise bekommt die Liste der Player, den Pot und den erhoehten Betrag 
+-- Reihenfolge der Spieler wird um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag 
-  | (eigCash- diff) >= 0                       = (p2:ps ++ [pay diff p1], pot + diff)
-  | (eigCash - diffBets) >= 0 && diffBets >= 0 = (p2:ps ++ [pay diffBets p1], pot + diffBets)
-  | otherwise                                  = (newPlayer2:ps ++ [pay eigCash p1], (pot + eigCash - (diffBets - eigCash)))
+  -- genung Geld fuer die Raise (bzw. fuer Call)
+  | eigCash >= diff                       = (p2:ps ++ [pay diff p1], pot + diff) 
+  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call (es wird AllIn gesetzt) 
+  | eigCash >= diffBets && diff >= eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) 
+  -- wenn nicht genug Geld fuer Call -> anderer Spieler bekommt sein zuviel gezahltes Geld zurueck, auch vom Pot wird es abgezogen
+  | otherwise                            = (newPlayer2:ps ++ [pay eigCash p1], (pot + eigCash - (diffBets - eigCash)))
     where diff       = diffBets + betrag
           diffBets   = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 
           eigCash    = getPlayerCash p1
@@ -45,9 +48,9 @@ doBlinds ps x = do
 delegateBlind :: [Player] -> [Player]
 delegateBlind [] = []
 delegateBlind (p:ps)
-    | getPlayerRole p == BigBlind = p {role = SmallBlind} : delegateBlind ps
+    | getPlayerRole p == BigBlind   = p {role = SmallBlind} : delegateBlind ps
     | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
-    | otherwise = p : delegateBlind ps
+    | otherwise                     = p : delegateBlind ps
 
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int 
@@ -56,20 +59,23 @@ blinds v = 3*v
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
 payBlind :: Int -> Player -> Player
 payBlind v p 
-    | getPlayerRole p == BigBlind = pay (2*v) p
+    | getPlayerRole p == BigBlind   = pay (2*v) p
     | getPlayerRole p == SmallBlind = pay v p
-    | otherwise = p
+    | otherwise                     = p
 
 -- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
 resetBets :: [Player] -> [Player]
 resetBets ps = map removeCurrentBet ps
 
+-- Handkarten der Spieler werden zurueckgesetzt (wieder leere Hand)
 resetHands :: [Player] -> [Player]
 resetHands ps = map (setPlayerHand []) ps
 
+-- Combos werden zurueckgesetzt (wieder keine)
 resetCombos :: [Player] -> [Player]
 resetCombos ps = map (setPlayerCombo $ HighCard []) ps
 
+-- alle Spieler spielen wieder mit (falls jemand fold eingesetzt hatte)
 resetIngame :: [Player] -> [Player]
 resetIngame ps = map (setPlayerIngame True) ps
 
