@@ -18,9 +18,12 @@ call p = raise p 0
 -- Reihenfolge der Spieler wird um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag 
-  | (eigCash - diff) >= 0                       = (p2:ps ++ [pay diff p1], pot + diff) -- wenn genug Geld fuer Erhoehung
-  | (eigCash - diffBets) >= 0 && diff > eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) -- AllIn (aber genug fuer Call)
-  | otherwise                                   = (newPlayer2:ps ++ [pay eigCash p1], (pot + eigCash - (diffBets - eigCash)))
+  -- genung Geld fuer die Raise (bzw. fuer Call)
+  | eigCash >= diff                       = (p2:ps ++ [pay diff p1], pot + diff) 
+  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call (es wird AllIn gesetzt) 
+  | eigCash >= diffBets && diff >= eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) 
+  -- wenn nicht genug Geld fuer Call -> anderer Spieler bekommt sein zuviel gezahltes Geld zurueck, auch vom Pot wird es abgezogen
+  | otherwise                            = (newPlayer2:ps ++ [pay eigCash p1], (pot + eigCash - (diffBets - eigCash)))
     where diff       = diffBets + betrag
           diffBets   = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 
           eigCash    = getPlayerCash p1
