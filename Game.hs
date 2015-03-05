@@ -113,8 +113,8 @@ startGame ps n = do
          --     --Weiterspielen?
          --     continueGame playersAfterShowdown n
          --
-          x <- checkAllInGame playersAndPot4 n 
-          when (x) $ do
+          allIngame4 <- checkAllInGame playersAndPot4 n 
+          when allIngame4 $ do
               --Showdown, wer hat gewonnen??
               playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
               --Weiterspielen?
