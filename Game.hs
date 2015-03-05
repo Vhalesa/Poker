@@ -168,11 +168,11 @@ call p = raise p 0
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag = if ((getPlayerCash p1 - diff) >= 0) 
                                   then (p2:ps ++ [pay diff p1], pot + diff)
-                                else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff - allIn)))
+                                else (newPlayer2:ps ++ [pay allIn p1], (pot + allIn - (diff2 - allIn)))
   where diff = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) + betrag
         diff2 = ((maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1) 
         allIn = getPlayerCash p1
-        newPlayer2 = pay (allIn - diff) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
+        newPlayer2 = pay (allIn - diff2) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player
@@ -322,8 +322,7 @@ entscheidungKI (p, pot) tisch = do
     let
         kiCards :: [Card]
         kiCards = getPlayerHand (head p)
-    --Achtung: KI muss vor raise ueberpruefen, ob sie dafuer ueberhaupt genug Geld hat
-    if ((any (>= Card(Spades,Jack)) kiCards) && (eigCash - (bet - eigBet) > 0)) then do
+    if ((any (>= Card(Spades,Jack)) kiCards) ) then do
       putStrLn "KI setzt Raise ein"
       putStrLn ""
       return $ raise (p, pot) 200
