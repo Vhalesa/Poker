@@ -126,49 +126,6 @@ mischen = do
       mixedDeck = shuffle cards generator []
   return mixedDeck
 
---Kuemmert sich um alles, was die Blinds angeht, Blinds zuweisen, bezahlen und in den Pot packen.
-doBlinds :: [Player] -> Int -> IO([Player],Int)
-doBlinds ps x = do
-    let ps1 = delegateBlind ps
-        ps2 = map (payBlind x) ps1
-        pot = blinds x
-    putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
-    putStrLn ("Verbleibende Chips: " ++ show ps2)
-    return (ps2,pot)
-        
-
--- Small und Big Blind zuweisen
-delegateBlind :: [Player] -> [Player]
-delegateBlind [] = []
-delegateBlind (p:ps)
-    | getPlayerRole p == BigBlind = p {role = SmallBlind} : delegateBlind ps
-    | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
-    | otherwise = p : delegateBlind ps
-
--- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
-blinds :: Int -> Int
-blinds v = 3*v
-
--- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
-payBlind :: Int -> Player -> Player
-payBlind v p
-    | getPlayerRole p == BigBlind = pay (2*v) p
-    | getPlayerRole p == SmallBlind = pay v p
-    | otherwise = p
-   
--- Der CurrentBet aller Spieler wird wieder auf 0 gesetzt (vor jeder Setzrunde erforderlich)
-resetBets :: [Player] -> [Player]
-resetBets ps = map removeCurrentBet ps
-
-resetHands :: [Player] -> [Player]
-resetHands ps = map (setPlayerHand []) ps
-
-resetCombos :: [Player] -> [Player]
-resetCombos ps = map (setPlayerCombo $ HighCard []) ps
-
-resetIngame :: [Player] -> [Player]
-resetIngame ps = map (setPlayerIngame True) ps
-
 -- Runde ohne Kartenaufdecken, das wurde davor schon gemacht
 -- setzen, erhoehen....
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
@@ -177,131 +134,25 @@ runde (p, pot) tisch = do
   x <- rundeImmer (p,pot) tisch
   y <- rundeImmer x tisch
   wdhRunde y tisch
-    where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int) 
+    where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           rundeImmer ((p1:ps),pot) tisch = if (not $ getPlayerIngame p1)
                                              then return $ nextPlayer ((p1:ps),pot)
-                                           else if (not $ all getPlayerIngame ps) 
-                                              then return $ ((p1:ps),pot)
-                                           else if (getKI p1) then entscheidungKI ((p1:ps),pot) tisch
+                                           else if (not $ all getPlayerIngame ps)
+                                             then return $ ((p1:ps),pot)
+                                           else if (getKI p1) 
+                                             then entscheidungKI ((p1:ps),pot) tisch
                                            else entscheidungMensch ((p1:ps),pot) tisch
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
-          wdhRunde ((p1:p2:ps),pot) tisch 
+          wdhRunde ((p1:p2:ps),pot) tisch
             | (getCurrentBet p1 == getCurrentBet p2) = return ((p1:p2:ps),pot)
             | (getPlayerIngame p1) && (not $ all getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
           nextPlayer :: ([Player],Int) -> ([Player],Int) --naechster Player kommt an Anfang der Liste (1. an den Schluss)  
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
 
--- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
--- mit Ausgabe, welche Karte gezogen wurde
---
--- 2 Karten werden fuer jeden Spieler gezogen
---runde1 :: [Card] -> [Player] -> IO
-runde1 stapel p = do
-  let cards1 = austeilen stapel 2 [] 2  
-      p1 = setPlayerHand (head cards1) (head p) 
-      p2 = setPlayerHand (cards1 !! 1) (p !! 1)
-  putStrLn ("Jeder Spieler hat seine Karten auf die Hand bekommen")
-  return ([p1,p2], last cards1)
-
---runde1 nicht in IO. 
-runde1b :: [Card] -> [Player] -> ([Player],[Card])
-runde1b cs ps = ([p1,p2],last cards1)
-                where cards1 = austeilen cs 2 [] 2  
-                      p1 = setPlayerHand (head cards1) (head ps)
-                      p2 = setPlayerHand (cards1 !! 1) (ps !! 1)
-
--- 3 Karten werden vom Stapel genommen
-runde2b :: [Card] -> [[Card]]
-runde2b cs = austeilen cs 1 [] 3
-
--- 1 Karte wird vom Stapel genommen (Funktioniert fuer Runde 3 und 4)
-runde34 :: [Card] -> [[Card]]
-runde34 cs = austeilen (last trashCard) 1 [] 1
-    where 
-        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
-        trashCard = austeilen cs 1 [] 1
-
---Gibt die ersten 3 Karten, den sog. Flop zurueck, sowie das restliche Deck
-runde2 cs = do
-    let
-        --TrashCard ist die Oberste Karte, die laut Regeln vor jedem geben zur Seite gelegt wird
-        trashCard = austeilen cs 1 [] 1
-        cardsAndDeck = runde2b (last trashCard)
-    putStrLn ""
-    putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
-    return cardsAndDeck
-
---Gibt die vierte Karte, den sog. Turn zurueck, sowie das restliche Deck
-runde3 cs = do
-    let 
-        cardsAndDeck = runde34 cs
-    putStrLn ""
-    putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
-    return cardsAndDeck
-
---Gibt die fuenfte und letzte Karte, den sog. River, zurueck, OHNE das restliche Deck (Das brauchen wir nicht mehr)
-runde4 cs = do
-    let 
-        cardsAndDeck = runde34 cs
-    putStrLn ""
-    putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
-    return cardsAndDeck
-
--- Zieht n mal jeweils x Karten, und gibt auch den Rest des Decks zurueck [[c1][c2]...[rest]]
--- Kann mit n = 1 genutzt werden, um Karten zum aufdecken zu ziehen
--- kann mit n >= 1 und x = 2 genutzt werden, um Spielern die Startkarten zu ziehen
--- Sollte aufgerufen werden: austeilen deck n [] x;
---  wenn erg /= [] werden die Karten in erg am Ende wieder mit ausgegeben
-austeilen :: [Card] -> Int -> [[Card]] -> Int -> [[Card]]
-austeilen deck 0 erg x = erg ++ [deck]
-austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ splitAt x deck)]) x
-
--- Vervollstaendigt die Tischkarten auf 5. 
-completeTableCards :: [Card] -> [Card] -> [Card]
-completeTableCards deck table = head $ austeilen deck 1 [] (5 - length table)
-  
--- Showdown
-showdown :: ([Player],Int) -> [Card] -> IO [Player]
-showdown (ps,pot) cs = do
-    let
-        playersWithCombo = map (getComboForPlayer cs) ps
-        
-        winner = playerWithHighestCombo playersWithCombo
-
-        updatedPlayers = payWinner playersWithCombo (winner,pot) 
-
-        
-    putStrLn("Gewonnen hat " ++ (show (map getPlayerName winner)) ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
-    putStrLn( show updatedPlayers)
-
-    return updatedPlayers
-
--- Gewinner bezahlt negativen Betrag = Gewinner bekommt Betrag  
-payWinner :: [Player] -> ([Player],Int) -> [Player]
-payWinner all (winners,pot) = replace newWinners all
-    where
-        newWinners = map (pay (negate $ quot pot (length winners))) winners
-
-
--- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
--- Funktioniert fuer beliebig viele Spieler, bis auf die letzte Zeile
-playerWithHighestCombo :: [Player] -> [Player]
-playerWithHighestCombo [p1] = [p1]
-playerWithHighestCombo (p1:p2:ps)
-    | getPlayerCombo p1 > getPlayerCombo p2 = playerWithHighestCombo (p1:ps)
-    | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
-    | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
-
--- Ersetzt in der zweiten Liste die Spieler mit gleichem Namen wie in der ersten Liste.
--- Funktioniert im Moment nur, wenn beide Listen gleich geordnet sind
-replace :: [Player] -> [Player] -> [Player]
-replace [] as = as
-replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns) as 
 
 
 -- Entscheidung: weiterspielen oder aufhoeren?
-
 continueGame ps n = do
     putStrLn ("Die " ++ show n ++ ". Spielrunde ist vorbei. Weiterspielen? (Y/N)")
     input <- getLine
