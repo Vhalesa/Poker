@@ -3,6 +3,7 @@ module KICalculation where
 import Combos
 import Cards
 
+
 -- fiktiver Int Wert der die Staerke der Hand der KI angibt
 handValue :: [Card] -> Int
 handValue (c1:c2:cs)
@@ -14,6 +15,7 @@ handValue (c1:c2:cs)
     | predInList c1 (c2:cs) || predInList c2 (c1:cs) = 100 + cardValueScore (getValue c1) + cardValueScore (getValue c2)
     -- Sonstiges
     | otherwise = cardValueScore (getValue c1) + cardValueScore (getValue c2)
+handValue (c1:cs) = cardValueScore (getValue c1)
 
 -- Ein fiktiver Wert, mit dem die KI berechnet, wie gut ihre Hand ist
 cardValueScore :: Value -> Int
