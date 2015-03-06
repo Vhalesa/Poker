@@ -36,6 +36,8 @@ entscheidungKI (p, pot) tisch = do
         maxBet :: Int
         maxBet = getCurrentBet $ p !! 1
 
+    putStr "Cheatmode: Die Karten der KI sind: "
+    putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "
     putStrLn . show $ kiCash 
     putStr "Die höchste Wette ist derzeit bei: "
