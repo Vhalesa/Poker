@@ -57,79 +57,62 @@ startGame ps n = do
 
     -- Setzen -> Ueberpruefen, ob es schon einen Gewinner gibt?
     playersAndPot1 <- runde (players1, snd playersAndPot) []
-    if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot1))
-      then do
-        continueGame (payWinner (fst playersAndPot1) ([head $ fst playersAndPot1],snd playersAndPot1)) n
-    else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot1)
-      then do
-        --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
-        playersAfterShowdown <- showdown playersAndPot1 $ completeTableCards deck1 [] 
-        --Weiterspielen?
-        continueGame playersAfterShowdown n
-    else do 
+    allIngame1 <- checkAllInGame playersAndPot1 n deck1 [] 
+    when allIngame1 $ do
+
       --Runde 2 ausfuehren: 3 Karten als Flop austeilen und wieder setzen
       r2 <- runde2 deck1
       let deck2 = last r2
+          tischkarten2 = head r2
 
-      --Setzen
+      --Setzen fuer Runde 2
       playersAndPot2 <- runde playersAndPot1 (head r2)
-      if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot2))
-        then do
-          continueGame (payWinner (fst playersAndPot2) ([head $ fst playersAndPot2],snd playersAndPot2)) n
-      else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot2)
-        then do
-          --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
-          playersAfterShowdown <- showdown playersAndPot2 $ completeTableCards deck2 (head r2)
-          --Weiterspielen?
-          continueGame playersAfterShowdown n
-      else do
+      allIngame2 <- checkAllInGame playersAndPot2 n deck2 tischkarten2
+      when allIngame2 $ do
+
         --Runde 3 ausfuehren: 1 Karte als Turn austeilen und wieder setzen
         r3 <- runde3 deck2
         let deck3 = last r3
-            tischkarten = head r2 ++ head r3
+            tischkarten = tischkarten2 ++ head r3
 
-        --Setzen 
+        --Setzen fuer Runde 3
         playersAndPot3 <- runde playersAndPot2 tischkarten
-        if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot3))
-          then do continueGame (payWinner (fst playersAndPot3) ([head $ fst playersAndPot3],snd playersAndPot3)) n
-        else if ( any (<= 0) $ map getPlayerCash $ fst playersAndPot3)
-          then do
-            --Showdown, da ein Spieler AllIn eingesetzt hat und kein Geld mehr hat
-            playersAfterShowdown <- showdown playersAndPot3 $ completeTableCards deck3 tischkarten 
-            --Weiterspielen?
-            continueGame playersAfterShowdown n
-        else do
+        allIngame3 <- checkAllInGame playersAndPot3 n deck3 tischkarten
+        when allIngame3 $ do
+
           --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
           r4 <- runde4 deck3
           let finalTischkarten = tischkarten ++ head r4
 
-          --Setzen
+          --Setzen fur Runde 4
           playersAndPot4 <- runde playersAndPot3 finalTischkarten
-         -- if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot4)) 
-         --   then do
-         --     continueGame (payWinner (fst playersAndPot4) ([head $ fst playersAndPot4],snd playersAndPot4)) n
-         --   else do
-         --     --Showdown, wer hat gewonnen??
-         --     playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
-         --     --Weiterspielen?
-         --     continueGame playersAfterShowdown n
-         --
-          allIngame4 <- checkAllInGame playersAndPot4 n 
+          allIngame4 <- checkAllInGame playersAndPot4 n [] finalTischkarten
           when allIngame4 $ do
-              --Showdown, wer hat gewonnen??
-              playersAfterShowdown <- showdown (playersAndPot4) (finalTischkarten)
-              --Weiterspielen?
-              continueGame playersAfterShowdown n
+            -- Showdown
+            endgame playersAndPot4 finalTischkarten n
 
--- ueberprueft, ob noch alle Spieler im Spiel sind, oder es schon einen Gewinner gibt
---checkAllInGame :: ([Player],Int) -> IO ()
-checkAllInGame playersAndPot n = do
-  if ( not $ all getPlayerIngame $ tail (fst $ playersAndPot)) 
-    then do
+--ueberprueft, ob noch alle Spieler im Spiel sind, oder es schon einen Gewinner gibt
+--checkAllInGame :: ([Player],Int) -> Int -> IO Bool
+checkAllInGame playersAndPot n deck tisch
+  -- nur noch ein Spieler dabei -> es wird beendet
+  | all (==False) $ map getPlayerIngame $ tail (fst $ playersAndPot) = do
       continueGame (payWinner (fst playersAndPot) ([head $ fst playersAndPot],snd playersAndPot)) n
       return False 
-    else
+  -- ein Spieler hat AllIn gesetzt -> Showdown 
+  | any (<= 0) $ map getPlayerCash $ fst playersAndPot = do
+      endgame playersAndPot (completeTableCards deck tisch) n
+      return False
+  -- Spiel geht normal weiter
+  | otherwise = do
       return True 
+
+-- Showdown + Entscheidung, ob noch ein weiteres Spiel gespielt wird oder nicht
+endgame :: ([Player],Int) -> [Card] -> Int -> IO ()
+endgame playersAndPot tischkarten n = do
+  --Showdown, wer hat gewonnen
+  playersAfterShowdown <- showdown playersAndPot tischkarten 
+  -- noch eine Runde spielen?
+  continueGame playersAfterShowdown n
 
 --Gibt gemischtes Kartendeck zurueck 
 mischen = do
