@@ -20,6 +20,7 @@ import Control.Monad
 main = do 
     let player1 = Player { name = "Player 1", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, ingame = True, currentBet=0}
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
+        player3 = Player { name = "Die Andere KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
     startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -142,21 +143,25 @@ mischen = do
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
 runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
-  x <- rundeImmer (p,pot) tisch
-  y <- rundeImmer x tisch
-  wdhRunde y tisch
+  x <- rundeImmer (p,pot) tisch --Small Blind ist immer dran
+  y <- rundeImmer x tisch --Big Blind ist immer dran
+  wdhRunde y tisch --solange, bis entweder alle Spieler die gleiche Wette haben, oder nur noch 1 im Spiel ist
     where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
-          rundeImmer ((p1:ps),pot) tisch = if (not $ getPlayerIngame p1)
-                                             then return $ nextPlayer ((p1:ps),pot)
-                                           else if (not $ all getPlayerIngame ps)
-                                             then return $ ((p1:ps),pot)
-                                           else if (getKI p1) 
-                                             then entscheidungKI ((p1:ps),pot) tisch
-                                           else entscheidungMensch ((p1:ps),pot) tisch
+          rundeImmer ((p1:ps),pot) tisch  
+              -- Spieler, der dran ist, ist nicht mehr im Spiel (wegen Fold) -> naechster Spieler ist dran
+              | (not $ getPlayerIngame p1)             = return $ nextPlayer ((p1:ps),pot)
+              -- wenn nur noch ein Spieler im Spiel ist -> jetzigen Wert zurueckgeben (wenn es nur 2 Spieler gibt
+              -- darf der 2. nicht noch setzen, wenn 1. Fold eingesetzt hat 
+              | all (==False) $ map getPlayerIngame ps = return $ ((p1:ps),pot)
+              | getKI p1                               = entscheidungKI ((p1:ps),pot) tisch
+              | otherwise                              = entscheidungMensch ((p1:ps),pot) tisch
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch
-            | (getCurrentBet p1 == getCurrentBet p2) = return ((p1:p2:ps),pot)
-            | (getPlayerIngame p1) && (not $ all getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
+            -- alle Spieler haben den gleichen Wettbetrag -> Setzrunde vorbei
+            | all (==True) $ map ((getCurrentBet p1) ==) $ map getCurrentBet (p2:ps) = return ((p1:p2:ps),pot)
+            -- nur noch ein Spieler im Spiel -> beende
+            | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
+            --sonst: naechster Spieler ist dran
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
           --naechster Player kommt an Anfang der Liste (1.Player an den Schluss)  
           nextPlayer :: ([Player],Int) -> ([Player],Int)
