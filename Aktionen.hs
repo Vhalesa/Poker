@@ -19,15 +19,21 @@ call p = raise p 0
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag 
   -- genung Geld fuer die Raise (bzw. fuer Call)
-  | eigCash >= diff                       = (p2:ps ++ [pay diff p1], pot + diff) 
-  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call (es wird AllIn gesetzt) 
+  | eigCash >= diff                        = (p2:ps ++ [pay diff p1], pot + diff) 
+  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call und einen Teil des Raise (es wird AllIn gesetzt) 
   | eigCash >= diffBets && diff >= eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) 
   -- wenn nicht genug Geld fuer Call -> anderer Spieler bekommt sein zuviel gezahltes Geld zurueck, auch vom Pot wird es abgezogen
-  | otherwise                            = (newPlayer2:ps ++ [pay eigCash p1], (pot + eigCash - (diffBets - eigCash)))
+  | otherwise                              = moneyBack p1 (p2:ps) [] pot 
     where diff       = diffBets + betrag
           diffBets   = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 
           eigCash    = getPlayerCash p1
-          newPlayer2 = pay (eigCash - diffBets) p2 --Player2 bekommt sein ueberschuessiges Geld zurueck
+          moneyBack :: Player -> [Player] -> [Player] -> Int -> ([Player],Int)
+          moneyBack p1 [] erg pot = (erg ++ [pay eigCash p1], pot)
+          moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (eigCash + getCurrentBet p1)) < 0)
+                                            then moneyBack p1 ps (erg ++ [p2]) pot
+                                            else moneyBack p1 ps 
+                                                 (erg ++ [pay (eigCash - (getCurrentBet p2 - getCurrentBet p1)) p2])
+                                                 (pot - eigCash - (getCurrentBet p2 - getCurrentBet p1)) 
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player
