@@ -4,6 +4,8 @@ import Player
 import Cards
 import Combos
 
+import Data.List
+
 --p1 folded
 fold :: ([Player],Int) -> ([Player],Int)
 fold ((p1:ps),pot) = (ps ++ [setPlayerIngame False p1], pot)
@@ -134,11 +136,11 @@ runde1 stapel p = do
 
 --runde1 nicht in IO. 
 runde1b :: [Card] -> [Player] -> ([Player],[Card])
-runde1b cs ps = ([p1,p2],last cards1)
-  where cards1 = austeilen cs 2 [] 2
-        p1 = setPlayerHand (head cards1) (head ps)
-        p2 = setPlayerHand (cards1 !! 1) (ps !! 1)
-                                                            
+runde1b cs ps = (playersWithHands 0,last cards1)
+  where cards1 = austeilen cs (length ps) [] 2
+        playersWithHands n
+            | n < (length ps) = setPlayerHand (cards1 !! n) (ps !! n) : playersWithHands (n+1)
+            | otherwise = []
 -- 3 Karten werden vom Stapel genommen
 runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
@@ -196,11 +198,12 @@ playerWithHighestCombo [p1] = [p1]
 playerWithHighestCombo (p1:p2:ps)
   | getPlayerCombo p1 > getPlayerCombo p2 = playerWithHighestCombo (p1:ps)
   | getPlayerCombo p1 < getPlayerCombo p2 = playerWithHighestCombo (p2:ps)
-  | otherwise = [p1,p2] -- Das funktioniert aber nur bei 2 Spielern
+  | otherwise = if all ( == getPlayerCombo p1 ) (map getPlayerCombo (p2:ps)) then (p1:p2:ps) else playerWithHighestCombo $ (p1:ps) ++ [p2]
 
 -- Ersetzt in der zweiten Liste die Spieler mit gleichem Namen wie in der ersten Liste.
--- Funktioniert im Moment nur, wenn beide Listen gleich geordnet sind
 replace :: [Player] -> [Player] -> [Player]
-replace [] as = as
-replace (n:ns) (a:as) = if (n==a) then n : replace ns as else a : replace (n:ns) as
-
+replace ns as = helpReplace ns as []
+    where
+        helpReplace ns [] vs = helpReplace ns vs []
+        helpReplace [] as vs = as ++ vs
+        helpReplace (n:ns) (a:as) vs = if (n==a) then n : helpReplace ns as vs else helpReplace (n:ns) as $ vs ++ [a] 
