@@ -97,12 +97,13 @@ startGame ps n = do
 --checkAllInGame :: ([Player],Int) -> Int -> IO Bool
 checkAllInGame playersAndPot n deck tisch
   -- nur noch ein Spieler dabei -> es wird beendet
-  | all (==False) $ map getPlayerIngame $ tail (fst $ playersAndPot) = do
-      continueGame (payWinner (fst playersAndPot) ([head $ fst playersAndPot],snd playersAndPot)) n
+  | length (filter getPlayerIngame (fst playersAndPot)) == 1 = do
+      --continueGame (payWinner (fst playersAndPot) ([head $ fst playersAndPot],snd playersAndPot)) n
+      continueGame (payWinner (fst playersAndPot) (filter getPlayerIngame (fst playersAndPot),snd playersAndPot)) n
       return False 
   -- ein Spieler hat AllIn gesetzt -> Showdown 
   | any (<= 0) $ map getPlayerCash $ fst playersAndPot = do
-      endgame playersAndPot (completeTableCards deck tisch) n
+      endgame ((filter getPlayerIngame $ fst playersAndPot), snd playersAndPot) (completeTableCards deck tisch) n
       return False
   -- Spiel geht normal weiter
   | otherwise = do
