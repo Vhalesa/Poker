@@ -128,9 +128,10 @@ mischen = do
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
 runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
-  x <- rundeImmer (p,pot) tisch --Small Blind ist immer dran
-  y <- rundeImmer x tisch --Big Blind ist immer dran
-  wdhRunde y tisch --solange, bis entweder alle Spieler die gleiche Wette haben, oder nur noch 1 im Spiel ist
+  -- x <- rundeImmer (p,pot) tisch --Small Blind ist immer dran
+  -- y <- rundeImmer x tisch --Big Blind ist immer dran
+  -- wdhRunde y tisch --solange, bis entweder alle Spieler die gleiche Wette haben, oder nur noch 1 im Spiel ist
+  jeder (p,pot) tisch $ length p
     where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           rundeImmer ((p1:ps),pot) tisch  
               -- Spieler, der dran ist, ist nicht mehr im Spiel (wegen Fold) -> naechster Spieler ist dran
@@ -142,15 +143,22 @@ runde (p, pot) tisch = do
               | otherwise                              = entscheidungMensch ((p1:ps),pot) tisch
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch
-            -- alle Spieler haben den gleichen Wettbetrag -> Setzrunde vorbei
-            | all (== maximum (map getCurrentBet (p1:p2:ps))) (map getCurrentBet (p1:p2:ps)) = return ((p1:p2:ps),pot)
+            -- alle Spieler, die noch ingame sind, haben den gleichen Wettbetrag -> Setzrunde vorbei
+            | all (== maximum (map getCurrentBet (p1:p2:ps))) (map getCurrentBet (playerIngame (p1:p2:ps))) = 
+                                                return ((p1:p2:ps),pot)
             -- nur noch ein Spieler im Spiel -> beende
             | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             --sonst: naechster Spieler ist dran
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
+          -- Jeder Spieler ist am Anfang der Runde mind.1 Mal dran. n ist length (p)
+          jeder (p,pot) tisch 0 = wdhRunde (p,pot) tisch
+          jeder (p,pot) tisch n = (rundeImmer (p,pot) tisch) >>= (\x -> jeder x tisch (n-1))
           --naechster Player kommt an Anfang der Liste (1.Player an den Schluss)  
           nextPlayer :: ([Player],Int) -> ([Player],Int)
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
+          --alle Spieler, die mitspielen
+          playerIngame :: [Player] -> [Player]
+          playerIngame ps = filter getPlayerIngame ps
 
 -- Entscheidung: weiterspielen oder aufhoeren?
 continueGame :: [Player] -> Int -> IO ()
