@@ -44,6 +44,9 @@ getComboForPlayer cs p = setPlayerCombo (checkCombo (reverse $ sort $ getPlayerH
 setPlayerCombo :: ScoreCombo -> Player -> Player
 setPlayerCombo combo x = x {combo}
 
+playerHasCash :: Player -> Bool
+playerHasCash Player {cash} = cash > 0
+
 getPlayerCash :: Player -> Int
 getPlayerCash Player {cash} = cash
 
