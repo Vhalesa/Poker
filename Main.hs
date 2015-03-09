@@ -12,7 +12,7 @@ import Combos
 main :: IO()
 main = do 
        test
-       mischen
+  --     mischen
 
 test = do
     let c1 = Card (Spades, Five)
@@ -22,14 +22,16 @@ test = do
         c5 = Card (Hearts, Nine)
         c6 = Card (Hearts, Ten)
         c7 = Card (Hearts, Jack)
-        c8 = Card (Hearts, Queen)
+        c8 = Card (Clubs, Jack)
         c9 = Card (Spades, King)
         co1 = Straight [c5,c6,c7,c8,c9]
         co2 = Straight [c4,c5,c6,c7,c8]
    
-    putStrLn ("Testspieler hat " ++ show co1 )
+--    putStrLn ("Testspieler hat " ++ show co1 )
 
-    putStrLn (show (co2 == co1))
+--    putStrLn (show (co2 == co1))
+
+    putStrLn $ show $ checkCombo [c9,c8,c7,c6,c5,c4,c2,c1]
 
 
 -- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)
