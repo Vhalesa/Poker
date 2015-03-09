@@ -168,18 +168,14 @@ continueGame :: [Player] -> Int -> IO ()
 continueGame ps n = do
     putStrLn ("Die " ++ show n ++ ". Spielrunde ist vorbei. Weiterspielen? (Y/N)")
     input <- getLine
-    if (any (<=10) $ map getPlayerCash ps) 
+    if (input=="n" || input=="N") 
       then do
-        putStrLn "Mindestens ein Spieler hat zu wenig Geld. Das Spiel ist deshalb beendet."
-        --todo falls wir mehr als 2 Spieler machen: Ohne den Spieler weiterspielen?
+        putStrLn "Du hast das Spiel beendet."
     else if (input=="y" || input=="Y") 
       then do
         putStrLn "Die naechste Spielrunde beginnt gleich!"
-        let updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets ps
+        let updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets $ filter playerHasCash ps
         startGame updatedPlayers $ n+1
-    else if (input=="n" || input=="N") 
-      then do
-        putStrLn "Du hast das Spiel beendet."
     else do
         continueGame ps n
 
