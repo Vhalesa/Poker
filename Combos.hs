@@ -37,7 +37,7 @@ checkCombo cs
     --Flush
     | checkFlush cs = Flush $ first5 $ getFlush cs $ ind5 $ colorsIn cs []
     --Straight
-    | checkStraight cs = Straight $ head $ getStraight cs
+    | checkStraight cs = Straight $ head $ getStraight $ remDup cs []
     --Drilling
     | fst $ checkThree cs = getThree cs
     --Paar / 2 Paare
