@@ -103,7 +103,7 @@ checkAllInGame playersAndPot n deck tisch
       return False 
   -- ein Spieler hat AllIn gesetzt -> Showdown 
   | any (<= 0) $ map getPlayerCash $ fst playersAndPot = do
-      endgame ((filter getPlayerIngame $ fst playersAndPot), snd playersAndPot) (completeTableCards deck tisch) n
+      endgame playersAndPot (completeTableCards deck tisch) n
       return False
   -- Spiel geht normal weiter
   | otherwise = do
@@ -148,7 +148,8 @@ runde (p, pot) tisch = do
             | all (== maximum (map getCurrentBet (p1:p2:ps))) (map getCurrentBet (playerIngame (p1:p2:ps))) = 
                                                 return ((p1:p2:ps),pot)
             -- nur noch ein Spieler im Spiel -> beende
-            | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
+            | length (filter getPlayerIngame (p1:p2:ps)) <= 1 = return ((p1:p2:ps),pot) 
+            -- | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             --sonst: naechster Spieler ist dran
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
           -- Jeder Spieler ist am Anfang der Runde mind.1 Mal dran. n ist length (p)
