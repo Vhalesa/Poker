@@ -31,7 +31,9 @@ Spielablauf (IO?):
   - vor der jeder Spielrunde
     - Kartendeck mischen [done]
     - Small/Big Blind zuweisen [done]
-  - 4 Wettrunden [done] 
+  - 4 Wettrunden [done]
+    -> ERSTE Wettrunde: Reihenfolge: ...,Dealer, Small, Big []
+    -> ZWEITE - VIERTE Wettrunde: Reihenfolge: Small, Big, ..., Dealer []
     -> Vorgehen bei jeder Wettrunde (Achtung, Pott muss mit übergeben werden) [done]
       -> Wenn alle Spieler außer einem fold gemacht haben, abbrechen und direkt verbleibenden Spieler zum Gewinner erklären [done]
       -> (man darf nicht 2x hintereinander erhöhen, ohne das der andere Spieler dazwischen erhöht hat)
