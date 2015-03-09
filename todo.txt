@@ -9,10 +9,10 @@ Chips: => abgeschafft!
   - Datentyp (Show, Ord, Eq) [done]
   - Chipshaufen für jeden Spieler für den Anfang [done]
   - Summe der Chips bilden [done]
-  - Wechselfunktion: []
+  - Wechselfunktion:
     - reines Wechseln ist fertig [done]
     - Austauschen des Chips (der aus dem Besitz gewechselt wird) mit den gewechselten Chips 
-      -> eigenen Chipshaufen aktualisieren []
+      -> eigenen Chipshaufen aktualisieren
 
 Regeln:
   - Tabelle mit den Gewinnmöglichkeiten [done]
@@ -20,14 +20,14 @@ Regeln:
   - Raise [done]
   - Call [done]
     Absicherung, bei nicht genug Geld -> automatisch AllIn -> anderer Spieler bekommt überschüssiges Geld zurück
-  - AllIn []
+  - AllIn [done]
     alle Karten aufdecken
     showDown
   - Fold [done]
 
 Spielablauf (IO?):
   - am Anfang vor allen Spielrunden (vor dem Spiel)
-    - Spielern Chipshaufen zuweisen
+    - Spielern Geld zuweisen [done]
   - vor der jeder Spielrunde
     - Kartendeck mischen [done]
     - Small/Big Blind zuweisen [done]
@@ -39,10 +39,10 @@ Spielablauf (IO?):
       - Small Blind: stockt er auf Big Blind auf, erhöhen oder aufhören [done]
       - Big Blind: aufstocken, erhöhen oder verlassen [done]
       - while (beide haben ungleichen Betrag)
-        - spielDerDranIst: Raise, Call oder Fold
+        - spielDerDranIst: Raise, Call oder Fold [done]
             -> Fold:
-                - Spieler temporär aus der Spielerliste löschen und am Ende nach dem Showdown wieder einsetzen?
-                - Hand des Spielers auf [] setzen?
+                - Spieler temporär aus der Spielerliste löschen und am Ende nach dem Showdown wieder einsetzen? [zu anstrengend]
+                - Hand des Spielers auf [] setzen? [machen wir nicht so]
                 - Spieler eine Bool Variable geben namens Fold? [done]
         - nächsterSpielerDran -> [p1,p2] (p1 war dran, wird wieder ganz hinten eingereiht) 
     - 1. Runde (PreFlop) [done]
@@ -63,18 +63,18 @@ Spielablauf (IO?):
       -> bekommt Combos => gibt das höchste aus(?), und/oder den Player, der gewonnen hat [done]
       -> dazu vielleicht die Combo in Player speichern? [done]
     - Verteilung des ChipsGewinns [done]
-  - nach jeder Spielrunde
+  - nach jeder Spielrunde [done]
     - Spieler hat die Möglichkeit aufzuhören [done]
     - automatisches Ende, wenn einer keine Chips mehr hat [done] 
     - Reset von Pot, Karten, Combo, CurrentBet [done]
   - nach n Spielrunden (Wenn jeder Spieler einmal Big Blind war)
     - Blinds werden erhoeht [done]
 
-Mensch: []
-- In neues Modul, da Game bereits sehr groß? []
-- Abfrage, was er tun will (Call, Raise, Fold) []
+Mensch: [done]
+- In neues Modul, da Game bereits sehr groß? [done]
+- Abfrage, was er tun will (Call, Raise, Fold) [done]
   -> bei Raise noch zusätzlich: um wie viel? 5,10,15 ....AllIn 
-  -> sowas wie raise 200 soll gehen []
+  -> sowas wie raise 200 soll gehen [done]
 - nach jedem Spiel: weiterspielen? [done]
 
 KI:
@@ -120,6 +120,9 @@ Allgemeine Anforderungen:
             (+ extra pred-Funktion damit Ace beides ist)
   - Chips Datentyp erwies sich im Nachhinein als nicht praktikabel
     Lösung: Chips Datentyp wurde wieder entfernt und stattdessen Int verwendet
+  - generell gibt es einige Sonderfälle, die man beachten muss. Nicht wirklich
+    ein Problem, aber die Funktionen mussten doch oft etwas abgeändert werden
+    oder nachträglich noch etwas eingefügt werden.
 
 - Verwendete Bibliotheken
   - Data.List (Um Listen zu sortieren)
