@@ -85,10 +85,11 @@ startGame ps n = do
           --Runde 4 ausfuehren: 1 Karte als River austeilen und wieder setzen
           r4 <- runde4 deck3
           let finalTischkarten = tischkarten ++ head r4
+              deck4 = last r4
 
           --Setzen fur Runde 4
           playersAndPot4 <- runde playersAndPot3 finalTischkarten
-          allIngame4 <- checkAllInGame playersAndPot4 n [] finalTischkarten
+          allIngame4 <- checkAllInGame playersAndPot4 n deck4 finalTischkarten
           when allIngame4 $ do
             -- Showdown
             endgame playersAndPot4 finalTischkarten n
