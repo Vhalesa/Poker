@@ -114,11 +114,11 @@ runde1 stapel p = do
 
 --runde1 nicht in IO. 
 runde1b :: [Card] -> [Player] -> ([Player],[Card])
-runde1b cs ps = ([p1,p2],last cards1)
-  where cards1 = austeilen cs 2 [] 2
-        p1 = setPlayerHand (head cards1) (head ps)
-        p2 = setPlayerHand (cards1 !! 1) (ps !! 1)
-                                                            
+runde1b cs ps = (playersWithHands 0,last cards1)
+  where cards1 = austeilen cs (length ps) [] 2
+        playersWithHands n
+            | n < (length ps) = setPlayerHand (cards1 !! n) (ps !! n) : playersWithHands (n+1)
+            | otherwise = []
 -- 3 Karten werden vom Stapel genommen
 runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
