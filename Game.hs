@@ -113,6 +113,8 @@ checkAllInGame playersAndPot n deck tisch
 -- Showdown + Entscheidung, ob noch ein weiteres Spiel gespielt wird oder nicht
 endgame :: ([Player],Int) -> [Card] -> Int -> IO ()
 endgame playersAndPot tischkarten n = do
+  putStrLn "Showdown! Die Tischkarten sind: "
+  putStrLn $ show tischkarten
   --Showdown, wer hat gewonnen
   playersAfterShowdown <- showdown playersAndPot tischkarten 
   -- noch eine Runde spielen?
