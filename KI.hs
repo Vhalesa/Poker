@@ -34,7 +34,7 @@ entscheidungKI (p, pot) tisch = do
         kiBet = getCurrentBet $ head p
     
         maxBet :: Int
-        maxBet = getCurrentBet $ p !! 1
+        maxBet = maximum (map getCurrentBet p)
 
     putStr "Cheatmode: Die Karten der KI sind: "
     putStrLn . show $ kiCards

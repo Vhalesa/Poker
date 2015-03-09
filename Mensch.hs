@@ -27,7 +27,7 @@ entscheidungMensch (p, pot) tisch = do
             putStrLn ""
           --du hast noch xxx Geld (weiter Info Ausgaben)?
           let eigCash = getPlayerCash $ head p
-              bet = getCurrentBet $ p !! 1
+              bet = maximum (map getCurrentBet p)
               eigBet = getCurrentBet $ head p
               allIn = eigCash - (bet - eigBet) 
           putStr "Du hast noch Cash: "

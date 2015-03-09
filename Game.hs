@@ -22,7 +22,7 @@ main = do
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
-    startGame [player3,player4,player1,player2] 1
+    startGame [player3,player4,player2,player1] 1
     --startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -143,7 +143,7 @@ runde (p, pot) tisch = do
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch
             -- alle Spieler haben den gleichen Wettbetrag -> Setzrunde vorbei
-            | all (==True) $ map ((getCurrentBet p1) ==) $ map getCurrentBet (p2:ps) = return ((p1:p2:ps),pot)
+            | all (== maximum (map getCurrentBet (p1:p2:ps))) (map getCurrentBet (p1:p2:ps)) = return ((p1:p2:ps),pot)
             -- nur noch ein Spieler im Spiel -> beende
             | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
             --sonst: naechster Spieler ist dran
