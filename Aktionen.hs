@@ -179,9 +179,9 @@ runde4 cs = do
 -- Showdown
 showdown :: ([Player],Int) -> [Card] -> IO [Player]
 showdown (ps,pot) cs = do
-  let playersWithCombo = map (getComboForPlayer cs) ps
+  let playersWithCombo = map (getComboForPlayer cs) $ filter getPlayerIngame ps
       winner = playerWithHighestCombo playersWithCombo
-      updatedPlayers = payWinner playersWithCombo (winner,pot)
+      updatedPlayers = payWinner ps (winner,pot)
   putStrLn("Gewonnen hat " ++ (show (map getPlayerName winner)) ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
   putStrLn( show updatedPlayers)
   return updatedPlayers
