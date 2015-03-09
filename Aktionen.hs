@@ -120,7 +120,7 @@ austeilen deck n erg x = austeilen (snd $ splitAt x deck) (n-1) (erg ++ [(fst $ 
 
 -- Vervollstaendigt die Tischkarten auf 5. 
 completeTableCards :: [Card] -> [Card] -> [Card]
-completeTableCards deck table = head $ austeilen deck 1 [] (5 - length table)
+completeTableCards deck table = table ++ (head $ austeilen deck 1 [] (5 - length table))
 
 -- Rund1,2,3,4 (jeweils das Karteaufdecken + Aufruf von runde)
 -- mit Ausgabe, welche Karte gezogen wurde
