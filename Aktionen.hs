@@ -55,10 +55,32 @@ doBlinds ps x = do
 -- Small und Big Blind zuweisen
 delegateBlind :: [Player] -> [Player]
 delegateBlind [] = []
-delegateBlind (p:ps)
-    | getPlayerRole p == BigBlind   = p {role = SmallBlind} : delegateBlind ps
-    | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
-    | otherwise                     = p : delegateBlind ps
+delegateBlind p
+--  | length p == 2 = del2 p 
+--  | length p == 2 = del2 p 
+  | length p >= 1 && length p <=2 = del2 p 
+  | length p > 3 = reverse $ del $ reverse p
+  | otherwise     = p
+  -- | otherwise     = []
+    where del2 [] = [] -- fuer nur 2 Spieler (Big Blind und Small Blind)
+          del2 (p:ps)
+            | getPlayerRole p == BigBlind = p {role = SmallBlind} : delegateBlind ps
+            | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
+            | otherwise = p : delegateBlind ps
+
+          del3 [] = [] -- fuer 3 Spieler (Big Blind, Small Blind und Dealer) Ist noch nicht fertig!
+          del3 (p:ps)
+            | getPlayerRole p == BigBlind = p {role = SmallBlind} : delegateBlind ps
+            | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
+            | otherwise = p : delegateBlind ps
+          
+          del (p1:ps) -- fuer 4 oder mehr Spieler
+            | getPlayerRole p1 == BigBlind  && length (p1:ps) > 3  = del $ ps ++ [p1 {role = None}]
+            | getPlayerRole p1 == SmallBlind && length (p1:ps) > 2 = p1 {role = BigBlind} : del ps
+            | getPlayerRole p1 == Dealer     = p1 {role = SmallBlind} : del ps
+            | otherwise                      = p1 {role = Dealer} : ps
+            -- | otherwise                      = p1 {role = Dealer} : ps
+            -- | otherwise                      = p1 : ps
 
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int 
