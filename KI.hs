@@ -44,6 +44,8 @@ entscheidungKI (p, pot) tisch = do
     putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "
     putStrLn . show $ kiCash 
+    putStr "Im Pot sind zur Zeit: "
+    putStrLn . show $ pot
     putStr "Die höchste Wette ist derzeit bei: "
     putStrLn . show $ maxBet 
     putStr "KIs Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)

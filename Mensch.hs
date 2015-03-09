@@ -30,6 +30,8 @@ entscheidungMensch (p, pot) tisch = do
               bet = maximum (map getCurrentBet p)
               eigBet = getCurrentBet $ head p
               allIn = eigCash - (bet - eigBet) 
+          putStr "Im Pot sind zur Zeit: "
+          putStrLn . show $ pot
           putStr "Du hast noch Cash: "
           putStrLn . show $ eigCash 
           putStr "Die höchste Wette ist derzeit bei: "
