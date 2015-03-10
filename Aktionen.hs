@@ -56,16 +56,16 @@ doBlinds ps x = do
 delegateBlind :: [Player] -> [Player]
 delegateBlind [] = []
 delegateBlind p
-  | length p == 2 = del2 p 
+  | length p == 2 = reverse $ sort $ del2 p 
   | length p == 3 = reverse $ sort $ del3 p
-  | length p > 3 = reverse $ del $ reverse p
+  | length p > 3 = reverse $ sort $ reverse $ del $ sort p
   | otherwise     = p
   -- | otherwise     = []
     where del2 [] = [] -- fuer nur 2 Spieler (Big Blind und Small Blind)
           del2 (p:ps)
-            | getPlayerRole p == BigBlind   = p {role = SmallBlind} : delegateBlind ps
-            | getPlayerRole p == SmallBlind = delegateBlind ps ++ [p {role = BigBlind}]
-            | otherwise = p : delegateBlind ps
+            | getPlayerRole p == BigBlind   = p {role = SmallBlind} : del2 ps
+            | getPlayerRole p == SmallBlind = del2 ps ++ [p {role = BigBlind}]
+            | otherwise = p : del2 ps
 
           del3 [] = [] -- fuer 3 Spieler (Big Blind, Small Blind und Dealer)
           del3 (p:ps)
@@ -83,6 +83,13 @@ delegateBlind p
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int 
 blinds v = 3*v 
+
+-- sortiert eine SpielerListe ....,D,S,B zu S,B,....,D
+sortBlinds :: [Player] -> [Player]
+sortBlinds ps 
+  | getPlayerRole (last ps) == BigBlind = sortBlinds $ last ps : init ps
+  | getPlayerRole (last ps) == SmallBlind = sortBlinds $ last ps : init ps
+  | otherwise = ps
 
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
 payBlind :: Int -> Player -> Player

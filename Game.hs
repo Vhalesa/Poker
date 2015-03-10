@@ -22,9 +22,9 @@ main = do
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
-    startGame [player4,player2,player1] 1
-    --startGame [player3,player4,player2,player1] 1
-    --startGame [player1,player2] 1
+    -- startGame [player4,player2,player1] 1
+    startGame [player3,player4,player2,player1] 1
+    --startGame [player2,player1] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
@@ -70,9 +70,11 @@ startGame ps n = do
           tischkarten2 = head r2
 
       -- TODO: Liste der Player so sortieren: S,B,...,D
+      let playersAndPot1s = (sortBlinds $ fst playersAndPot1, snd playersAndPot1)
+      print $ fst playersAndPot1s
       
       --Setzen fuer Runde 2
-      playersAndPot2 <- runde playersAndPot1 (head r2)
+      playersAndPot2 <- runde playersAndPot1s (head r2)
       allIngame2 <- checkAllInGame playersAndPot2 n deck2 tischkarten2
       when allIngame2 $ do
 
