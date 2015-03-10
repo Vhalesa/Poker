@@ -22,7 +22,8 @@ main = do
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
-    startGame [player3,player4,player2,player1] 1
+    startGame [player4,player2,player1] 1
+    --startGame [player3,player4,player2,player1] 1
     --startGame [player1,player2] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
@@ -46,7 +47,7 @@ startGame ps n = do
     putStrLn "\ESC[5;32m$$$\ESC[0m \ESC[5mWIN BIG MONEY \ESC[5;32m$$$\ESC[0m"
     putStrLn ""
     putStrLn ""
-  
+
     --Blinds bezahlen 
     let blindsMultiplikator = 1 + (quot (n-1) $ length ps)
     playersAndPot <- doBlinds ps (blindsMultiplikator*10)
@@ -57,6 +58,7 @@ startGame ps n = do
         players1 = fst $ r1
         deck1 = snd $ r1
 
+    -- Reihefolge: ...,D,S,B
     -- Setzen -> Ueberpruefen, ob es schon einen Gewinner gibt?
     playersAndPot1 <- runde (players1, snd playersAndPot) []
     allIngame1 <- checkAllInGame playersAndPot1 n deck1 [] 
@@ -67,6 +69,8 @@ startGame ps n = do
       let deck2 = last r2
           tischkarten2 = head r2
 
+      -- TODO: Liste der Player so sortieren: S,B,...,D
+      
       --Setzen fuer Runde 2
       playersAndPot2 <- runde playersAndPot1 (head r2)
       allIngame2 <- checkAllInGame playersAndPot2 n deck2 tischkarten2

@@ -39,7 +39,12 @@ entscheidungKI (p, pot) tisch = do
         kiName :: String
         kiName = getPlayerName $ head p
 
-    putStrLn . show $ kiName
+        kiRole :: Role
+        kiRole = getPlayerRole $ head p
+
+    putStr . show $ kiName
+    putStr " ist gerade "
+    putStrLn . show $ kiRole
     putStr "Cheatmode: Die Karten der KI sind: "
     putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "

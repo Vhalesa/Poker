@@ -9,17 +9,20 @@ import Data.List
 
 --Datentyp, welche Rolle der Spieler gerade annimmt (interessant bei 3+ Spielern)
 data Role = BigBlind | SmallBlind | Dealer | None
-    deriving (Eq)
+    deriving (Eq,Show,Ord)
 
 --Datentyp fuer Spieler
 data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ingame::Bool, ki::Bool}
 
 instance Show Player where
-    show Player {name,cash} = "(" ++ name ++ ", Cash: " ++ show cash ++")"
+    show Player {name,cash} = "(" ++ name ++ ", Cash: " ++ show cash ++ ")"
 
 --Zwei Spieler mit dem selben Namen sind der selbe Spieler
 instance Eq Player where
     a == b = getPlayerName a == getPlayerName b
+
+instance Ord Player where
+    compare a b = compare (getPlayerRole a) (getPlayerRole b)
 
 getPlayerName :: Player -> String
 getPlayerName Player {name} = name
