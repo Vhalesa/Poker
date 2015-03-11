@@ -27,6 +27,9 @@ entscheidungKI (p, pot) tisch = do
         kiHandValue :: Int
         kiHandValue = checkKICardValue $ reverse $ sort $ kiCards ++ tisch
 
+        tableValue :: Int
+        tableValue = checkKICardValue $ reverse $ sort $ tisch
+
         kiToPay :: Int
         kiToPay = maxBet - kiBet
 
@@ -57,17 +60,22 @@ entscheidungKI (p, pot) tisch = do
     putStrLn . show $ kiBet 
 
     -- ALL IN
-    if kiHandValue >= 25000 then do
+    -- KI hat einen guten Flush oder besseres
+    if kiHandValue >= 28000 then do
       putStrLn "KI setzt AllIn ein"
       kiRaise (p,pot) kiCash
+
     -- RAISE
-    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) then
-      if kiToPay < 300 && kiRaiseBetrag > 150 then
-         kiRaise (p,pot) kiRaiseBetrag
+    --      KI hat min. 2Pair       KI hat gute Handkarten                  KI hat min. ein Pair und es liegen schon 4 Karten und der Pot ist klein
+    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) || (length tisch >= 4 && kiHandValue - tableValue > 5000 && pot <= 200) then
+      if kiToPay <= 3*kiRaiseBetrag then
+         kiRaise (p,pot) $ max kiRaiseBetrag kiToPay
       else
          kiCall (p,pot)
+
     -- CALL
-    else if (kiHandValue > 5000 && kiToPay <= kiRaiseBetrag) || (kiHandValue > 800 && tisch == []) || kiToPay <=0 then do
+    --      KI hat min Pair und muss nicht zu viel zahlen                      KI hat okay Handkarten und muss nicht zu viel zahlen                KI muss nix zahlen
+    else if (kiHandValue - tableValue > 5000 && kiToPay <= 2*kiRaiseBetrag) || (kiHandValue > 800 && tisch == [] && 2*kiToPay <= kiRaiseBetrag) || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
     else
@@ -75,16 +83,20 @@ entscheidungKI (p, pot) tisch = do
       
 
 kiRaise (p, pot) betrag = do
-    putStrLn (show $ getPlayerName (head p) ++ " setzt Raise ein und erhöht um " ++ show betrag)
+    putStr $ show $ getPlayerName (head p)
+    putStr " setzt Raise ein und erhoeht um "
+    putStrLn $ show betrag
     putStrLn ""
     return $ raise (p, pot) betrag
 
 kiCall (p,pot) = do
-    putStrLn (show $ getPlayerName (head p) ++ " setzt Call ein")
+    putStr $ show $ getPlayerName (head p)
+    putStrLn " setzt Call ein"
     putStrLn ""
     return $ call (p,pot)
 
 kiFold (p,pot) = do
-    putStrLn (show $ getPlayerName (head p) ++ " setzt Fold ein")
+    putStr $ show $ getPlayerName (head p)
+    putStrLn " setzt Fold ein"
     putStrLn ""
     return $ fold (p, pot)

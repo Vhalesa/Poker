@@ -18,6 +18,7 @@ handValue (c1:c2:cs)
     -- Sonstiges
     | otherwise = cardValueScore (getValue c1) + cardValueScore (getValue c2)
 handValue (c1:cs) = cardValueScore (getValue c1)
+handValue [] = 0
 
 -- Ein fiktiver Wert, mit dem die KI berechnet, wie gut ihre Hand ist
 cardValueScore :: Value -> Int
@@ -57,3 +58,10 @@ cardListValue :: [Card] -> Int
 cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
+--berechnet die Chance, dass noch ein Flush zusammen kommt 
+calculateFlushChance :: [Card] -> Double
+calculateFlushChance cs
+    | any (>=5) $ colorsIn cs [] = 1.0
+    | any (==4) $ colorsIn cs [] = if length cs == 6 then 9/46 else if length cs == 5 then 9/47 + 9/46 else 0.0
+    | any (==3) $ colorsIn cs [] = if length cs == 5 then 10/47 * 9/46 else 0.0
+    | any (==2) $ colorsIn cs [] = if length cs == 2 then 311/50 * 10/49 * 9/48 else 0.0
