@@ -9,7 +9,13 @@ import Data.List
 
 --Datentyp, welche Rolle der Spieler gerade annimmt (interessant bei 3+ Spielern)
 data Role = BigBlind | SmallBlind | Dealer | None
-    deriving (Eq,Show,Ord)
+    deriving (Eq,Ord)
+
+instance Show Role where
+    show BigBlind = "Big Blind"
+    show SmallBlind = "Small Blind"
+    show Dealer = "Dealer"
+    show None = "normaler Spieler"
 
 --Datentyp fuer Spieler
 data Player = Player {name::String, hand::[Card], combo::ScoreCombo, cash::Int, role::Role, currentBet::Int, ingame::Bool, ki::Bool}

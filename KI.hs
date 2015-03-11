@@ -45,7 +45,7 @@ entscheidungKI (p, pot) tisch = do
     putStr . show $ kiName
     putStr " ist gerade "
     putStrLn . show $ kiRole
-    putStr "Cheatmode: Die Karten der KI sind: "
+    putStr "Cheatmode: Die Karten der KI sind: " -- Das hier sollte nach dem Debug auf jeden Fall raus
     putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "
     putStrLn . show $ kiCash 
@@ -62,7 +62,7 @@ entscheidungKI (p, pot) tisch = do
       kiRaise (p,pot) kiCash
     -- RAISE
     else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) then
-      if kiToPay < 300 then
+      if kiToPay < 300 && kiRaiseBetrag > 150 then
          kiRaise (p,pot) kiRaiseBetrag
       else
          kiCall (p,pot)
@@ -75,16 +75,16 @@ entscheidungKI (p, pot) tisch = do
       
 
 kiRaise (p, pot) betrag = do
-    putStrLn ("KI setzt Raise ein und erhöht um " ++ show betrag)
+    putStrLn (show $ getPlayerName (head p) ++ " setzt Raise ein und erhöht um " ++ show betrag)
     putStrLn ""
     return $ raise (p, pot) betrag
 
 kiCall (p,pot) = do
-    putStrLn "KI setzt Call ein"
+    putStrLn (show $ getPlayerName (head p) ++ " setzt Call ein")
     putStrLn ""
     return $ call (p,pot)
 
 kiFold (p,pot) = do
-    putStrLn "KI setzt Fold ein"
+    putStrLn (show $ getPlayerName (head p) ++ " setzt Fold ein")
     putStrLn ""
     return $ fold (p, pot)

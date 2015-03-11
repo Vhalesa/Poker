@@ -47,6 +47,7 @@ comboValueScore (Pair2 cs)= 10000 + cardListValue cs
 comboValueScore (Pair cs)= 5000 + cardListValue cs
 comboValueScore (HighCard cs)= cardListValue cs
 
+-- Berechnung der KI um ihre Hand zu analysieren
 tableValue :: [Card] -> Int
 tableValue cs = comboValueScore kiCombo
     where
@@ -55,3 +56,4 @@ tableValue cs = comboValueScore kiCombo
 cardListValue :: [Card] -> Int
 cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
+
