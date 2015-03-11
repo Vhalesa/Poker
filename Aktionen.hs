@@ -87,8 +87,8 @@ blinds v = 3*v
 -- sortiert eine SpielerListe ....,D,S,B zu S,B,....,D
 sortBlinds :: [Player] -> [Player]
 sortBlinds ps 
-  | getPlayerRole (last ps) == BigBlind = sortBlinds $ last ps : init ps
-  | getPlayerRole (last ps) == SmallBlind = sortBlinds $ last ps : init ps
+  | getPlayerRole (last ps) == BigBlind && length ps > 2 = sortBlinds $ last ps : init ps
+  | getPlayerRole (last ps) == SmallBlind && length ps > 2= sortBlinds $ last ps : init ps
   | otherwise = ps
 
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
