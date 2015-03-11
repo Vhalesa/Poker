@@ -22,7 +22,7 @@ main = do
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
-    -- startGame [player4,player2,player1] 1
+    --startGame [player4,player2,player1] 1
     startGame [player3,player4,player2,player1] 1
     --startGame [player2,player1] 1
 
@@ -32,7 +32,6 @@ main = do
 startGame ps n = do
     --Karten mischen
     deck <- mischen
-    --print deck
 
     putStrLn ""
     putStrLn "  ██████╗  ██████╗ ██╗  ██╗███████╗██████╗"
@@ -48,9 +47,12 @@ startGame ps n = do
     putStrLn ""
     putStrLn ""
 
+    -- Pruefen, ob noch alle wichtigen Rollen dabei sind, und ansonsten neu verteilen
+    let psCheck = checkSetRoles ps
+    
     --Blinds bezahlen 
-    let blindsMultiplikator = 1 + (quot (n-1) $ length ps)
-    playersAndPot <- doBlinds ps (blindsMultiplikator*10)
+    let blindsMultiplikator = 1 + (quot (n-1) $ length psCheck)
+    playersAndPot <- doBlinds psCheck (blindsMultiplikator*10)
     
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --Karten austeilen 
@@ -105,7 +107,6 @@ startGame ps n = do
 checkAllInGame playersAndPot n deck tisch
   -- nur noch ein Spieler dabei -> es wird beendet
   | length (filter getPlayerIngame (fst playersAndPot)) == 1 = do
-      --continueGame (payWinner (fst playersAndPot) ([head $ fst playersAndPot],snd playersAndPot)) n
       continueGame (payWinner (fst playersAndPot) (filter getPlayerIngame (fst playersAndPot),snd playersAndPot)) n
       return False 
   -- ein Spieler hat AllIn gesetzt -> Showdown 
@@ -138,9 +139,6 @@ mischen = do
 -- es muessen die [Player], der Pot und die Tischkarten uebergeben werden
 runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
-  -- x <- rundeImmer (p,pot) tisch --Small Blind ist immer dran
-  -- y <- rundeImmer x tisch --Big Blind ist immer dran
-  -- wdhRunde y tisch --solange, bis entweder alle Spieler die gleiche Wette haben, oder nur noch 1 im Spiel ist
   jeder (p,pot) tisch $ length p
     where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           rundeImmer ((p1:ps),pot) tisch  
