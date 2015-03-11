@@ -69,16 +69,16 @@ delegateBlind p
 
           del3 [] = [] -- fuer 3 Spieler (Big Blind, Small Blind und Dealer)
           del3 (p:ps)
-            | getPlayerRole p == BigBlind   = p {role = Dealer} : del3 ps
-            | getPlayerRole p == Dealer     = p {role = SmallBlind} : del3 ps
-            | getPlayerRole p == SmallBlind = del3 ps ++ [p {role = BigBlind}]
+            | getPlayerRole p == BigBlind   = p {role = SmallBlind} : del3 ps
+            | getPlayerRole p == Dealer     = p {role = BigBlind} : del3 ps
+            | getPlayerRole p == SmallBlind = del3 ps ++ [p {role = Dealer}]
             | otherwise = p : del3 ps
           
           del (p1:ps) -- fuer 4 oder mehr Spieler
-            | getPlayerRole p1 == BigBlind   = del $ ps ++ [p1 {role = None}]
-            | getPlayerRole p1 == SmallBlind = p1 {role = BigBlind} : del ps
-            | getPlayerRole p1 == Dealer     = p1 {role = SmallBlind} : del ps
-            | otherwise                      = p1 {role = Dealer} : ps
+            | getPlayerRole p1 == BigBlind   = p1 {role = SmallBlind} : del ps
+            | getPlayerRole p1 == SmallBlind = p1 {role = Dealer} : del ps
+            | getPlayerRole p1 == Dealer     = del $ ps ++ [p1 {role = None}]
+            | otherwise                      = p1 {role = BigBlind} : ps
 
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int 
