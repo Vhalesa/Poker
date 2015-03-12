@@ -23,8 +23,8 @@ main = do
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
     --startGame [player4,player2,player1] 1
-    startGame [player3,player4,player2,player1] 1
-    --startGame [player2,player1] 1
+    --startGame [player3,player4,player2,player1] 1
+    startGame [player2,player1] 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
@@ -181,7 +181,11 @@ continueGame ps n = do
       then do
         putStrLn "Die naechste Spielrunde beginnt gleich!"
         let updatedPlayers = resetIngame $ resetCombos $ resetHands $ resetBets $ filter playerHasCash ps
-        startGame updatedPlayers $ n+1
+        if (length updatedPlayers > 1) 
+          then do
+            startGame updatedPlayers $ n+1
+          else do
+            putStrLn "Es gibt nur noch einen Spieler! Es findet doch keine neue Runde statt."
     else do
         continueGame ps n
 
