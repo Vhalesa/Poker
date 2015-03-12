@@ -18,6 +18,7 @@ handValue (c1:c2:cs)
     -- Sonstiges
     | otherwise = cardValueScore (getValue c1) + cardValueScore (getValue c2)
 handValue (c1:cs) = cardValueScore (getValue c1)
+handValue [] = 0
 
 -- Ein fiktiver Wert, mit dem die KI berechnet, wie gut ihre Hand ist
 cardValueScore :: Value -> Int
@@ -47,11 +48,43 @@ comboValueScore (Pair2 cs)= 10000 + cardListValue cs
 comboValueScore (Pair cs)= 5000 + cardListValue cs
 comboValueScore (HighCard cs)= cardListValue cs
 
+-- Berechnung der KI um ihre Hand zu analysieren
 tableValue :: [Card] -> Int
-tableValue cs = comboValueScore kiCombo
+tableValue cs = (bonusScoreChance cs) + comboValueScore kiCombo
     where
         kiCombo = checkCombo cs
 
 cardListValue :: [Card] -> Int
 cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
+
+-- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht. (Bislang nur Flush)
+bonusScoreChance :: [Card] -> Int
+bonusScoreChance cs
+    | calculateFlushChance cs >= 0.19 && calculateFlushChance cs < 1.0 = 5000
+    | otherwise = 0
+
+--berechnet die Chance, dass noch ein Flush zusammen kommt 
+calculateFlushChance :: [Card] -> Double
+calculateFlushChance cs
+    | any (>=5) $ colorsIn cs [] = 1.0
+    | any (==4) $ colorsIn cs [] = if length cs == 6 then 9/46 else if length cs == 5 then 9/47 + 9/46 else 0.0
+    | any (==3) $ colorsIn cs [] = if length cs == 5 then 10/47 * 9/46 else 0.0
+    | any (==2) $ colorsIn cs [] = if length cs == 2 then 3 * 11/50 * 10/49 * 9/48 else 0.0
+    | otherwise = 0.0
+
+calculatePairChance :: [Card] -> Int -> Double
+calculatePairChance [] _ = 0.0
+calculatePairChance (c1:c2:c3:c4:cs) l
+    | c1 == c2 && c1 == c3 && c1 == c4 = calculatePairChance cs l
+    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l)) + calculatePairChance (c4:cs) l
+    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance (c3:c4:cs) l
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance (c2:c3:c4:cs) l
+calculatePairChance [c1,c2,c3] l
+    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l))
+    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance [c3] l
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2,c3] l
+calculatePairChance [c1,c2] l
+    | c1 == c2 = 2 / (52 - (fromIntegral l))
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2] l
+calculatePairChance [c1] l = 3 / (52 - (fromIntegral l))
