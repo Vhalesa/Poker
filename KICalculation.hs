@@ -76,14 +76,15 @@ bonusScoreChance cs = do
   sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..2]] -- hier muss bei n = Anzahl aller Berechnungen
   hSetBuffering stdin NoBuffering 
   erg <- warten doneCalc
+  putStr "KI hat nebenläufig berechnet: "
+  print erg
   return erg
 
--- wartet bis alle Berechnungen fertig sind und entscheidet dann, was es tut
+--wartet bis alle Berechnungen fertig sind, addiert diese und gibt den errechnet Wert zurueck
 warten :: TVar [Int] -> IO Int
 warten doneCalc = do
   c <- atomically getCalc
   let chance = foldl (+) 0 c
-  putStrLn "KI hat berechnet....muss nun entscheiden."
   return chance
   where getCalc = do
           d <- readTVar doneCalc
