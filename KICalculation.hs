@@ -50,7 +50,7 @@ comboValueScore (HighCard cs)= cardListValue cs
 
 -- Berechnung der KI um ihre Hand zu analysieren
 tableValue :: [Card] -> Int
-tableValue cs = comboValueScore kiCombo
+tableValue cs = (bonusScoreChance cs) + comboValueScore kiCombo
     where
         kiCombo = checkCombo cs
 
@@ -58,10 +58,17 @@ cardListValue :: [Card] -> Int
 cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
+-- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht. (Bislang nur Flush)
+bonusScoreChance :: [Card] -> Int
+bonusScoreChance cs
+    | calculateFlushChance cs >= 0.19 && calculateFlushChance cs < 1.0 = 5000
+    | otherwise = 0
+
 --berechnet die Chance, dass noch ein Flush zusammen kommt 
 calculateFlushChance :: [Card] -> Double
 calculateFlushChance cs
     | any (>=5) $ colorsIn cs [] = 1.0
     | any (==4) $ colorsIn cs [] = if length cs == 6 then 9/46 else if length cs == 5 then 9/47 + 9/46 else 0.0
     | any (==3) $ colorsIn cs [] = if length cs == 5 then 10/47 * 9/46 else 0.0
-    | any (==2) $ colorsIn cs [] = if length cs == 2 then 311/50 * 10/49 * 9/48 else 0.0
+    | any (==2) $ colorsIn cs [] = if length cs == 2 then 3 * 11/50 * 10/49 * 9/48 else 0.0
+    | otherwise = 0.0

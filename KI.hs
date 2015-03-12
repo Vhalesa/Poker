@@ -13,7 +13,6 @@ import Data.List
 entscheidungKI :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungKI (p, pot) tisch = do
     putStrLn ""
-    putStrLn "KI ist am Zug"
     let
         kiCards :: [Card]
         kiCards = getPlayerHand (head p)
@@ -45,11 +44,13 @@ entscheidungKI (p, pot) tisch = do
         kiRole :: Role
         kiRole = getPlayerRole $ head p
 
-    putStr . show $ kiName
+    putStr kiName
+    putStrLn " ist am Zug"
+    putStr kiName
     putStr " ist gerade "
     putStrLn . show $ kiRole
-    putStr "Cheatmode: Die Karten der KI sind: " -- Das hier sollte nach dem Debug auf jeden Fall raus
-    putStrLn . show $ kiCards
+    --putStr "Cheatmode: Die Karten der KI sind: " -- Das hier sollte nach dem Debug auf jeden Fall raus
+    --putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "
     putStrLn . show $ kiCash 
     putStr "Im Pot sind zur Zeit: "
