@@ -72,3 +72,19 @@ calculateFlushChance cs
     | any (==3) $ colorsIn cs [] = if length cs == 5 then 10/47 * 9/46 else 0.0
     | any (==2) $ colorsIn cs [] = if length cs == 2 then 3 * 11/50 * 10/49 * 9/48 else 0.0
     | otherwise = 0.0
+
+calculatePairChance :: [Card] -> Int -> Double
+calculatePairChance [] _ = 0.0
+calculatePairChance (c1:c2:c3:c4:cs) l
+    | c1 == c2 && c1 == c3 && c1 == c4 = calculatePairChance cs l
+    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l)) + calculatePairChance (c4:cs) l
+    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance (c3:c4:cs) l
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance (c2:c3:c4:cs) l
+calculatePairChance [c1,c2,c3] l
+    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l))
+    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance [c3] l
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2,c3] l
+calculatePairChance [c1,c2] l
+    | c1 == c2 = 2 / (52 - (fromIntegral l))
+    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2] l
+calculatePairChance [c1] l = 3 / (52 - (fromIntegral l))
