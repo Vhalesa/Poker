@@ -69,18 +69,18 @@ cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
 -- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht
 -- bekommt die Hand+Tischkarten uebergeben
--- bonusScoreChance cs = undefined -- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
+-- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
 bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
   doneCalc <- newTVarIO []
-  todoCalc <- newTVarIO [] 
-  sequence_ [ forkIO $ chanceBerechnung n cs todoCalc doneCalc | n <- [1..2]] -- hier muss bei n = Anzahl aller Berechnungen
-  erg <- warten todoCalc doneCalc
+  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..2]] -- hier muss bei n = Anzahl aller Berechnungen
+  hSetBuffering stdin NoBuffering 
+  erg <- warten doneCalc
   return erg
 
 -- wartet bis alle Berechnungen fertig sind und entscheidet dann, was es tut
-warten :: TVar [Int] -> TVar [Int] -> IO Int
-warten todoCalc doneCalc = do
+warten :: TVar [Int] -> IO Int
+warten doneCalc = do
   c <- atomically getCalc
   let chance = foldl (+) 0 c
   putStrLn "KI hat berechnet....muss nun entscheiden."
@@ -91,12 +91,11 @@ warten todoCalc doneCalc = do
             then return ()
             else retry
           writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren
-          writeTVar todoCalc [1..2] --Liste mit den noch nicht fertigen Berechnungen zuruecksetzten (TODO: richtige Anzahl)
           return d 
   
 -- berechnet nebenlaeufig, was fuer eine Wahrscheinlichkeit ihr n hat und schreibt es in die TVar
-chanceBerechnung :: Int -> [Card] -> TVar [Int] -> TVar [Int] -> IO ()
-chanceBerechnung n cs todoCalc doneCalc = do
+chanceBerechnung :: Int -> [Card] -> TVar [Int] -> IO ()
+chanceBerechnung n cs doneCalc = do
   let c = calculateChance n cs
   atomically $ do
     d <- readTVar doneCalc
