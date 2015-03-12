@@ -73,7 +73,7 @@ cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
   doneCalc <- newTVarIO []
-  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..2]] -- hier muss bei n = Anzahl aller Berechnungen
+  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..3]] -- hier muss bei n = Anzahl aller Berechnungen
   hSetBuffering stdin NoBuffering 
   erg <- warten doneCalc
   putStr "KI hat nebenläufig berechnet: "
@@ -88,7 +88,7 @@ warten doneCalc = do
   return chance
   where getCalc = do
           d <- readTVar doneCalc
-          if (length d >= 2) --hier muss mit Anzahl aller Berechnungen verglichen werden
+          if (length d >= 3) --hier muss mit Anzahl aller Berechnungen verglichen werden
             then return ()
             else retry
           writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren
