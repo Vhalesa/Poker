@@ -65,6 +65,8 @@ bonusScoreChance cs = undefined -- TODO alle Berechnungen hier nebenlaeufig verw
 calculateFlushBonusScore :: [Card] -> Int
 calculateFlushBonusScore cs
     | calculateFlushChance cs >= 0.19 && calculateFlushChance cs < 1.0 = 5000
+    | calculateFlushChance cs >= 0.1 && calculateFlushChance cs < 0.19 = 2000
+    | calculateFlushChance cs >= 0.05 && calculateFlushChance cs < 0.1 = 1000
     | otherwise = 0
 
 --berechnet die Chance, dass noch ein Flush zusammen kommt
@@ -84,19 +86,45 @@ calculateOvercardBonusScore cs = -20 * round (100 * calculateHigherCardChance cs
 calculateHigherCardChance :: [Card] -> Double
 calculateHigherCardChance cs
     | length cs >= 7 || highestV == Ace = 0.0
-    | highestV == King = 4/remainingCards
-    | highestV == Queen = 8/remainingCards
-    | highestV == Jack = 12/remainingCards
-    | highestV == Ten = 16/remainingCards
-    | highestV == Nine = 20/remainingCards
-    | highestV == Eight = 24/remainingCards
-    | highestV == Seven = 28/remainingCards
-    | highestV == Six = 32/remainingCards
-    | highestV == Five = 36/remainingCards
-    | highestV == Four = 40/remainingCards
-    | highestV == Three = 44/remainingCards
-    | highestV == Two = 48/remainingCards
+    | highestV == King = cardChance
+    | highestV == Queen = 2 * cardChance
+    | highestV == Jack = 3 * cardChance
+    | highestV == Ten = 4 * cardChance
+    | highestV == Nine = 5 * cardChance
+    | highestV == Eight = 6 * cardChance
+    | highestV == Seven = 7 * cardChance
+    | highestV == Six = 8 * cardChance
+    | highestV == Five = 9 * cardChance
+    | highestV == Four = 10 * cardChance
+    | highestV == Three = 11 * cardChance
+    | highestV == Two = 12 * cardChance
 
     where
         highestV = getValue $ head cs
         remainingCards = 52 - (fromIntegral $ length cs)
+        cardChance = 4/remainingCards
+
+calculateStraightBonusScore :: [Card] -> Int
+calculateStraightBonusScore cs
+    | calculateStraightChance cs >= 0.15 && calculateStraightChance cs < 1.0 = 5000
+    | calculateStraightChance cs >= 0.10 && calculateStraightChance cs < 0.15 = 3000
+    | calculateStraightChance cs >= 0.05 && calculateStraightChance cs < 0.10 = 1000
+    | otherwise = 0
+
+-- Berechnet die Chance auf eine Strasse
+calculateStraightChance :: [Card] -> Double
+calculateStraightChance cs
+    | length cs >= 7 = 0.0
+    | maximumStraightComponents == 4 = 1.0
+    | maximumStraightComponents == 3 = possible3 * cardChance
+    | maximumStraightComponents == 2 = if length cs <= 5 then possible2 * cardChance * cardChance else 0.0
+    | maximumStraightComponents == 1 = if length cs <= 4 then possible1 * cardChance * cardChance * cardChance else 0.0
+    | otherwise = 0.0
+    where
+        existingStraightComponents = map (numberOfPreds cs) cs
+        maximumStraightComponents = maximum existingStraightComponents
+        remainingCards = 52 - (fromIntegral $ length cs)
+        possible3 = fromIntegral $ length $ filter (==3) existingStraightComponents
+        possible2 = fromIntegral $ length $ filter (==2) existingStraightComponents
+        possible1 = fromIntegral $ length $ filter (==1) existingStraightComponents
+        cardChance = 4/remainingCards

@@ -224,3 +224,21 @@ predInList c1 cs = elem (getPred c1) $ map getValue cs
 -- gibt den Value der Vorgänger-Karte (naechstniedrigeren Karte) zurueck
 getPred :: Card -> Value 
 getPred (Card(c,v)) = predB v
+
+-- gibt an, wie viele fuer eine Strasse in Frage kommende Karten in der Liste enthalten sind
+numberOfPreds :: [Card] -> Card -> Int
+numberOfPreds cs c = length straightCandidates
+    where
+        straightCandidates = intersect (valuesIn cs) (get4Preds c)
+        
+        valuesIn :: [Card] -> [Value]
+        valuesIn cs = map getValue $ remDup cs []
+        
+        get4Preds :: Card -> [Value]
+        -- Strasse kann nicht mit hoechster Karte 4,3,2 anfangen.
+        get4Preds c = if getValue c >= Five then [p1,p2,p3,p4] else []
+            where
+                p1 = getPred c
+                p2 = predB p1
+                p3 = predB p2
+                p4 = predB p3
