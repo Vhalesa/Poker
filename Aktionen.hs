@@ -46,8 +46,9 @@ pay x p = p {cash = getPlayerCash p - x, currentBet = getCurrentBet p + x}
 doBlinds :: [Player] -> Int -> IO([Player],Int)
 doBlinds ps x = do
   let ps1 = delegateBlind ps
-      ps2 = map (payBlind x) ps1 
-      pot = blinds x
+      ps2 = map (payBlind blind) ps1 
+      pot = blinds blind
+      blind = if any (<2*x) (map getPlayerCash ps) then quot (minimum $ map getPlayerCash ps) 2 else x
   putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
   putStrLn ("Verbleibende Chips: " ++ show ps2)
   return (ps2,pot)
