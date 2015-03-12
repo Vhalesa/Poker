@@ -23,12 +23,6 @@ entscheidungKI (p, pot) tisch = do
         kiRaiseBetrag :: Int
         kiRaiseBetrag = if kiCash <= 50 then kiCash else 50 + quot kiCash 15
 
-        kiHandValue :: Int
-        kiHandValue = checkKICardValue $ reverse $ sort $ kiCards ++ tisch
-
-        tableValue :: Int
-        tableValue = checkKICardValue $ reverse $ sort $ tisch
-
         kiToPay :: Int
         kiToPay = maxBet - kiBet
 
@@ -43,6 +37,10 @@ entscheidungKI (p, pot) tisch = do
 
         kiRole :: Role
         kiRole = getPlayerRole $ head p
+
+    --muessen in IO, da die Berechnungen nebenlaeufig ueber TVarIO ablaufen
+    kiHandValue <- checkKICardValue $ reverse $ sort $ kiCards ++ tisch
+    tableValue <- checkKICardValue $ reverse $ sort $ tisch
 
     putStr kiName
     putStrLn " ist am Zug"
