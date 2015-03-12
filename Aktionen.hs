@@ -80,6 +80,22 @@ delegateBlind p
             | getPlayerRole p1 == Dealer     = del $ ps ++ [p1 {role = None}]
             | otherwise                      = p1 {role = BigBlind} : ps
 
+-- ueberprueft, ob alle wichtigen Rollen (BigBlind, SmallBlind, Dealer) vergeben sind
+-- und wenn nicht bekommt ein Spieler die fehlende Rolle
+checkSetRoles :: [Player] -> [Player]
+--checkSetRoles ps = sort ps 
+-- checkSetRoles ps = hilf (sort ps)
+checkSetRoles ps = p1 {role = BigBlind} : [p2 {role = SmallBlind}] ++ hilf p
+  where hilf [] = [] 
+        hilf (p1:ps)
+        --hilf (p1:p2:ps) = p1 {role = BigBlind} : [p2 {role = SmallBlind}] ++ hilf ps
+         -- | 
+          -- | getPlayerRole p1 /= BigBlind  = p1 {role = BigBlind} : hilf ps 
+          -- | getPlayerRole p1 /= SmallBlind  = p1 {role = SmallBlind} : hilf ps 
+          | length (p1:ps) >= 1 = p1 {role = Dealer} : ps 
+          | otherwise = (p1:ps)
+        (p1:p2:p) = sort ps
+
 -- Blinds kommen in den Pot; Uebergabeparameter = Small Blind
 blinds :: Int -> Int 
 blinds v = 3*v 
@@ -87,8 +103,8 @@ blinds v = 3*v
 -- sortiert eine SpielerListe ....,D,S,B zu S,B,....,D
 sortBlinds :: [Player] -> [Player]
 sortBlinds ps 
-  | getPlayerRole (last ps) == BigBlind = sortBlinds $ last ps : init ps
-  | getPlayerRole (last ps) == SmallBlind = sortBlinds $ last ps : init ps
+  | getPlayerRole (last ps) == BigBlind && length ps > 2 = sortBlinds $ last ps : init ps
+  | getPlayerRole (last ps) == SmallBlind && length ps > 2= sortBlinds $ last ps : init ps
   | otherwise = ps
 
 -- Spieler muss Blind bezahlen Uebergabeparameter = Small Blind
