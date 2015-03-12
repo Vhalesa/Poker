@@ -1,10 +1,17 @@
 module KICalculation where
 
+import Data.List
+import Control.Concurrent.STM
+import Control.Concurrent
+import Control.Monad
+import System.Random
+import System.IO
+
 import Combos
 import Cards
 
-checkKICardValue :: [Card] -> Int
-checkKICardValue cs = if length cs < 5 then handValue cs else tableValue cs
+checkKICardValue :: [Card] -> IO Int
+checkKICardValue cs = if length cs < 5 then return (handValue cs) else tableValue cs
 
 -- fiktiver Int Wert der die Staerke der Hand der KI angibt
 handValue :: [Card] -> Int
@@ -49,8 +56,10 @@ comboValueScore (Pair cs)= 5000 + cardListValue cs
 comboValueScore (HighCard cs)= cardListValue cs
 
 -- Berechnung der KI um ihre Hand zu analysieren
-tableValue :: [Card] -> Int
-tableValue cs = (bonusScoreChance cs) + comboValueScore kiCombo
+tableValue :: [Card] -> IO Int
+tableValue cs = do
+    bonus <-(bonusScoreChance cs) 
+    return $ bonus + comboValueScore kiCombo
     where
         kiCombo = checkCombo cs
 
@@ -59,7 +68,45 @@ cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
 -- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht
-bonusScoreChance cs = undefined -- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
+-- bekommt die Hand+Tischkarten uebergeben
+-- bonusScoreChance cs = undefined -- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
+bonusScoreChance :: [Card] -> IO Int
+bonusScoreChance cs = do
+  doneCalc <- newTVarIO []
+  todoCalc <- newTVarIO [] 
+  sequence_ [ forkIO $ chanceBerechnung n cs todoCalc doneCalc | n <- [1..2]] -- hier muss bei n = Anzahl aller Berechnungen
+  erg <- warten todoCalc doneCalc
+  return erg
+
+-- wartet bis alle Berechnungen fertig sind und entscheidet dann, was es tut
+warten :: TVar [Int] -> TVar [Int] -> IO Int
+warten todoCalc doneCalc = do
+  c <- atomically getCalc
+  let chance = foldl (+) 0 c
+  putStrLn "KI hat berechnet....muss nun entscheiden."
+  return chance
+  where getCalc = do
+          d <- readTVar doneCalc
+          if (length d >= 2) --hier muss mit Anzahl aller Berechnungen verglichen werden
+            then return ()
+            else retry
+          writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren
+          writeTVar todoCalc [1..2] --Liste mit den noch nicht fertigen Berechnungen zuruecksetzten (TODO: richtige Anzahl)
+          return d 
+  
+-- berechnet nebenlaeufig, was fuer eine Wahrscheinlichkeit ihr n hat und schreibt es in die TVar
+chanceBerechnung :: Int -> [Card] -> TVar [Int] -> TVar [Int] -> IO ()
+chanceBerechnung n cs todoCalc doneCalc = do
+  let c = calculateChance n cs
+  atomically $ do
+    d <- readTVar doneCalc
+    writeTVar doneCalc $ c : d 
+
+-- Berechnet je nach n, die Wahrschneinlichkeit fuer Flush, Straight ...
+calculateChance :: Int -> [Card] -> Int
+calculateChance n cs
+  | n == 1 = calculateFlushBonusScore cs
+  | otherwise = calculateOvercardBonusScore cs
 
 -- Berechnet abhaengig von der Moeglichkeit auf einen Flush einen Bonus Score
 calculateFlushBonusScore :: [Card] -> Int
