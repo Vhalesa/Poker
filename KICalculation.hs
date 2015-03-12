@@ -58,13 +58,16 @@ cardListValue :: [Card] -> Int
 cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
--- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht. (Bislang nur Flush)
-bonusScoreChance :: [Card] -> Int
-bonusScoreChance cs
+-- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht
+bonusScoreChance cs = undefined -- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
+
+-- Berechnet abhaengig von der Moeglichkeit auf einen Flush einen Bonus Score
+calculateFlushBonusScore :: [Card] -> Int
+calculateFlushBonusScore cs
     | calculateFlushChance cs >= 0.19 && calculateFlushChance cs < 1.0 = 5000
     | otherwise = 0
 
---berechnet die Chance, dass noch ein Flush zusammen kommt 
+--berechnet die Chance, dass noch ein Flush zusammen kommt
 calculateFlushChance :: [Card] -> Double
 calculateFlushChance cs
     | any (>=5) $ colorsIn cs [] = 1.0
@@ -73,18 +76,27 @@ calculateFlushChance cs
     | any (==2) $ colorsIn cs [] = if length cs == 2 then 3 * 11/50 * 10/49 * 9/48 else 0.0
     | otherwise = 0.0
 
-calculatePairChance :: [Card] -> Int -> Double
-calculatePairChance [] _ = 0.0
-calculatePairChance (c1:c2:c3:c4:cs) l
-    | c1 == c2 && c1 == c3 && c1 == c4 = calculatePairChance cs l
-    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l)) + calculatePairChance (c4:cs) l
-    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance (c3:c4:cs) l
-    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance (c2:c3:c4:cs) l
-calculatePairChance [c1,c2,c3] l
-    | c1 == c2 && c1 == c3 = 1 / (52 - (fromIntegral l))
-    | c1 == c2 = 2 / (52 - (fromIntegral l)) + calculatePairChance [c3] l
-    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2,c3] l
-calculatePairChance [c1,c2] l
-    | c1 == c2 = 2 / (52 - (fromIntegral l))
-    | otherwise = 3 / (52 - (fromIntegral l)) + calculatePairChance [c2] l
-calculatePairChance [c1] l = 3 / (52 - (fromIntegral l))
+-- Vermindert den Bonus Score abhaengig von der Moeglichkeit, dass noch hoehere Karten kommen
+calculateOvercardBonusScore :: [Card] -> Int
+calculateOvercardBonusScore cs = -20 * round (100 * calculateHigherCardChance cs)
+
+-- Berechnet die Chance, dass noch eine hoehere Karte kommt, als die momentan hoechste
+calculateHigherCardChance :: [Card] -> Double
+calculateHigherCardChance cs
+    | length cs >= 7 || highestV == Ace = 0.0
+    | highestV == King = 4/remainingCards
+    | highestV == Queen = 8/remainingCards
+    | highestV == Jack = 12/remainingCards
+    | highestV == Ten = 16/remainingCards
+    | highestV == Nine = 20/remainingCards
+    | highestV == Eight = 24/remainingCards
+    | highestV == Seven = 28/remainingCards
+    | highestV == Six = 32/remainingCards
+    | highestV == Five = 36/remainingCards
+    | highestV == Four = 40/remainingCards
+    | highestV == Three = 44/remainingCards
+    | highestV == Two = 48/remainingCards
+
+    where
+        highestV = getValue $ head cs
+        remainingCards = 52 - (fromIntegral $ length cs)

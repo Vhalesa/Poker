@@ -7,6 +7,7 @@ import Random
 import Cards
 --import Chips
 import Combos
+import KICalculation
 
 --Diese Main Methode ist vorlaeufig zu Testzwecken bestimmt.
 main :: IO()
@@ -30,8 +31,10 @@ test = do
 --    putStrLn ("Testspieler hat " ++ show co1 )
 
 --    putStrLn (show (co2 == co1))
+    let mycards = [c9,c8,c7,c6,c5,c4,c3,c2,c1]
 
-    putStrLn $ show $ checkCombo [c9,c8,c7,c6,c5,c4,c2,c1]
+    putStrLn $ show $ checkCombo mycards
+    putStrLn $ show $ calculateFlushChance mycards
 
 
 -- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)
