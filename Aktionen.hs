@@ -20,7 +20,7 @@ call p = raise p 0
 -- Reihenfolge der Spieler wird um 1 verschoben -> naechster Spieler ist dran
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag 
-  -- genung Geld fuer die Raise (bzw. fuer Call)
+  -- genug Geld fuer die Raise (bzw. fuer Call)
   | eigCash >= diff                        = (p2:ps ++ [pay diff p1], pot + diff) 
   -- nicht genug Geld fuer den kompletten Raise, aber fuer Call und einen Teil des Raise (es wird AllIn gesetzt) 
   | eigCash >= diffBets && diff >= eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) 
@@ -29,6 +29,8 @@ raise ((p1:p2:ps),pot) betrag
     where diff       = diffBets + betrag
           diffBets   = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 
           eigCash    = getPlayerCash p1
+          -- andere Spieler bekommen ihr zu viel gezahltes Geld zurueck, wenn ein Spieler AllIn gegangen ist
+          -- auch vom Pot wird es wieder abgezogen
           moneyBack :: Player -> [Player] -> [Player] -> Int -> ([Player],Int)
           moneyBack p1 [] erg pot = (erg ++ [pay eigCash p1], pot)
           moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (getPlayerCash p1 + getCurrentBet p1)) < 0)
@@ -61,7 +63,6 @@ delegateBlind p
   | length p == 3 = reverse $ sort $ del3 p
   | length p > 3 = reverse $ sort $ reverse $ del $ sort p
   | otherwise     = p
-  -- | otherwise     = []
     where del2 [] = [] -- fuer nur 2 Spieler (Big Blind und Small Blind)
           del2 (p:ps)
             | getPlayerRole p == BigBlind   = p {role = SmallBlind} : del2 ps
@@ -84,15 +85,9 @@ delegateBlind p
 -- ueberprueft, ob alle wichtigen Rollen (BigBlind, SmallBlind, Dealer) vergeben sind
 -- und wenn nicht bekommt ein Spieler die fehlende Rolle
 checkSetRoles :: [Player] -> [Player]
---checkSetRoles ps = sort ps 
--- checkSetRoles ps = hilf (sort ps)
 checkSetRoles ps = p1 {role = BigBlind} : [p2 {role = SmallBlind}] ++ hilf p
   where hilf [] = [] 
         hilf (p1:ps)
-        --hilf (p1:p2:ps) = p1 {role = BigBlind} : [p2 {role = SmallBlind}] ++ hilf ps
-         -- | 
-          -- | getPlayerRole p1 /= BigBlind  = p1 {role = BigBlind} : hilf ps 
-          -- | getPlayerRole p1 /= SmallBlind  = p1 {role = SmallBlind} : hilf ps 
           | length (p1:ps) >= 1 = p1 {role = Dealer} : ps 
           | otherwise = (p1:ps)
         (p1:p2:p) = sort ps
@@ -163,6 +158,7 @@ runde1b cs ps = (playersWithHands 0,last cards1)
         playersWithHands n
             | n < (length ps) = setPlayerHand (cards1 !! n) (ps !! n) : playersWithHands (n+1)
             | otherwise = []
+
 -- 3 Karten werden vom Stapel genommen
 runde2b :: [Card] -> [[Card]]
 runde2b cs = austeilen cs 1 [] 3
