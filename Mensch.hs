@@ -105,19 +105,19 @@ isInt x = reads x
 --zur Zeit 1-3 moeglich
 anzahlPlayer :: IO Int
 anzahlPlayer = do
-  putStrLn "Mit wie vielen KIs möchtest du spielen? (1/2/3)?"
+  putStrLn "Mit wie vielen KIs möchtest du spielen? Du kannst gegen 1 bis 7 KIs spielen." 
   abfrage
   where abfrage = do
           eingabe <- getLine
           if (null (isInt eingabe)) || ( (snd $ head $ isInt eingabe) /= "")
             then do
-              putStrLn "Du musst 1, 2 oder 3 eingeben!"
+              putStrLn "Du musst eine Zahl zwischen 1 und 7 eingeben!"
               abfrage
             else do
               let betrag = fst $ head (isInt eingabe)
-              if (betrag > 0 && betrag < 4)
+              if (betrag > 0 && betrag < 8)
                 then do return $ betrag + 1
               else do
-                putStrLn "Momentan kann man nur gegen 1, 2 oder 3 Gegener spielen."
-                putStrLn "Also nur eine Zahl zwischen 1 und 3 eingeben."
+                putStrLn "Momentan kann man nur gegen 1 bis 7 Gegener spielen."
+                putStrLn "Also nur eine Zahl zwischen 1 und 7 eingeben."
                 abfrage

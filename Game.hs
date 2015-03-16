@@ -22,8 +22,12 @@ main = do
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
+        player5 = Player { name = "Supreme KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player6 = Player { name = "Master KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player7 = Player { name = "Fabulous KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player8 = Player { name = "Best KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         -- Liste aller Spieler (maximale Anzahl bis jetzt). Koennen aber noch mehr hinzugefuegt werden
-        players = [player3,player4,player2,player1]
+        players = [player8,player7,player6,player5,player3,player4,player2,player1]
 
     -- Mensch waehlt aus, gegen wie viele KIs er spielen moechte
     anzahl <- anzahlPlayer
