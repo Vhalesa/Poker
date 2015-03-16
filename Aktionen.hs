@@ -32,11 +32,13 @@ raise ((p1:p2:ps),pot) betrag
           -- andere Spieler bekommen ihr zu viel gezahltes Geld zurueck, wenn ein Spieler AllIn gegangen ist
           -- auch vom Pot wird es wieder abgezogen
           moneyBack :: Player -> [Player] -> [Player] -> Int -> ([Player],Int)
-          moneyBack p1 [] erg pot = (erg ++ [pay eigCash p1], pot)
-          moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (getPlayerCash p1 + getCurrentBet p1)) < 0)
+          moneyBack p1 [] erg pot = (erg ++ [pay (getPlayerCash p1) p1], pot + (getPlayerCash p1))
+          moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (getPlayerCash p1 + getCurrentBet p1)) <= 0)
+                                            --p2 kriegt kein Geld zurueck
                                             then moneyBack p1 ps (erg ++ [p2]) pot
+                                            --p2 bekommt Geld zurueck und der Pot auch
                                             else moneyBack p1 ps 
-                                                 (erg ++ [pay (eigCash - (getCurrentBet p2 - getCurrentBet p1)) p2])
+                                                 (erg ++ [pay (getPlayerCash p1 - (getCurrentBet p2 - getCurrentBet p1)) p2])
                                                  (pot + getPlayerCash p1 - (getCurrentBet p2 - getCurrentBet p1)) 
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag

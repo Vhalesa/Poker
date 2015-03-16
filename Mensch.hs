@@ -102,7 +102,7 @@ isInt :: String -> [(Int,String)]
 isInt x = reads x
 
 --fragt beim menschlichen Spieler ab, gegen wie viele KIs er spielen will
---zur Zeit 1-3 moeglich
+--zur Zeit 1-7 moeglich
 anzahlPlayer :: IO Int
 anzahlPlayer = do
   putStrLn "Mit wie vielen KIs möchtest du spielen? Du kannst gegen 1 bis 7 KIs spielen." 

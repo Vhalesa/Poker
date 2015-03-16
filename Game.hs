@@ -61,7 +61,7 @@ startGame ps n = do
     --Blinds werden automatisch bezahlt
     let blindsMultiplikator = 1 + (quot (n-1) $ length psCheck)
     playersAndPot <- doBlinds psCheck (blindsMultiplikator*10)
-    
+
     --Runde 1 ausfuehren: Karten austeilen und Spieler duerfen setzen,...
     --Karten austeilen 
     let r1 = runde1b deck $ fst playersAndPot
@@ -129,6 +129,8 @@ endgame :: ([Player],Int) -> [Card] -> Int -> IO ()
 endgame playersAndPot tischkarten n = do
   putStrLn "Showdown! Die Tischkarten sind: "
   putStrLn $ show tischkarten
+  putStr "Der Pot enthält: "
+  putStrLn $ show $ snd playersAndPot
   --Showdown, wer hat gewonnen
   playersAfterShowdown <- showdown playersAndPot tischkarten 
   -- noch eine Runde spielen?
