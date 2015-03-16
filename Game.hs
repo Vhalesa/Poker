@@ -16,15 +16,23 @@ import System.Random
 import Data.List
 import Control.Monad
 
--- Erst Startfunktionen bei Spielstart, dann Endlos weitere Spielrunden, bis Spiel verlassen wird
+-- Erst Startfunktionen bei Spielstart, dann endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
     let player1 = Player { name = "Human Genius", hand = [], combo = HighCard [], cash = 4000, ki = False, role=BigBlind, ingame = True, currentBet=0}
         player2 = Player { name = "Awesome KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=SmallBlind, ingame = True, currentBet=0}
         player3 = Player { name = "Majestic KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
         player4 = Player { name = "Superb KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=Dealer, ingame = True, currentBet=0}
-    --startGame [player4,player2,player1] 1
-    startGame [player3,player4,player2,player1] 1
-    --startGame [player2,player1] 1
+        player5 = Player { name = "Supreme KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player6 = Player { name = "Master KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player7 = Player { name = "Fabulous KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        player8 = Player { name = "Best KI", hand = [], combo = HighCard [], cash = 4000, ki = True, role=None, ingame = True, currentBet=0}
+        -- Liste aller Spieler (maximale Anzahl bis jetzt). Koennen aber noch mehr hinzugefuegt werden
+        players = [player8,player7,player6,player5,player3,player4,player2,player1]
+
+    -- Mensch waehlt aus, gegen wie viele KIs er spielen moechte
+    anzahl <- anzahlPlayer
+    let playersWahl = fst $ splitAt anzahl $ reverse players 
+    startGame playersWahl 1
 
 --alle Methoden, die fuer den Spielablauf benoetigt werden
 
@@ -50,7 +58,7 @@ startGame ps n = do
     -- Pruefen, ob noch alle wichtigen Rollen dabei sind, und ansonsten neu verteilen
     let psCheck = checkSetRoles ps
     
-    --Blinds bezahlen 
+    --Blinds werden automatisch bezahlt
     let blindsMultiplikator = 1 + (quot (n-1) $ length psCheck)
     playersAndPot <- doBlinds psCheck (blindsMultiplikator*10)
     
@@ -71,9 +79,8 @@ startGame ps n = do
       let deck2 = last r2
           tischkarten2 = head r2
 
-      -- TODO: Liste der Player so sortieren: S,B,...,D
+      -- Liste der Player so sortieren: S,B,...,D
       let playersAndPot1s = (sortBlinds $ fst playersAndPot1, snd playersAndPot1)
-      print $ fst playersAndPot1s
       
       --Setzen fuer Runde 2
       playersAndPot2 <- runde playersAndPot1s (head r2)
@@ -103,7 +110,7 @@ startGame ps n = do
             endgame playersAndPot4 finalTischkarten n
 
 --ueberprueft, ob noch alle Spieler im Spiel sind, oder es schon einen Gewinner gibt
---checkAllInGame :: ([Player],Int) -> Int -> IO Bool
+checkAllInGame :: ([Player],Int) -> Int -> [Card] -> [Card] -> IO Bool
 checkAllInGame playersAndPot n deck tisch
   -- nur noch ein Spieler dabei -> es wird beendet
   | length (filter getPlayerIngame (fst playersAndPot)) == 1 = do
@@ -128,6 +135,7 @@ endgame playersAndPot tischkarten n = do
   continueGame playersAfterShowdown n
 
 --Gibt gemischtes Kartendeck zurueck 
+mischen :: IO [Card]
 mischen = do
   randomNum <- randomIO :: IO Int 
   let generator = makeGenerator randomNum
@@ -140,7 +148,12 @@ mischen = do
 runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
   jeder (p,pot) tisch $ length p
-    where rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
+    where -- Jeder Spieler ist am Anfang der Runde mind. 1 Mal dran. n ist die Anzahl der Spieler
+          jeder (p,pot) tisch 0 = wdhRunde (p,pot) tisch
+          jeder (p,pot) tisch n = (rundeImmer (p,pot) tisch) >>= (\x -> jeder x tisch (n-1))
+          -- jeder Spieler darf bei der Setzrunde mind. 1 Mal entscheiden, was er tut Call/Fold/Raise 
+          -- (außer er hat schon gewonnen oder ist nicht mehr im Spiel)
+          rundeImmer :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           rundeImmer ((p1:ps),pot) tisch  
               -- Spieler, der dran ist, ist nicht mehr im Spiel (wegen Fold) -> naechster Spieler ist dran
               | (not $ getPlayerIngame p1)             = return $ nextPlayer ((p1:ps),pot)
@@ -149,6 +162,7 @@ runde (p, pot) tisch = do
               | all (==False) $ map getPlayerIngame ps = return $ ((p1:ps),pot)
               | getKI p1                               = entscheidungKI ((p1:ps),pot) tisch
               | otherwise                              = entscheidungMensch ((p1:ps),pot) tisch
+          -- Setzen geht weiter bis alle den gleichen Wettbetrag haben oder einer gewonnen hat
           wdhRunde :: ([Player],Int) -> [Card] -> IO ([Player],Int)
           wdhRunde ((p1:p2:ps),pot) tisch
             -- alle Spieler, die noch ingame sind, haben den gleichen Wettbetrag -> Setzrunde vorbei
@@ -156,16 +170,12 @@ runde (p, pot) tisch = do
                                                 return ((p1:p2:ps),pot)
             -- nur noch ein Spieler im Spiel -> beende
             | length (filter getPlayerIngame (p1:p2:ps)) <= 1 = return ((p1:p2:ps),pot) 
-            -- | (getPlayerIngame p1) && (all (==False) $ map getPlayerIngame (p2:ps)) = return ((p1:p2:ps),pot)
-            --sonst: naechster Spieler ist dran
+            -- sonst: naechster Spieler ist dran
             | otherwise = (rundeImmer ((p1:p2:ps),pot) tisch) >>= (\x -> wdhRunde x tisch)
-          -- Jeder Spieler ist am Anfang der Runde mind.1 Mal dran. n ist length (p)
-          jeder (p,pot) tisch 0 = wdhRunde (p,pot) tisch
-          jeder (p,pot) tisch n = (rundeImmer (p,pot) tisch) >>= (\x -> jeder x tisch (n-1))
-          --naechster Player kommt an Anfang der Liste (1.Player an den Schluss)  
+          --Funktion: naechster Player kommt an Anfang der Liste (1.Player an den Schluss)  
           nextPlayer :: ([Player],Int) -> ([Player],Int)
           nextPlayer ((p1:ps),pot) = ((ps ++ [p1]),pot)
-          --alle Spieler, die mitspielen
+          -- gibt alle Spieler zurueck, die mitspielen
           playerIngame :: [Player] -> [Player]
           playerIngame ps = filter getPlayerIngame ps
 

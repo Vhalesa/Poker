@@ -68,45 +68,48 @@ cardListValue [] = 0
 cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 
 -- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht
+-- und gibt diesen BonusScore zurueck
 -- bekommt die Hand+Tischkarten uebergeben
--- TODO alle Berechnungen hier nebenlaeufig verwalten und addieren
+-- TODO alle Berechnungen hier nebenlaeufig verwalten
 bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
+  -- hier kommen alle BonusScores der fertigen Berechnungen rein
   doneCalc <- newTVarIO []
   sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..3]] -- hier muss bei n = Anzahl aller Berechnungen
-  hSetBuffering stdin NoBuffering 
+  hSetBuffering stdin NoBuffering --damit die Ausgabe nicht gebuffert wird, kann nachher wieder weg
   erg <- warten doneCalc
-  putStr "KI hat nebenläufig berechnet: "
-  print erg
+  putStr "KI hat nebenläufig berechnet: " --nur fuer Debug, kann auch wieder weg
+  print erg -- das hier auch
   return erg
 
 --wartet bis alle Berechnungen fertig sind, addiert diese und gibt den errechnet Wert zurueck
 warten :: TVar [Int] -> IO Int
 warten doneCalc = do
-  c <- atomically getCalc
-  let chance = foldl (+) 0 c
-  return chance
+  listChance <- atomically getCalc
+  let addChance = foldl (+) 0 listChance -- addiert alle einzelnen BonusScores
+  return addChance
+  -- ueberprueft, ob alle Berechnungen fertig sind, wenn ja gibt sie sie zurueck
   where getCalc = do
-          d <- readTVar doneCalc
-          if (length d >= 3) --hier muss mit Anzahl aller Berechnungen verglichen werden
+          dCalc <- readTVar doneCalc
+          if (length dCalc >= 3) --hier muss mit Anzahl aller Berechnungen verglichen werden
             then return ()
-            else retry
-          writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren
-          return d 
+            else retry --solange versuchen, bis alle fertig sind
+          writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren (fuers naechste Mal)
+          return dCalc 
   
--- berechnet nebenlaeufig, was fuer eine Wahrscheinlichkeit ihr n hat und schreibt es in die TVar
+-- berechnet nebenlaeufig, was fuer eine Wahrscheinlichkeit/BonusScore ihr n (Flush, Straight...) hat und schreibt es in die TVar
 chanceBerechnung :: Int -> [Card] -> TVar [Int] -> IO ()
 chanceBerechnung n cs doneCalc = do
-  let c = calculateChance n cs
+  let singleChance = calculateChance n cs
   atomically $ do
     d <- readTVar doneCalc
-    writeTVar doneCalc $ c : d 
+    writeTVar doneCalc $ singleChance : d 
 
--- Berechnet je nach n, die Wahrschneinlichkeit fuer Flush, Straight ...
+-- Berechnet je nach n, die Wahrschneinlichkeit/BonusScore fuer Flush, Straight ...
 calculateChance :: Int -> [Card] -> Int
 calculateChance n cs
-  | n == 1 = calculateFlushBonusScore cs
-  | n == 2 = calculateStraightBonusScore cs
+  | n == 1    = calculateFlushBonusScore cs
+  | n == 2    = calculateStraightBonusScore cs
   | otherwise = calculateOvercardBonusScore cs
 
 -- Berechnet abhaengig von der Moeglichkeit auf einen Flush einen Bonus Score
