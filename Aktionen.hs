@@ -222,6 +222,6 @@ playerWithHighestCombo (p1:p2:ps)
 replace :: [Player] -> [Player] -> [Player]
 replace ns as = helpReplace ns as []
     where
-        helpReplace ns [] vs = helpReplace ns vs []
         helpReplace [] as vs = as ++ vs
+        helpReplace ns [] vs = helpReplace ns vs []
         helpReplace (n:ns) (a:as) vs = if (n==a) then n : helpReplace ns as vs else helpReplace (n:ns) as $ vs ++ [a] 
