@@ -4,8 +4,10 @@ import Cards
 import Aktionen 
 import Player
 import KICalculation
+import Random
 
 import Data.List
+import System.Random
  
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -22,7 +24,7 @@ entscheidungKI (p, pot) tisch = do
 
         kiRaiseBetrag :: Int
         kiRaiseBetrag = if kiCash <= 50 then kiCash else 50 + quot kiCash 15
-
+        
         kiToPay :: Int
         kiToPay = maxBet - kiBet
 
@@ -99,3 +101,11 @@ kiFold (p,pot) = do
     putStrLn " setzt Fold ein"
     putStrLn ""
     return $ fold (p, pot)
+
+-- gibt einen Random Int zwischen l und r zurueck
+kiRandomMoney :: Int -> Int -> IO Int
+kiRandomMoney l r = do
+  randomNum <- randomIO :: IO Int 
+  let generator = makeGenerator randomNum
+      randomMoney = randomBetrag generator l r
+  return randomMoney

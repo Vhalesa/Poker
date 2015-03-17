@@ -11,6 +11,10 @@ makeGenerator x = mkStdGen x
 randomizer :: StdGen -> Int -> (Int, StdGen)
 randomizer gen x = randomR (0,x) gen
 
+--Gibt eine Zufallszahl zwischen l und r zuruck
+randomBetrag :: StdGen -> Int -> Int -> Int
+randomBetrag gen l r = fst $ randomR (l,r) gen
+
 -- Gibt die n.te Karte des übergebenden Kartenstapels (beliebiger Groesse) zurueck
 getCard :: [Card] -> Int -> Card
 getCard stapel n = stapel !! n
