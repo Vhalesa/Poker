@@ -125,8 +125,11 @@ Allgemeine Anforderungen:
   - generell gibt es einige Sonderfälle, die man beachten muss. Nicht wirklich
     ein Problem, aber die Funktionen mussten doch oft etwas abgeändert werden
     oder nachträglich noch etwas eingefügt werden.
+  - Control.Concurrent.STM war auf dem Cip-Pool nicht installiert.
+    -> cabal install stm
 
 - Verwendete Bibliotheken
   - Data.List (Um Listen zu sortieren)
   - System.Random (Für die Mischfunktion)
   - Control.Monad (Für when-Abfragen)
+  - Control.Concurrent.STM und Control.Concurrent für Nebenläufigkeit
