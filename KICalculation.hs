@@ -1,11 +1,8 @@
 module KICalculation where
 
-import Data.List
 import Control.Concurrent.STM
 import Control.Concurrent
-import Control.Monad
 import System.Random
-import System.IO
 
 import Combos
 import Cards
@@ -76,10 +73,7 @@ bonusScoreChance cs = do
   -- hier kommen alle BonusScores der fertigen Berechnungen rein
   doneCalc <- newTVarIO []
   sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..3]] -- hier muss bei n = Anzahl aller Berechnungen
-  hSetBuffering stdin NoBuffering --damit die Ausgabe nicht gebuffert wird, kann nachher wieder weg
   erg <- warten doneCalc
-  putStr "KI hat nebenläufig berechnet: " --nur fuer Debug, kann auch wieder weg
-  print erg -- das hier auch
   return erg
 
 --wartet bis alle Berechnungen fertig sind, addiert diese und gibt den errechnet Wert zurueck
