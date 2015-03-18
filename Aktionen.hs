@@ -6,11 +6,12 @@ import Combos
 
 import Data.List
 
---p1 folded
+-- Spieler p1 setzt fold ein und ist fuer diese Runde nicht mehr im Spiel
+-- Naechster kommt an die Reihe 
 fold :: ([Player],Int) -> ([Player],Int)
 fold ((p1:ps),pot) = (ps ++ [setPlayerIngame False p1], pot)
 
--- p1 erhoeht 
+-- Spieler p1 called. Naechster kommt an die Reihe.
 -- bekommt die Liste der Player und den Pot (und gibt diese mit Veraenderung wieder zurueck)
 call :: ([Player],Int) -> ([Player],Int)
 call p = raise p 0 
@@ -21,25 +22,27 @@ call p = raise p 0
 raise :: ([Player],Int) -> Int -> ([Player],Int)
 raise ((p1:p2:ps),pot) betrag 
   -- genug Geld fuer die Raise (bzw. fuer Call)
-  | eigCash >= diff                        = (p2:ps ++ [pay diff p1], pot + diff) 
-  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call und einen Teil des Raise (es wird AllIn gesetzt) 
-  | eigCash >= diffBets && diff >= eigCash = (p2:ps ++ [pay eigCash p1], pot + eigCash) 
-  -- wenn nicht genug Geld fuer Call -> anderer Spieler bekommt sein zuviel gezahltes Geld zurueck, auch vom Pot wird es abgezogen
-  | otherwise                              = moneyBack p1 (p2:ps) [] pot 
-    where diff       = diffBets + betrag
-          diffBets   = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 
-          eigCash    = getPlayerCash p1
+  | cashP1 >= diff                       = (p2:ps ++ [pay diff p1], pot + diff) 
+  -- nicht genug Geld fuer den kompletten Raise, aber fuer Call und einen Teil des Raise (p1 zahlt sein gesamtes Geld ein)
+  | cashP1 >= diffBets && diff >= cashP1 = (p2:ps ++ [pay cashP1 p1], pot + cashP1) 
+  -- wenn nicht genug Geld fuer Call -> andere Spieler bekommen ihr zuviel gezahltes Geld zurueck, auch vom Pot wird es abgezogen
+  | otherwise                            = moneyBack p1 (p2:ps) [] pot 
+    where diff     = diffBets + betrag -- (Differenz zwischen eigener und hoechster Wette) + erhoeter Betrag
+          diffBets = (maximum (map getCurrentBet (p1:p2:ps))) - getCurrentBet p1 --Differenz zwischen hoechster und eigener Wette
+          cashP1   = getPlayerCash p1
           -- andere Spieler bekommen ihr zu viel gezahltes Geld zurueck, wenn ein Spieler AllIn gegangen ist
           -- auch vom Pot wird es wieder abgezogen
           moneyBack :: Player -> [Player] -> [Player] -> Int -> ([Player],Int)
-          moneyBack p1 [] erg pot = (erg ++ [pay (getPlayerCash p1) p1], pot + (getPlayerCash p1))
-          moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (getPlayerCash p1 + getCurrentBet p1)) <= 0)
+          --am Schluss zahlt p1 sein gesamtes Geld und es kommt in den Pot
+          moneyBack p1 [] erg pot = (erg ++ [pay cashP1 p1], pot + cashP1)
+          --prueft fuer alle Mitspieler von p1, ob sie eine hoehere Wette haben als p1 (mit seinem gesamten Geld)
+          moneyBack p1 (p2:ps) erg pot = if ((getCurrentBet p2 - (cashP1 + getCurrentBet p1)) <= 0)
                                             --p2 kriegt kein Geld zurueck
                                             then moneyBack p1 ps (erg ++ [p2]) pot
                                             --p2 bekommt Geld zurueck und der Pot auch
                                             else moneyBack p1 ps 
-                                                 (erg ++ [pay (getPlayerCash p1 - (getCurrentBet p2 - getCurrentBet p1)) p2])
-                                                 (pot + getPlayerCash p1 - (getCurrentBet p2 - getCurrentBet p1)) 
+                                                 (erg ++ [pay (cashP1 - (getCurrentBet p2 - getCurrentBet p1)) p2])
+                                                 (pot + cashP1 - (getCurrentBet p2 - getCurrentBet p1)) 
 
 -- Spieler bezahlt aus seinem Geld einen bestimmten Betrag
 pay :: Int -> Player -> Player

@@ -6,7 +6,7 @@ import Aktionen
 
 import Control.Monad
 
---Abfrage beim Mensch: Call, Raise oder Fold?
+-- Abfrage beim Mensch: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
 entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungMensch (p, pot) tisch = do
@@ -66,7 +66,7 @@ entscheidungMensch (p, pot) tisch = do
           else do
             putStrLn "Du musst Call, Raise oder Fold eingeben."
             abfrage
-        --Betrag, um den der Spieler erhoehen will
+        -- Abfrage des Betrags, um den der Spieler erhoehen will
         raiseAbfrage allIn = do
           eingabe <- getLine
           checkRaiseAbfrage eingabe allIn
@@ -119,5 +119,4 @@ anzahlPlayer = do
                 then do return $ betrag + 1
               else do
                 putStrLn "Momentan kann man nur gegen 1 bis 7 Gegener spielen."
-                putStrLn "Also nur eine Zahl zwischen 1 und 7 eingeben."
                 abfrage
