@@ -130,6 +130,6 @@ Allgemeine Anforderungen:
 
 - Verwendete Bibliotheken
   - Data.List (Um Listen zu sortieren)
-  - System.Random (Für die Mischfunktion)
+  - System.Random (Für die Mischfunktion und random Geld setzen)
   - Control.Monad (Für when-Abfragen)
   - Control.Concurrent.STM und Control.Concurrent für Nebenläufigkeit

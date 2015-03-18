@@ -1,9 +1,9 @@
 {-# LANGUAGE NamedFieldPuns #-}
+
 --Dieses Modul verwaltet Spieler quasi objektorientiert. 
 module Player where
 import Cards
 import Combos
---import Chips
 
 import Data.List
 
@@ -69,7 +69,7 @@ setPlayerRole :: Role -> Player -> Player
 setPlayerRole role x = x {role}
 
 getCurrentBet :: Player -> Int
-getCurrentBet Player {currentBet} =currentBet
+getCurrentBet Player {currentBet} = currentBet
 
 setCurrentBet ::  Int -> Player -> Player
 setCurrentBet currentBet x = x {currentBet}

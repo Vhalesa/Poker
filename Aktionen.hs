@@ -215,7 +215,7 @@ payWinner all (winners,pot) = replace newWinners all
   where newWinners = map (pay (negate $ quot pot (length winners))) winners
 
 -- Gibt den Spieler (bzw. die Spieler) mit der hoechsten Combo aus
--- Funktioniert fuer beliebig viele Spieler, bis auf die letzte Zeile
+-- Funktioniert fuer beliebig viele Spieler
 playerWithHighestCombo :: [Player] -> [Player]
 playerWithHighestCombo [p1] = [p1]
 playerWithHighestCombo (p1:p2:ps)

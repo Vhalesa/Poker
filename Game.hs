@@ -114,7 +114,12 @@ checkAllInGame :: ([Player],Int) -> Int -> [Card] -> [Card] -> IO Bool
 checkAllInGame playersAndPot n deck tisch
   -- nur noch ein Spieler dabei -> es wird beendet
   | length (filter getPlayerIngame (fst playersAndPot)) == 1 = do
-      continueGame (payWinner (fst playersAndPot) (filter getPlayerIngame (fst playersAndPot),snd playersAndPot)) n
+      let winnersAndPot = (filter getPlayerIngame (fst playersAndPot),snd playersAndPot)
+          updatedPlayers = payWinner (fst playersAndPot) winnersAndPot
+      putStr "Gewonnen hat: "
+      putStrLn . show $ fst winnersAndPot
+      putStrLn "Alle anderen haben gefolded."
+      continueGame updatedPlayers n  
       return False 
   -- ein Spieler hat AllIn gesetzt -> Showdown 
   | any (<= 0) $ map getPlayerCash $ fst playersAndPot = do
