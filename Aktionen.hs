@@ -205,7 +205,7 @@ showdown (ps,pot) cs = do
   let playersWithCombo = map (getComboForPlayer cs) $ filter getPlayerIngame ps
       winner = playerWithHighestCombo playersWithCombo
       updatedPlayers = payWinner ps (winner,pot)
-  printPlayerHands ps
+  printPlayerHands ps []
   putStrLn("Gewonnen hat " ++ (show (map getPlayerName winner)) ++ " mit " ++ show (map getPlayerCombo winner) ++ "")
   putStrLn( show updatedPlayers)
   return updatedPlayers
@@ -232,17 +232,26 @@ replace ns as = helpReplace ns as []
         helpReplace ns [] vs = helpReplace ns vs []
         helpReplace (n:ns) (a:as) vs = if (n==a) then n : helpReplace ns as vs else helpReplace (n:ns) as $ vs ++ [a] 
 
-printPlayerHands ps = do
+printPlayerHands :: [Player] -> [ScoreCombo] -> IO ()
+printPlayerHands ps cs = do
     let
         printHand p = do
             putStr $ getPlayerName p
             if getPlayerIngame p then do
                 putStr " hat auf der Hand "
                 putStrLn $ show $ getPlayerHand p
+                printPlayerHands (tail ps) (cs ++ [getPlayerCombo p]) 
             else do
                 putStrLn " ist ausgestiegen."
+                printPlayerHands (tail ps) cs
     if ps==[] then do
         putStrLn ""
     else do
-        printHand $ head ps
-        printPlayerHands $ tail ps
+        if cs == [] then do
+            printHand $ head ps
+        else if all (<= (getPlayerCombo $ head ps)) cs then do 
+            printHand $ head ps
+        else do
+            putStr $ getPlayerName $ head ps
+            putStrLn " zeigt seine Karten nicht vor."
+            printPlayerHands (tail ps) cs
