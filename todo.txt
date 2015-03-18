@@ -14,15 +14,15 @@ Chips: => abgeschafft!
     - Austauschen des Chips (der aus dem Besitz gewechselt wird) mit den gewechselten Chips 
       -> eigenen Chipshaufen aktualisieren
 
-Regeln:
+Regeln: [done]
   - Tabelle mit den Gewinnmöglichkeiten [done]
   - Big Blind, Small Blind [done]
   - Raise [done]
   - Call [done]
     Absicherung, bei nicht genug Geld -> automatisch AllIn -> anderer Spieler bekommt überschüssiges Geld zurück
   - AllIn [done]
-    alle Karten aufdecken
-    showDown
+    alle Karten aufdecken [done]
+    showDown [done]
   - Fold [done]
 
 Spielablauf (IO?):
@@ -94,9 +94,12 @@ KI:
     -> KI verwendet ihre Berechnungen um zu entscheiden, ob sie Call, Raise, Fold oder AllIn macht [done]
     -> KI kann bluffen []
 
-Text-Ausgabe:
+Text-Ausgabe: []
   - Kartensymbole wenn möglich in bunt (rot/schwarz) [done]
   - Ausgabe generell schöner machen. Fragen vielleicht in fett oder so []
+  - Ausgabe langsamer, nicht alles auf einmal. Aber nicht so wichtig. []
+  - Ausgaben augräumen []
+  - Poker-Spiel-Blink-Dings ganz an den Anfang, vor Spieleranzahl-Auswahl
 
 Allgemeine Anforderungen:
 - mind. 2 (oder 3) Themen aus der Vorlesung verwenden
