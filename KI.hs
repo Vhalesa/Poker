@@ -79,7 +79,7 @@ entscheidungKI (p, pot) tisch = do
          kiCall (p,pot)
 
     -- CALL
-    --      KI hat min Pair und muss nicht zu viel zahlen                      KI hat okay Handkarten und muss nicht zu viel zahlen                KI hat 10- Chips KI muss nix zahlen
+    --      KI hat min Pair und muss nicht zu viel zahlen                       KI hat okay Handkarten und muss nicht zu viel zahlen                 KI hat 10- Chips KI muss nix zahlen
     else if (kiHandValue - tableValue > 5000 && kiToPay <= 2*kiMinimumRaise) || (kiHandValue > 800 && tisch == [] && kiToPay <= 2*kiMinimumRaise) || kiCash <= 10 || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
