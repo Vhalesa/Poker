@@ -22,8 +22,11 @@ entscheidungKI (p, pot) tisch = do
         kiCash :: Int
         kiCash = getPlayerCash (head p)
 
-        kiRaiseBetrag :: Int
-        kiRaiseBetrag = if kiCash <= 50 then kiCash else 50 + quot kiCash 15
+        kiMinimumRaise :: Int
+        kiMinimumRaise = if kiCash <= 100 then kiCash else 50 + quot kiCash 20
+
+        kiMaximumRaise :: Int
+        kiMaximumRaise = min kiCash $ 4*kiMinimumRaise
         
         kiToPay :: Int
         kiToPay = maxBet - kiBet
@@ -43,6 +46,7 @@ entscheidungKI (p, pot) tisch = do
     --muessen in IO, da die Berechnungen nebenlaeufig ueber TVarIO ablaufen
     kiHandValue <- checkKICardValue $ reverse $ sort $ kiCards ++ tisch
     tableValue <- checkKICardValue $ reverse $ sort $ tisch
+    kiRaiseBetrag <- kiRandomMoney kiMinimumRaise kiMaximumRaise
 
     putStr kiName
     putStrLn " ist am Zug"
@@ -68,15 +72,15 @@ entscheidungKI (p, pot) tisch = do
 
     -- RAISE
     --      KI hat min. 2Pair       KI hat gute Handkarten                  KI hat min. ein Pair und es liegen schon 4 Karten und der Pot ist klein
-    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) || (length tisch >= 4 && kiHandValue - tableValue > 5000 && pot <= 200) then
-      if kiToPay <= 3*kiRaiseBetrag then
+    else if kiHandValue >= 10000 || (tisch == [] && kiHandValue >= 1300) || (length tisch >= 4 && kiHandValue - tableValue > 5000 && pot <= quot kiCash 15) then
+      if kiToPay <= 4*kiMinimumRaise then
          kiRaise (p,pot) $ max kiRaiseBetrag kiToPay
       else
          kiCall (p,pot)
 
     -- CALL
     --      KI hat min Pair und muss nicht zu viel zahlen                      KI hat okay Handkarten und muss nicht zu viel zahlen                KI hat 10- Chips KI muss nix zahlen
-    else if (kiHandValue - tableValue > 5000 && kiToPay <= 2*kiRaiseBetrag) || (kiHandValue > 800 && tisch == [] && kiToPay <= 2*kiRaiseBetrag) || kiCash <= 10 || kiToPay <=0 then do
+    else if (kiHandValue - tableValue > 5000 && kiToPay <= 2*kiMinimumRaise) || (kiHandValue > 800 && tisch == [] && kiToPay <= 2*kiMinimumRaise) || kiCash <= 10 || kiToPay <=0 then do
       kiCall (p,pot)
     -- FOLD
     else
