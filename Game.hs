@@ -29,17 +29,6 @@ main = do
         -- Liste aller Spieler (maximale Anzahl bis jetzt). Koennen aber noch mehr hinzugefuegt werden
         players = [player8,player7,player6,player5,player3,player4,player2,player1]
 
-    -- Mensch waehlt aus, gegen wie viele KIs er spielen moechte
-    anzahl <- anzahlPlayer
-    let playersWahl = fst $ splitAt anzahl $ reverse players 
-    startGame playersWahl 1
-
---alle Methoden, die fuer den Spielablauf benoetigt werden
-
---Ein komplettes Spiel mit einer Liste an Spielern durchfuehren; n = n-te Spielrunde
-startGame ps n = do
-    --Karten mischen
-    deck <- mischen
 
     putStrLn ""
     putStrLn "  ██████╗  ██████╗ ██╗  ██╗███████╗██████╗"
@@ -54,6 +43,18 @@ startGame ps n = do
     putStrLn "\ESC[5;32m$$$\ESC[0m \ESC[5mWIN BIG MONEY \ESC[5;32m$$$\ESC[0m"
     putStrLn ""
     putStrLn ""
+
+    -- Mensch waehlt aus, gegen wie viele KIs er spielen moechte
+    anzahl <- anzahlPlayer
+    let playersWahl = fst $ splitAt anzahl $ reverse players 
+    startGame playersWahl 1
+
+--alle Methoden, die fuer den Spielablauf benoetigt werden
+
+--Ein komplettes Spiel mit einer Liste an Spielern durchfuehren; n = n-te Spielrunde
+startGame ps n = do
+    --Karten mischen
+    deck <- mischen
 
     -- Pruefen, ob noch alle wichtigen Rollen dabei sind, und ansonsten neu verteilen
     let psCheck = checkSetRoles ps
