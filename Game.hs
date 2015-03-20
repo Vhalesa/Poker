@@ -15,6 +15,8 @@ import KI
 import System.Random
 import Data.List
 import Control.Monad
+import Control.Concurrent.Thread.Delay
+
 
 -- Erst Startfunktionen bei Spielstart, dann endlos weitere Spielrunden, bis Spiel verlassen wird
 main = do 
@@ -117,6 +119,7 @@ checkAllInGame playersAndPot n deck tisch
   | length (filter getPlayerIngame (fst playersAndPot)) == 1 = do
       let winnersAndPot = (filter getPlayerIngame (fst playersAndPot),snd playersAndPot)
           updatedPlayers = payWinner (fst playersAndPot) winnersAndPot
+      putStrLn ""
       putStr "Gewonnen hat: "
       putStrLn . show $ fst winnersAndPot
       putStrLn "Alle anderen haben gefolded."

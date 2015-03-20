@@ -5,6 +5,7 @@ import Cards
 import Combos
 
 import Data.List
+import Control.Concurrent.Thread.Delay
 
 -- Spieler p1 setzt fold ein und ist fuer diese Runde nicht mehr im Spiel
 -- Naechster kommt an die Reihe 
@@ -56,8 +57,10 @@ doBlinds ps x = do
       ps2 = map (payBlind blind) ps1 
       pot = blinds blind
       blind = if any (<2*x) (map getPlayerCash ps) then quot (minimum $ map getPlayerCash ps) 2 else x
+  putStrLn ""
   putStrLn ("Der Pot betraegt nach den Blinds " ++ show pot)
   putStrLn ("Verbleibende Chips: " ++ show ps2)
+  delay 1000000
   return (ps2,pot)
                                     
 -- Small und Big Blind zuweisen
@@ -183,6 +186,7 @@ runde2 cs = do
     cardsAndDeck = runde2b (last trashCard)
   putStrLn ""
   putStrLn("Der Flop ist " ++ show (head cardsAndDeck))
+  delay 1000000
   return cardsAndDeck
 
 --Gibt die vierte Karte, den sog. Turn zurueck, sowie das restliche Deck
@@ -190,6 +194,7 @@ runde3 cs = do
   let cardsAndDeck = runde34 cs
   putStrLn ""
   putStrLn("Die Turn Karte ist " ++ show (head cardsAndDeck))
+  delay 1000000
   return cardsAndDeck
 
 --Gibt die fuenfte und letzte Karte, den sog. River, zurueck, OHNE das restliche Deck (Das brauchen wir nicht mehr)
@@ -197,6 +202,7 @@ runde4 cs = do
   let cardsAndDeck = runde34 cs
   putStrLn ""
   putStrLn("Die River Karte ist " ++ show (head cardsAndDeck))
+  delay 1000000
   return cardsAndDeck
 
 -- Showdown

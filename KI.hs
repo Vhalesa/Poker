@@ -8,6 +8,7 @@ import Random
 
 import Data.List
 import System.Random
+import Control.Concurrent.Thread.Delay
  
 -- Abfrage bei der KI: Call, Raise oder Fold?
 -- braucht dazu die Player, den Pot und die Tischkarten
@@ -92,18 +93,21 @@ kiRaise (p, pot) betrag = do
     putStr " setzt Raise ein und erhoeht um "
     putStrLn $ show betrag
     putStrLn ""
+    delay 2000000
     return $ raise (p, pot) betrag
 
 kiCall (p,pot) = do
     putStr $ show $ getPlayerName (head p)
     putStrLn " setzt Call ein"
     putStrLn ""
+    delay 2000000
     return $ call (p,pot)
 
 kiFold (p,pot) = do
     putStr $ show $ getPlayerName (head p)
     putStrLn " setzt Fold ein"
     putStrLn ""
+    delay 2000000
     return $ fold (p, pot)
 
 -- gibt einen Random Int zwischen l und r zurueck
