@@ -97,13 +97,13 @@ KI:
 Text-Ausgabe: []
   - Kartensymbole wenn möglich in bunt (rot/schwarz) [done]
   - Ausgabe generell schöner machen. Fragen vielleicht in fett oder so []
-  - Ausgabe langsamer, nicht alles auf einmal. Aber nicht so wichtig. []
+  - Ausgabe langsamer, nicht alles auf einmal. Aber nicht so wichtig. [done]
   - Ausgaben augräumen []
-  - Poker-Spiel-Blink-Dings ganz an den Anfang, vor Spieleranzahl-Auswahl
+  - Poker-Spiel-Blink-Dings ganz an den Anfang, vor Spieleranzahl-Auswahl[done]
 
 Allgemeine Anforderungen:
 - mind. 2 (oder 3) Themen aus der Vorlesung verwenden
-  - z.B. Parallelität, Nebenläufigkeit, (Lazyness?) bei der KI
+  - z.B. Parallelität, Nebenläufigkeit [drin], (Lazyness?) bei der KI
   - Mehrere KIs später (?), dann parallele und nebenläufige Berechnungen? 
   - evtl. GUI
   - generell IO für Ein- und Ausgabe [drin]
@@ -130,9 +130,12 @@ Allgemeine Anforderungen:
     oder nachträglich noch etwas eingefügt werden.
   - Control.Concurrent.STM war auf dem Cip-Pool nicht installiert.
     -> cabal install stm
+  - Control.Concurrent.Thread.Delay muss auch auf dem Cip-Pool installiert werden
+    -> cabal install concurrent-extra
 
 - Verwendete Bibliotheken
   - Data.List (Um Listen zu sortieren)
   - System.Random (Für die Mischfunktion und random Geld setzen)
   - Control.Monad (Für when-Abfragen)
   - Control.Concurrent.STM und Control.Concurrent für Nebenläufigkeit
+  - Control.Concurrent.Thread.Delay für verzögerte Ausgabe
