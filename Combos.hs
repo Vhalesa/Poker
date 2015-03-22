@@ -209,6 +209,18 @@ colorsIn (ca : cs) (d:h:s:c:is)
             | otherwise = colorsIn cs (d:h:s:c+1:[])
 colorsIn cs []= colorsIn cs [0,0,0,0]
 
+-- Funktion zaehlt, wie oft welcher Wert in der Liste der Karten vorkommt 
+-- gibt aus: z.B. [(A,2),(K,1),(3,1)]
+-- unter http://www.jammni.de/php/forum.php?forum=6&posting=2049 gefunden (die inList Funktion)
+valuesIn :: [Card] -> [(Value,Int)]
+valuesIn cs = hilf (map getValue cs) [] 
+  where 
+    hilf [] erg = erg 
+    hilf (c1:cs) erg = hilf cs (inList c1 erg)
+      where inList c1 [] = ((c1,1):[])
+            inList c1 ((x,count):erg) 
+                  | (c1==x)   = (x,(count+1)) : erg
+                  | otherwise = (x,count) : (inList c1 erg)
 
 -- Karten mit gleichem Value eliminieren (von jedem Value nur 1 Karte danach) (Farbe wird nicht beachtet)
 -- Starten: remDup listeVonKarten []
