@@ -172,7 +172,8 @@ calculateDrillingChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=3) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Drilling 
   | any (>=2) $ map snd (valuesIn cs) = length (filter (>=2) (map snd (valuesIn cs))) * cardChance3 --es gibt bereits ein Paar
-  | otherwise = (fromIntegral $ length cs) * cardChance2 * cardChance3
+  | length cs <= 5 = (fromIntegral $ length cs) * cardChance2 * cardChance3 --kein Paar, es werden noch mind. 2 Karten gezogen 
+  | otherwise = 0.0 
   where cardChance2 = 3 / remainingCards 
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
