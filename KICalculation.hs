@@ -149,6 +149,16 @@ calculateHigherCardChance cs
         remainingCards = 52 - (fromIntegral $ length cs)
         cardChance = 4/remainingCards
 
+--Berechnet die Chance, dass noch ein Paar zustande kommt
+calculatePairChance :: [Card] -> Double
+calculatePairChance cs
+  | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
+  | any (>=2) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Paar
+  | otherwise = (fromIntegral $ length cs) * cardChance2
+  where cardChance2 = 3 / remainingCards 
+        remainingCards = 52 - (fromIntegral $ length cs)
+
+
 calculateStraightBonusScore :: [Card] -> Int
 calculateStraightBonusScore cs
     | calculateStraightChance cs >= 0.15 && calculateStraightChance cs < 1.0 = 5000
