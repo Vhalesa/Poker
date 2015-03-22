@@ -158,6 +158,24 @@ calculatePairChance cs
   where cardChance2 = 3 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
 
+--Chance, dass noch 2 Paare zustande kommen
+--calculateTwoPairsChance :: [Card] -> Double
+--calculateTwoPairsChance cs
+--  | length cs >= 7 = 0.0
+--  | length >= 2 $ filter (>=2) $ map snd (valuesIn cs) = 1.0 --es gibt bereits 2 Paare
+--  | length >= 1 $ filter (>=2) $ map snd (valuesIn cs) = --es gibt bereits 1 Paar
+--  | 
+
+--Chance, dass noch ein Drilling zustande kommt
+calculateDrillingChance :: [Card] -> Double
+calculateDrillingChance cs
+  | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
+  | any (>=3) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Drilling 
+  | any (>=2) $ map snd (valuesIn cs) = length (filter (>=2) (map snd (valuesIn cs))) * cardChance3 --es gibt bereits ein Paar
+  | otherwise = (fromIntegral $ length cs) * cardChance2 * cardChance3
+  where cardChance2 = 3 / remainingCards 
+        cardChance3 = 2 / remainingCards 
+        remainingCards = 52 - (fromIntegral $ length cs)
 
 calculateStraightBonusScore :: [Card] -> Int
 calculateStraightBonusScore cs
