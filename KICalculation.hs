@@ -159,19 +159,23 @@ calculatePairChance cs
         remainingCards = 52 - (fromIntegral $ length cs)
 
 --Chance, dass noch 2 Paare zustande kommen
---calculateTwoPairsChance :: [Card] -> Double
---calculateTwoPairsChance cs
---  | length cs >= 7 = 0.0
---  | length >= 2 $ filter (>=2) $ map snd (valuesIn cs) = 1.0 --es gibt bereits 2 Paare
---  | length >= 1 $ filter (>=2) $ map snd (valuesIn cs) = --es gibt bereits 1 Paar
---  | 
+calculateTwoPairsChance :: [Card] -> Double
+calculateTwoPairsChance cs
+  | length cs >= 7 = 0.0
+  | length (filter (>=2) $ map snd (valuesIn cs)) >= 2 = 1.0 --es gibt bereits 2 Paare
+  | length (filter (>=2) $ map snd (valuesIn cs)) >= 1 = ((fromIntegral $ length cs)-1) * cardChance2 --es gibt bereits ein Paar
+  | length cs <= 5 = (fromIntegral $ length cs) * cardChance2 + ((fromIntegral $ length cs)-1) * cardChance2 --noch kein Paar
+  | otherwise = 0.0 -- es werden keine 2 Karten mehr gezogen, und es gibt keine gleichwertigen Karten
+  where cardChance2 = 3 / remainingCards 
+        remainingCards = 52 - (fromIntegral $ length cs)
 
 --Chance, dass noch ein Drilling zustande kommt
 calculateDrillingChance :: [Card] -> Double
 calculateDrillingChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=3) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Drilling 
-  | any (>=2) $ map snd (valuesIn cs) = length (filter (>=2) (map snd (valuesIn cs))) * cardChance3 --es gibt bereits ein Paar
+  | any (>=2) $ map snd (valuesIn cs) = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs))))
+                                         * cardChance3 --es gibt bereits ein Paar
   | length cs <= 5 = (fromIntegral $ length cs) * cardChance2 * cardChance3 --kein Paar, es werden noch mind. 2 Karten gezogen 
   | otherwise = 0.0 
   where cardChance2 = 3 / remainingCards 
