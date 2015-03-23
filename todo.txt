@@ -55,10 +55,9 @@ Spielablauf (IO?):[done]
       -> weitere (4.) Karte wird offen gelegt 
     - 4. Runde [done]
       -> weitere (5.) Karte wird offen gelegt
-  - Showdown []
+  - Showdown [done]
     - Spieler (4.Runde als letzter erhöht / Small Blind) muss seine Combo vorzeigen [done]
       -> Im Moment wird einfach für alle, die noch dabei sind, ausgewertet und nur die Gewinner-Kombo angezeigt [done]
-      -> Sollte man vielleicht noch ändern, aber hat nicht so hohe Priorität (Sagt Georg :D ) []
     - anderer Spieler darf
     - Berechnung/Vergleich wer gewonnen hat -> CompareFunktion [done]
       -> (vielleicht geht es automatisch?) [done]
@@ -98,7 +97,7 @@ Text-Ausgabe: []
   - Kartensymbole wenn möglich in bunt (rot/schwarz) [done]
   - Ausgabe generell schöner machen. Fragen vielleicht in fett oder so []
   - Ausgabe langsamer, nicht alles auf einmal. Aber nicht so wichtig. [done]
-  - Ausgaben augräumen []
+  - Ausgaben augräumen [done]
   - Poker-Spiel-Blink-Dings ganz an den Anfang, vor Spieleranzahl-Auswahl[done]
 
 Allgemeine Anforderungen:
@@ -110,6 +109,10 @@ Allgemeine Anforderungen:
 
 - für Präsentation:
   - welche Techniken aus der Vorlesung wurden wo angewendet?
+    * IO (zum Ausgeben der Information für den Spieler, Abfrage der Eingabe des Spielers)
+    * generell Monaden/monadische Funktionen
+    * Nebenläufigkeit mit STM (für die Berechnungen der KI)
+    * Record-Syntax (für den Spieler Datentyp)
   - welche interessanten Probleme traten auf? - wie wurden sie gelöst?
   - welche Bibliotheken/Codevorlagen wurden genutzt?
 

@@ -160,6 +160,7 @@ runde :: ([Player],Int) -> [Card]-> IO ([Player],Int)
 runde (p, pot) tisch = do
   jeder (p,pot) tisch $ length p
     where -- Jeder Spieler ist am Anfang der Runde mind. 1 Mal dran. n ist die Anzahl der Spieler
+          jeder :: ([Player],Int) -> [Card] -> Int -> IO ([Player],Int)
           jeder (p,pot) tisch 0 = wdhRunde (p,pot) tisch
           jeder (p,pot) tisch n = (rundeImmer (p,pot) tisch) >>= (\x -> jeder x tisch (n-1))
           -- jeder Spieler darf bei der Setzrunde mind. 1 Mal entscheiden, was er tut Call/Fold/Raise 
