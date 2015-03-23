@@ -72,7 +72,7 @@ bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
   -- hier kommen alle BonusScores der fertigen Berechnungen rein
   doneCalc <- newTVarIO []
-  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..7]] -- hier muss bei n = Anzahl aller Berechnungen
+  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..8]] -- hier muss bei n = Anzahl aller Berechnungen
   erg <- warten doneCalc
   return erg
 
@@ -85,7 +85,7 @@ warten doneCalc = do
   -- ueberprueft, ob alle Berechnungen fertig sind, wenn ja gibt sie sie zurueck
   where getCalc = do
           dCalc <- readTVar doneCalc
-          if (length dCalc >= 7) --hier muss mit Anzahl aller Berechnungen verglichen werden
+          if (length dCalc >= 8) --hier muss mit Anzahl aller Berechnungen verglichen werden
             then return ()
             else retry --solange versuchen, bis alle fertig sind
           writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren (fuers naechste Mal)
@@ -108,6 +108,7 @@ calculateChance n cs
   | n == 4    = calculateTwoPairsBonusScore cs
   | n == 5    = calculateDrillingBonusScore cs
   | n == 6    = calculateVierlingBonusScore cs
+  | n == 7    = calculateFullHouseBonusScore cs
   | otherwise = calculateOvercardBonusScore cs
 
 -- Berechnet abhaengig von der Moeglichkeit auf einen Flush einen Bonus Score
@@ -205,6 +206,13 @@ calculateDrillingChance cs
   where cardChance2 = 3 / remainingCards 
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+
+--Bonus Score fuer ein FullHouse 
+--TODO
+calculateFullHouseBonusScore :: [Card] -> Int
+calculateFullHouseBonusScore cs
+    | calculateFullHouseChance cs >= 0.15 && calculateFullHouseChance cs < 1.0 = 300
+    | otherwise = 0
 
 --Chance, dass noch ein FullHouse zustande kommt
 calculateFullHouseChance :: [Card] -> Double
