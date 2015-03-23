@@ -154,7 +154,6 @@ calculateHigherCardChance cs
         cardChance = 4/remainingCards
 
 --Bonus Score fuer ein Paar 
---TODO
 calculatePairBonusScore :: [Card] -> Int
 calculatePairBonusScore cs
     | calculatePairChance cs >= 0.25 && calculatePairChance cs < 1.0 = 1000
@@ -167,15 +166,16 @@ calculatePairChance :: [Card] -> Double
 calculatePairChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=2) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Paar
-  | otherwise = 1.0 - ((1 - (cardChance2 * fromIntegral (length cs))) ^ (7 - length cs))
+  | otherwise = 1.0 - ((1 - cardChance2) ^ (7 - length cs)) 
   where cardChance2 = 3 / remainingCards
         remainingCards = 52 - (fromIntegral $ length cs)
 
 --Bonus Score fuer ein 2 Paare
---TODO
 calculateTwoPairsBonusScore :: [Card] -> Int
 calculateTwoPairsBonusScore cs
-    | calculateTwoPairsChance cs >= 0.15 && calculateTwoPairsChance cs < 1.0 = 300
+    | calculateTwoPairsChance cs >= 0.25 && calculateTwoPairsChance cs < 1.0 = 2000
+    | calculateTwoPairsChance cs >= 0.12 = 600
+    | calculateTwoPairsChance cs >= 0.0  = 200
     | otherwise = 0
 
 --Chance, dass noch 2 Paare zustande kommen
@@ -184,11 +184,11 @@ calculateTwoPairsChance cs
   | length cs >= 7 = 0.0
   | length (filter (>=2) $ map snd (valuesIn cs)) >= 2 = 1.0 --es gibt bereits 2 Paare
   | length (filter (>=2) $ map snd (valuesIn cs)) >= 1 = wahrsch $ (length cs) - 2 -- bereits ein Paar
-  | length cs <= 5 = (wahrsch (length cs)) * (wahrsch $ (length cs) - 2) --noch kein Paar
+  | length cs <= 5 = (wahrsch (length cs)) * (wahrsch $ (length cs)) --noch kein Paar
   | otherwise = 0.0 -- es werden keine 2 Karten mehr gezogen, und es gibt keine gleichwertigen Karten
   where cardChance2 = 3 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
-        wahrsch cardsDrawn = 1.0 - ((1 - (cardChance2 * fromIntegral cardsDrawn)) ^ (7 - length cs))
+        wahrsch cardsDrawn = 1.0 - ((1 - cardChance2) ^ (7 - length cs))
 
 --Bonus Score fuer ein Drilling
 --TODO
