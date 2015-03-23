@@ -72,7 +72,7 @@ bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
   -- hier kommen alle BonusScores der fertigen Berechnungen rein
   doneCalc <- newTVarIO []
-  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..3]] -- hier muss bei n = Anzahl aller Berechnungen
+  sequence_ [ forkIO $ chanceBerechnung n cs doneCalc | n <- [1..6]] -- hier muss bei n = Anzahl aller Berechnungen
   erg <- warten doneCalc
   return erg
 
@@ -85,7 +85,7 @@ warten doneCalc = do
   -- ueberprueft, ob alle Berechnungen fertig sind, wenn ja gibt sie sie zurueck
   where getCalc = do
           dCalc <- readTVar doneCalc
-          if (length dCalc >= 3) --hier muss mit Anzahl aller Berechnungen verglichen werden
+          if (length dCalc >= 6) --hier muss mit Anzahl aller Berechnungen verglichen werden
             then return ()
             else retry --solange versuchen, bis alle fertig sind
           writeTVar doneCalc [] --Liste der fertigen Berechnungen leeren (fuers naechste Mal)
@@ -104,6 +104,9 @@ calculateChance :: Int -> [Card] -> Int
 calculateChance n cs
   | n == 1    = calculateFlushBonusScore cs
   | n == 2    = calculateStraightBonusScore cs
+  | n == 3    = calculatePairBonusScore cs
+  | n == 4    = calculateTwoPairsBonusScore cs
+  | n == 5    = calculateDrillingBonusScore cs
   | otherwise = calculateOvercardBonusScore cs
 
 -- Berechnet abhaengig von der Moeglichkeit auf einen Flush einen Bonus Score
@@ -143,11 +146,17 @@ calculateHigherCardChance cs
     | highestV == Four = 10 * cardChance
     | highestV == Three = 11 * cardChance
     | highestV == Two = 12 * cardChance
-
     where
         highestV = getValue $ head cs
         remainingCards = 52 - (fromIntegral $ length cs)
         cardChance = 4/remainingCards
+
+--Bonus Score fuer ein Paar 
+--TODO
+calculatePairBonusScore :: [Card] -> Int
+calculatePairBonusScore cs
+    | calculatePairChance cs >= 0.15 && calculatePairChance cs < 1.0 = 300
+    | otherwise = 0
 
 --Berechnet die Chance, dass noch ein Paar zustande kommt
 calculatePairChance :: [Card] -> Double
@@ -157,6 +166,13 @@ calculatePairChance cs
   | otherwise = (fromIntegral $ length cs) * cardChance2
   where cardChance2 = 3 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+
+--Bonus Score fuer ein 2 Paare
+--TODO
+calculateTwoPairsBonusScore :: [Card] -> Int
+calculateTwoPairsBonusScore cs
+    | calculateTwoPairsChance cs >= 0.15 && calculateTwoPairsChance cs < 1.0 = 300
+    | otherwise = 0
 
 --Chance, dass noch 2 Paare zustande kommen
 calculateTwoPairsChance :: [Card] -> Double
@@ -168,6 +184,13 @@ calculateTwoPairsChance cs
   | otherwise = 0.0 -- es werden keine 2 Karten mehr gezogen, und es gibt keine gleichwertigen Karten
   where cardChance2 = 3 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+
+--Bonus Score fuer ein Drilling
+--TODO
+calculateDrillingBonusScore :: [Card] -> Int
+calculateDrillingBonusScore cs
+    | calculateDrillingChance cs >= 0.15 && calculateDrillingChance cs < 1.0 = 300
+    | otherwise = 0
 
 --Chance, dass noch ein Drilling zustande kommt
 calculateDrillingChance :: [Card] -> Double
@@ -182,6 +205,7 @@ calculateDrillingChance cs
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
 
+--Bonus Score fuer die Strasse
 calculateStraightBonusScore :: [Card] -> Int
 calculateStraightBonusScore cs
     | calculateStraightChance cs >= 0.15 && calculateStraightChance cs < 1.0 = 5000

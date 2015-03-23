@@ -11,7 +11,8 @@ import Control.Monad
 entscheidungMensch :: ([Player],Int) -> [Card] -> IO ([Player],Int)
 entscheidungMensch (p, pot) tisch = do
   putStrLn ""
-  putStrLn "Du bist dran"
+  putStr $ getPlayerName $ head p
+  putStrLn ", du bist dran."
   abfrage
   where abfrage = do
           let hand = getPlayerHand $ head p
