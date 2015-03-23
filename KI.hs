@@ -54,8 +54,8 @@ entscheidungKI (p, pot) tisch = do
     putStr kiName
     putStr " ist gerade "
     putStrLn . show $ kiRole
-    --putStr "Cheatmode: Die Karten der KI sind: " -- Das hier sollte nach dem Debug auf jeden Fall raus
-    --putStrLn . show $ kiCards
+   -- putStr "Cheatmode: Die Karten der KI sind: " -- Das hier sollte nach dem Debug auf jeden Fall raus
+   -- putStrLn . show $ kiCards
     putStr "KI hat noch Cash: "
     putStrLn . show $ kiCash 
     putStr "Im Pot sind zur Zeit: "

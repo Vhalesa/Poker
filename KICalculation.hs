@@ -67,7 +67,6 @@ cardListValue (c:cs) = cardValueScore (getValue c) + cardListValue cs
 -- Berechnet mit ein, dass evtl. noch die Chance auf einen Flush, eine Straigt oder ähnliches besteht
 -- und gibt diesen BonusScore zurueck
 -- bekommt die Hand+Tischkarten uebergeben
--- TODO alle Berechnungen hier nebenlaeufig verwalten
 bonusScoreChance :: [Card] -> IO Int
 bonusScoreChance cs = do
   -- hier kommen alle BonusScores der fertigen Berechnungen rein

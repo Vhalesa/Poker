@@ -26,7 +26,7 @@ entscheidungMensch (p, pot) tisch = do
             putStr "Auf dem Tisch liegen: "
             (putStr . show) tisch
             putStrLn ""
-          --du hast noch xxx Geld (weiter Info Ausgaben)?
+          --du hast noch xxx Geld und weitere Info Ausgaben
           let eigCash = getPlayerCash $ head p
               bet = maximum (map getCurrentBet p)
               eigBet = getCurrentBet $ head p
@@ -40,7 +40,7 @@ entscheidungMensch (p, pot) tisch = do
           putStrLn . show $ eigCash 
           putStr "Die höchste Wette ist derzeit bei: "
           putStrLn . show $ bet
-          putStr "Deine Wette ist derzeit bei: " -- eher zu Debug-Zwecken (kann nachher evtl weg)
+          putStr "Deine Wette ist derzeit bei: " 
           putStrLn . show $ eigBet
           putStrLn "Was möchtest du tun? (Call/Raise/Fold)"
           input <- getLine

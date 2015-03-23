@@ -25,7 +25,7 @@ Regeln: [done]
     showDown [done]
   - Fold [done]
 
-Spielablauf (IO?):
+Spielablauf (IO?):[done]
   - am Anfang vor allen Spielrunden (vor dem Spiel)
     - Spielern Geld zuweisen [done]
   - vor der jeder Spielrunde
@@ -56,7 +56,7 @@ Spielablauf (IO?):
     - 4. Runde [done]
       -> weitere (5.) Karte wird offen gelegt
   - Showdown []
-    - Spieler (4.Runde als letzter erhöht / Small Blind) muss seine Combo vorzeigen []
+    - Spieler (4.Runde als letzter erhöht / Small Blind) muss seine Combo vorzeigen [done]
       -> Im Moment wird einfach für alle, die noch dabei sind, ausgewertet und nur die Gewinner-Kombo angezeigt [done]
       -> Sollte man vielleicht noch ändern, aber hat nicht so hohe Priorität (Sagt Georg :D ) []
     - anderer Spieler darf
@@ -89,7 +89,7 @@ KI:
 - Später: KI macht intelligente Züge 
     -> KI berechnet ihr momentanes Blatt [done]
     -> KI berechnet die Wahrscheinlichkeit, dass sie damit gewinnt []
-    -> KI berechnet die Wahrscheinlichkeit, dass ihr Blatt noch besser wird [in progress]
+    -> KI berechnet die Wahrscheinlichkeit, dass ihr Blatt noch besser wird [done]
     -> KI macht Berechnungen nebenläufig (Awesome Vorlesungstechnik) [done]
     -> KI verwendet ihre Berechnungen um zu entscheiden, ob sie Call, Raise, Fold oder AllIn macht [done]
     -> KI kann bluffen []

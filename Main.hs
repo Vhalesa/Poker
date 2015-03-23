@@ -18,6 +18,7 @@ main = do
 test = do
     let c1 = Card (Spades, Five)
         c2 = Card (Clubs, Five)
+        ci = Card (Diamonds, Five)
         c3 = Card (Diamonds, Seven)
         c4 = Card (Hearts, Eight)
         c5 = Card (Hearts, Nine)
@@ -32,9 +33,17 @@ test = do
 
 --    putStrLn (show (co2 == co1))
     let mycards = [c9,c8,c7,c6,c5,c4,c3,c2,c1]
-
-    putStrLn $ show $ checkCombo mycards
-    putStrLn $ show $ calculateFlushChance mycards
+        onePair = [c1,c2,c3,c4,c5,c6]
+        drilling = [c1,c2,ci,c4,c5]
+        twoPair = [c1,c2,c7,c8]
+        house = [c1,c2,ci,c7,c8]
+    
+    putStrLn $ show $ calculateVierlingChance $ take 2 onePair
+    putStrLn $ show $ calculateVierlingChance $ take 5 drilling 
+    putStrLn $ show $ calculateVierlingChance $ take 4 twoPair 
+    putStrLn $ show $ calculateVierlingChance $ take 5 house 
+    --putStrLn $ show $ checkCombo mycards
+    --putStrLn $ show $ calculateFlushChance mycards
 
 
 -- Gibt gemischtes Kartendeck aus (im Moment auf die Kommandozeile)
