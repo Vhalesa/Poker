@@ -206,6 +206,23 @@ calculateDrillingChance cs
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
 
+--Chance, dass noch ein FullHouse zustande kommt
+calculateFullHouseChance :: [Card] -> Double
+calculateFullHouseChance cs
+  | length cs >= 7 = 0.0 -- es kommt keine weitere Karte mehr
+  | length (filter (>=3) (map snd (valuesIn cs))) >= 1 && length (filter (>=2) (map snd (valuesIn cs))) >= 2 =
+    1.0 -- es gibt bereits ein FullHouse
+  | any (>=3) $ map snd (valuesIn cs) = (fromIntegral $ length cs) * cardChance2 --es gibt bereits ein Drilling
+  | length (filter (>=2) (map snd (valuesIn cs))) >= 2 = fromIntegral ((length (filter (>=2) (map snd (valuesIn cs)))) - 1) 
+    * cardChance3 --es gibt mind. 2 Paare
+  | (length cs <= 5) && (any (>=2) $ map snd (valuesIn cs)) = 
+                fromIntegral ((length cs) - 2) * cardChance2 * cardChance3 --es gibt bereits ein Paar
+  | length cs <= 4 = calculateDrillingChance cs * calculatePairChance cs --kein Paar, es werden noch mind. 3 Karten gezogen 
+  | otherwise = 0.0 
+  where cardChance2 = 3 / remainingCards 
+        cardChance3 = 2 / remainingCards 
+        remainingCards = 52 - (fromIntegral $ length cs)
+
 --Bonus Score fuer ein Vierling 
 --TODO
 calculateVierlingBonusScore :: [Card] -> Int
