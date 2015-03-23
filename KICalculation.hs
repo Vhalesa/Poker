@@ -290,3 +290,4 @@ calculateStraightChance cs
         possible2 = fromIntegral $ length $ filter (==2) existingStraightComponents
         possible1 = fromIntegral $ length $ filter (==1) existingStraightComponents
         cardChance = 4/remainingCards
+
