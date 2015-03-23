@@ -156,9 +156,9 @@ calculateHigherCardChance cs
 --Bonus Score fuer ein Paar 
 calculatePairBonusScore :: [Card] -> Int
 calculatePairBonusScore cs
-    | calculatePairChance cs >= 0.25 && calculatePairChance cs < 1.0 = 1000
-    | calculatePairChance cs >= 0.12 = 300
-    | calculatePairChance cs >= 0.0  = 100
+    | calculatePairChance cs > 0.25 && calculatePairChance cs < 1.0 = 1000
+    | calculatePairChance cs > 0.12 = 300
+    | calculatePairChance cs > 0.0  = 100
     | otherwise = 0
 
 --Berechnet die Chance, dass ein Paar zustande kommen kann
@@ -173,9 +173,9 @@ calculatePairChance cs
 --Bonus Score fuer ein 2 Paare
 calculateTwoPairsBonusScore :: [Card] -> Int
 calculateTwoPairsBonusScore cs
-    | calculateTwoPairsChance cs >= 0.25 && calculateTwoPairsChance cs < 1.0 = 2000
-    | calculateTwoPairsChance cs >= 0.12 = 600
-    | calculateTwoPairsChance cs >= 0.0  = 200
+    | calculateTwoPairsChance cs > 0.25 && calculateTwoPairsChance cs < 1.0 = 2000
+    | calculateTwoPairsChance cs > 0.12 = 600
+    | calculateTwoPairsChance cs > 0.0  = 200
     | otherwise = 0
 
 --Chance, dass noch 2 Paare zustande kommen
@@ -191,10 +191,11 @@ calculateTwoPairsChance cs
         wahrsch cardsDrawn = 1.0 - ((1 - cardChance2) ^ (7 - length cs))
 
 --Bonus Score fuer ein Drilling
---TODO
 calculateDrillingBonusScore :: [Card] -> Int
 calculateDrillingBonusScore cs
-    | calculateDrillingChance cs >= 0.15 && calculateDrillingChance cs < 1.0 = 300
+    | calculateDrillingChance cs > 0.20 && calculateDrillingChance cs < 1.0 = 3000
+    | calculateDrillingChance cs > 0.10 = 1000 
+    | calculateDrillingChance cs > 0.0  = 300
     | otherwise = 0
 
 --Chance, dass noch ein Drilling zustande kommt
@@ -202,19 +203,22 @@ calculateDrillingChance :: [Card] -> Double
 calculateDrillingChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=3) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Drilling 
-  | any (>=2) $ map snd (valuesIn cs) = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs))))
-                                         * cardChance3 --es gibt bereits ein Paar
-  | length cs <= 5 = (fromIntegral $ length cs) * cardChance2 * cardChance3 --kein Paar, es werden noch mind. 2 Karten gezogen 
+  | any (>=2) $ map snd (valuesIn cs) = (wahrsch (length cs) cardChance3) * anzahlPaare --es gibt bereits mind. ein Paar
+  | length cs <= 5 = (wahrsch (length cs) cardChance3) * (wahrsch (length cs) cardChance2) --noch gar nichts
   | otherwise = 0.0 
   where cardChance2 = 3 / remainingCards 
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+        wahrsch cardsDrawn cardChance = 1.0 - ((1 - cardChance) ^ (7 - length cs))
+        anzahlPaare = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs)))) --Anzahl der Paare
+
 
 --Bonus Score fuer ein FullHouse 
---TODO
 calculateFullHouseBonusScore :: [Card] -> Int
 calculateFullHouseBonusScore cs
-    | calculateFullHouseChance cs >= 0.15 && calculateFullHouseChance cs < 1.0 = 300
+    | calculateFullHouseChance cs >= 0.20 && calculateFullHouseChance cs < 1.0 = 5000
+    | calculateFullHouseChance cs >= 0.10 = 3000
+    | calculateFullHouseChance cs >= 0.05 = 1000
     | otherwise = 0
 
 --Chance, dass noch ein FullHouse zustande kommt
@@ -223,22 +227,23 @@ calculateFullHouseChance cs
   | length cs >= 7 = 0.0 -- es kommt keine weitere Karte mehr
   | length (filter (>=3) (map snd (valuesIn cs))) >= 1 && length (filter (>=2) (map snd (valuesIn cs))) >= 2 =
     1.0 -- es gibt bereits ein FullHouse
-  | any (>=3) $ map snd (valuesIn cs) = (fromIntegral $ length cs) * cardChance2 --es gibt bereits ein Drilling
-  | length (filter (>=2) (map snd (valuesIn cs))) >= 2 = fromIntegral ((length (filter (>=2) (map snd (valuesIn cs)))) - 1) 
-    * cardChance3 --es gibt mind. 2 Paare
+  | any (>=3) $ map snd (valuesIn cs) = wahrsch ((length cs) - 3) cardChance2 --es gibt bereits ein Drilling
+  | length (filter (>=2) (map snd (valuesIn cs))) >= 2 = (wahrsch (length cs) cardChance3) * anzahlPaare
+     --es gibt mind. 2 Paare
   | (length cs <= 5) && (any (>=2) $ map snd (valuesIn cs)) = 
-                fromIntegral ((length cs) - 2) * cardChance2 * cardChance3 --es gibt bereits ein Paar
+            (wahrsch (length cs) cardChance3) * (wahrsch (length cs) cardChance2) --es gibt bereits ein Paar
   | length cs <= 4 = calculateDrillingChance cs * calculatePairChance cs --kein Paar, es werden noch mind. 3 Karten gezogen 
   | otherwise = 0.0 
   where cardChance2 = 3 / remainingCards 
         cardChance3 = 2 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+        wahrsch cardsDrawn cardChance = 1.0 - ((1 - cardChance) ^ (7 - length cs))
+        anzahlPaare = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs)))) --Anzahl der Paare
 
 --Bonus Score fuer ein Vierling 
---TODO
 calculateVierlingBonusScore :: [Card] -> Int
 calculateVierlingBonusScore cs
-    | calculateVierlingChance cs >= 0.15 && calculateVierlingChance cs < 1.0 = 300
+    | calculateVierlingChance cs >= 0.03 && calculateVierlingChance cs < 1.0 = 2000
     | otherwise = 0
 
 --Chance, dass noch ein Vierling zustande kommt
@@ -246,16 +251,19 @@ calculateVierlingChance :: [Card] -> Double
 calculateVierlingChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=4) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Vierling 
-  | any (>=3) $ map snd (valuesIn cs) = (fromIntegral $ length (filter (>=3) (map snd (valuesIn cs)))) 
-                                         * cardChance4 --es gibt bereits mind. ein Drilling 
-  | any (>=2) (map snd (valuesIn cs)) && length cs <= 5 = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs))))
-                                         * cardChance3 * cardChance4 --es gibt bereits ein Paar
-  | length cs <= 4 = (fromIntegral $ length cs) * cardChance2 * cardChance3 * cardChance4 --kein Paar, 3(+) Karten werden gezogen 
+  | any (>=3) $ map snd (valuesIn cs) = (wahrsch (length cs) cardChance4) * anzahlDrillinge--es gibt bereits mind. ein Drilling 
+  | any (>=2) (map snd (valuesIn cs)) && length cs <= 5 = 
+      (wahrsch (length cs) cardChance3) * (wahrsch (length cs) cardChance4) * anzahlPaare --es gibt bereits mind. ein Paar
+  | length cs <= 4 = --kein Paar, 3(+) Karten werden gezogen 
+      (wahrsch (length cs) cardChance2) * (wahrsch (length cs) cardChance3) * (wahrsch (length cs) cardChance4) 
   | otherwise = 0.0 
   where cardChance2 = 3 / remainingCards 
         cardChance3 = 2 / remainingCards 
         cardChance4 = 1 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
+        wahrsch cardsDrawn cardChance = 1.0 - ((1 - cardChance) ^ (7 - length cs))
+        anzahlPaare = (fromIntegral $ length (filter (>=2) (map snd (valuesIn cs)))) --Anzahl der Paare
+        anzahlDrillinge = (fromIntegral $ length (filter (>=3) (map snd (valuesIn cs)))) --Anzahl der Paare
 
 --Bonus Score fuer die Strasse
 calculateStraightBonusScore :: [Card] -> Int
