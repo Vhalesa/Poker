@@ -160,12 +160,12 @@ calculatePairBonusScore cs
     | calculatePairChance cs >= 0.15 && calculatePairChance cs < 1.0 = 300
     | otherwise = 0
 
---Berechnet die Chance, dass noch ein Paar zustande kommt
+--Berechnet die Chance, dass ein Paar zustande kommen kann
 calculatePairChance :: [Card] -> Double
 calculatePairChance cs
   | length cs >= 7 = 0.0 --es kommt keine weitere Karte mehr
   | any (>=2) $ map snd (valuesIn cs) = 1.0 --es gibt bereits ein Paar
-  | otherwise = (fromIntegral $ length cs) * cardChance2
+  | otherwise = 1.0 - ((1 - cardChance2) ^ (7 - length cs))
   where cardChance2 = 3 / remainingCards 
         remainingCards = 52 - (fromIntegral $ length cs)
 
