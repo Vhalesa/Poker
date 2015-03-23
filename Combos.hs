@@ -5,9 +5,6 @@ import Cards
 
 import Data.List
 
---Die 5 Karten, die fuer jeden Spieler gewertet werden
-data Combo = Combo (Card,Card,Card,Card,Card)
-
 --Die Verschiedenen Typen von Wertungen
 data ScoreCombo = HighCard [Card]
                 | Pair [Card] 
