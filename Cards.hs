@@ -12,19 +12,20 @@ module Cards where
     deriving (Show, Bounded)
 
 
-{-  instance Show Color where
+  instance Show Color where
     show Diamonds = " \ESC[47;38;5;160m♦\ESC[0m "
     show Hearts = " \ESC[47;38;5;160m♥\ESC[0m "
     show Spades = " \ESC[47;38;5;16m♠\ESC[0m "
     show Clubs = " \ESC[47;38;5;16m♣\ESC[0m "
--}
 
---Karten werden nicht fancy angezeigt
+
+{--Karten werden nicht fancy angezeigt
   instance Show Color where
     show Diamonds = "♦"
     show Hearts = "♥"
     show Spades = "♠"
     show Clubs = "♣"
+--}
 
 
   instance Eq Card where
@@ -34,12 +35,6 @@ module Cards where
     compare (Card (c1,v1)) (Card (c2,v2)) = compare v1 v2
 
   -- Quelle: http://stackoverflow.com/questions/5684049/is-there-some-way-to-define-an-enum-in-haskell-that-wraps-around
-  -- | a `succ` that wraps 
-  -- wird im Moment nicht benoetigt, aber vielleicht spaeter?
-  --succB :: (Bounded a, Enum a, Eq a) => a -> a 
-  --succB en | en == maxBound = minBound
-  --         | otherwise = succ en
-  --
   -- | a `pred` that wraps
   -- damit Ace auch der Vorgaenger von Two ist
   predB :: (Bounded a, Enum a, Eq a) => a -> a
