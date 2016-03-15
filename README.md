@@ -9,3 +9,6 @@ KI-Gegner oder die jeweiligen Aktionen eingegeben werden.
 Bei Problemen mit der bunten Kartenausgabe kann in Cards.hs
 die andere Show-Instanz verwendet werden. Dazu die Zeilen 23-27 
 verwenden und Zeilen 15-19 auskommentieren.
+
+
+![Screenshot](https://github.com/Vhalesa/Poker/blob/master/screenshot.jpg?raw=true)
